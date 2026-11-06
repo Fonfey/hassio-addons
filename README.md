@@ -6,10 +6,13 @@ Store-repository voor Home Assistant. Hier staan de app-beschrijvingen; de code 
 
 ### UniFi Dashboard
 
-Live overzicht van je UniFi-netwerk: netwerkkaart, internetverkeer tot 24 uur terug, switchpoorten, wifi-radio's en clients. [Documentatie](unifi_dashboard/DOCS.md) · code in [HomeAssistantUnifi](https://github.com/Fonfey/HomeAssistantUnifi)
+Live overzicht van je UniFi-netwerk: netwerkkaart, internetverkeer tot 24 uur terug, wat er op elke switchpoort zit, wifi-radio's en clients, met de afbeeldingen uit UniFi. [Documentatie](unifi_dashboard/DOCS.md) · code in [HomeAssistantUnifi](https://github.com/Fonfey/HomeAssistantUnifi)
 
-![UniFi Dashboard: netwerkkaart, internetverkeer, apparaten en clients (voorbeeldgegevens)](docs/unifi-dashboard.png)
-*UniFi Dashboard met voorbeeldgegevens: bovenaan de netwerkkaart, daaronder het internetverkeer, de apparaten met poorten en wifi-radio's, en de lijst met clients.*
+![UniFi Dashboard: overzicht met netwerkkaart en internetverkeer (voorbeeldgegevens)](docs/unifi-overzicht.png)
+*Het tabblad Overzicht: de netwerkkaart met je provider en het internetverkeer.*
+
+![UniFi Dashboard: pagina van een switch met per poort wat erop is aangesloten (voorbeeldgegevens)](docs/unifi-switch.png)
+*De pagina van een switch: per poort wat erop zit. Met je eigen console zie je de afbeeldingen en iconen uit UniFi.*
 
 ### AdGuard DNS Dashboard
 

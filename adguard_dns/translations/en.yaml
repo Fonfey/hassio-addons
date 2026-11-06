@@ -1,0 +1,20 @@
+configuration:
+  api_key:
+    name: API key
+    description: 'Create it at https://adguard-dns.io/en/dashboard/ : open your account at the top right, choose User preferences
+      and go to API keys. Copy the key right away, it is shown only once.'
+  refresh_seconds:
+    name: Refresh (seconds)
+    description: How often the dashboard fetches new data.
+  home_country:
+    name: Home country
+    description: Country code for the pin on the world map, for example NL.
+  allow_blocking:
+    name: Allow changes
+    description: 'Let the dashboard change settings: block and unblock domains, user rules, filter lists, server settings
+      and per-device protection. Turn off for a view-only dashboard.'
+  allowed_users:
+    name: Allowed admins (optional)
+    description: Only administrators see the sidebar button. If you have several administrators and not all of them may view
+      the dashboard, enter the usernames that may. Leave empty to give all administrators access. The bottom of the dashboard
+      shows the exact name.

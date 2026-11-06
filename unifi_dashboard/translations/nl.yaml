@@ -1,0 +1,19 @@
+configuration:
+  unifi_host:
+    name: Adres van je console
+    description: IP-adres of hostnaam van je UniFi-console, bijvoorbeeld 192.168.1.1.
+  unifi_api_key:
+    name: API-key
+    description: 'Aanmaken in UniFi Network (open het IP-adres van je console in de browser): ga naar Instellingen, Control
+      Plane, Integraties en klik op Create API Key. Kopieer de key direct, je ziet hem maar één keer.'
+  unifi_site:
+    name: Site
+    description: Naam van de site. Laat leeg voor de eerste site.
+  refresh_seconds:
+    name: Verversen (seconden)
+    description: Hoe vaak het dashboard nieuwe gegevens ophaalt.
+  allowed_users:
+    name: Toegestane beheerders (optioneel)
+    description: Alleen beheerders zien de knop in de zijbalk. Heb je meerdere beheerders en mag niet iedereen het dashboard
+      zien, vul dan hier de gebruikersnamen in die wel mogen. Laat leeg om alle beheerders toegang te geven. Onderaan het
+      dashboard staat "Ingelogd als" met de exacte naam.

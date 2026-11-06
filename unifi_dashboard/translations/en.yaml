@@ -1,0 +1,19 @@
+configuration:
+  unifi_host:
+    name: Console address
+    description: IP address or hostname of your UniFi console, for example 192.168.1.1.
+  unifi_api_key:
+    name: API key
+    description: 'Create it in UniFi Network (open your console''s IP address in a browser): go to Settings, Control Plane,
+      Integrations and click Create API Key. Copy the key right away, it is shown only once.'
+  unifi_site:
+    name: Site
+    description: Name of the site. Leave empty for the first site.
+  refresh_seconds:
+    name: Refresh (seconds)
+    description: How often the dashboard fetches new data.
+  allowed_users:
+    name: Allowed admins (optional)
+    description: Only administrators see the sidebar button. If you have several administrators and not all of them may view
+      the dashboard, enter the usernames that may. Leave empty to give all administrators access. The bottom of the dashboard
+      shows the exact name.

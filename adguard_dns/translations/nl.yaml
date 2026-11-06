@@ -1,0 +1,20 @@
+configuration:
+  api_key:
+    name: API-key
+    description: 'Aanmaken op https://adguard-dns.io/en/dashboard/ : klik rechtsboven op je account, kies User preferences
+      en ga naar API keys. Kopieer de key direct, je ziet hem maar één keer.'
+  refresh_seconds:
+    name: Verversen (seconden)
+    description: Hoe vaak het dashboard nieuwe gegevens ophaalt.
+  home_country:
+    name: Thuisland
+    description: Landcode voor de speld op de wereldkaart, bijvoorbeeld NL.
+  allow_blocking:
+    name: Wijzigingen toestaan
+    description: 'Laat het dashboard instellingen wijzigen: domeinen blokkeren en deblokkeren, gebruikersregels, blokkeerlijsten,
+      serverinstellingen en bescherming per apparaat. Zet uit voor een dashboard dat alleen mag kijken.'
+  allowed_users:
+    name: Toegestane beheerders (optioneel)
+    description: Alleen beheerders zien de knop in de zijbalk. Heb je meerdere beheerders en mag niet iedereen het dashboard
+      zien, vul dan hier de gebruikersnamen in die wel mogen. Laat leeg om alle beheerders toegang te geven. Onderaan het
+      dashboard staat "Ingelogd als" met de exacte naam.

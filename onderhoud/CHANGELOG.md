@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1
+
+### Opgelost
+- De app toonde voorbeeldgegevens in plaats van je eigen Home Assistant, omdat hij de toegangssleutel van Home Assistant niet vond. Hij leest die nu ook op de plek waar de app-omgeving hem bewaart.
+- Lukt het toch niet om Home Assistant te bereiken, dan zie je een duidelijke foutmelding in plaats van voorbeeldgegevens.
+- Lijsten tonen nu altijd alle onderdelen, ook bij veel updates, reparaties of oude entiteiten.
+
 ## 1.0.0
 
 - Eerste versie van Onderhoud.

@@ -2,17 +2,28 @@
 
 Store-repository voor Home Assistant. Hier staan de app-beschrijvingen; de code staat in de eigen repository van elke app en wordt als kant-en-klaar image geleverd.
 
-| App | Wat het doet | Code |
-|---|---|---|
-| [UniFi Dashboard](unifi_dashboard/DOCS.md) | Live overzicht van je UniFi-netwerk: netwerkkaart, internetverkeer, switchpoorten, wifi-radio's en clients. | [HomeAssistantUnifi](https://github.com/Fonfey/HomeAssistantUnifi) |
-| [AdGuard DNS Dashboard](adguard_dns/DOCS.md) | Statistieken van je AdGuard DNS-account, querylog, blokkeren en deblokkeren, blokkeerlijsten en serverinstellingen. | [HomeAssistantAdguard](https://github.com/Fonfey/HomeAssistantAdguard) |
-| [Onderhoud](onderhoud/DOCS.md) | Eén lijst met wat aandacht nodig heeft in je Home Assistant: back-ups, offline apparaten, batterijen, automations die botsen of nooit draaien, en wat je kunt opruimen. | [HomeAssistantOnderhoud](https://github.com/Fonfey/HomeAssistantOnderhoud) |
+## De apps
 
-![UniFi Dashboard](docs/unifi.png)
+### UniFi Dashboard
 
-![AdGuard DNS Dashboard](docs/adguard.png)
+Live overzicht van je UniFi-netwerk: netwerkkaart, internetverkeer tot 24 uur terug, switchpoorten, wifi-radio's en clients. [Documentatie](unifi_dashboard/DOCS.md) · code in [HomeAssistantUnifi](https://github.com/Fonfey/HomeAssistantUnifi)
 
-![Onderhoud](docs/onderhoud.png)
+![UniFi Dashboard: netwerkkaart, internetverkeer, apparaten en clients (voorbeeldgegevens)](docs/unifi-dashboard.png)
+*UniFi Dashboard met voorbeeldgegevens: bovenaan de netwerkkaart, daaronder het internetverkeer, de apparaten met poorten en wifi-radio's, en de lijst met clients.*
+
+### AdGuard DNS Dashboard
+
+Statistieken van je AdGuard DNS-account, querylog, blokkeren en deblokkeren, blokkeerlijsten en serverinstellingen. [Documentatie](adguard_dns/DOCS.md) · code in [HomeAssistantAdguard](https://github.com/Fonfey/HomeAssistantAdguard)
+
+![AdGuard DNS Dashboard: overzicht van verzoeken en blokkades (voorbeeldgegevens)](docs/adguard-dns-dashboard.png)
+*AdGuard DNS Dashboard met voorbeeldgegevens: het overzicht met verzoeken, blokkades, servers en apparaten.*
+
+### Onderhoud
+
+Eén lijst met wat aandacht nodig heeft in je Home Assistant: back-ups, offline apparaten, batterijen, sensoren zonder data, automations die botsen of nooit draaien, en wat je kunt opruimen. [Documentatie](onderhoud/DOCS.md) · code in [HomeAssistantOnderhoud](https://github.com/Fonfey/HomeAssistantOnderhoud)
+
+![Onderhoud: lijst met punten op volgorde van belang (voorbeeldgegevens)](docs/onderhoud-lijst.png)
+*Onderhoud met voorbeeldgegevens: de punten op volgorde van belang, van Belangrijk via Nalopen naar Opruimen.*
 
 ## Installeren in Home Assistant
 

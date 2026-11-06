@@ -1,0 +1,13 @@
+configuration:
+  check_interval_minutes:
+    name: Controleren elke (minuten)
+    description: Hoe vaak Onderhoud je Home Assistant controleert. Met Opnieuw controleren in de app kan het altijd direct.
+  battery_threshold:
+    name: Batterij bijna leeg onder (%)
+    description: Batterijen onder dit percentage komen in de lijst. Telefoons en thuisbatterijen tellen niet mee.
+  disabled_days:
+    name: Automation lang uit na (dagen)
+    description: Uitgeschakelde automations die langer dan dit aantal dagen niet hebben gedraaid, komen bij Opruimen.
+  allowed_users:
+    name: Toegestane beheerders (optioneel)
+    description: Alleen beheerders zien de knop in de zijbalk. Vul hier gebruikersnamen in als niet elke beheerder Onderhoud mag zien. Leeg is alle beheerders.

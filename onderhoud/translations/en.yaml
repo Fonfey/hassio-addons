@@ -1,0 +1,13 @@
+configuration:
+  check_interval_minutes:
+    name: Check every (minutes)
+    description: How often Onderhoud checks your Home Assistant. Use Opnieuw controleren in the app to check right away.
+  battery_threshold:
+    name: Battery low below (%)
+    description: Batteries below this percentage are listed. Phones and home batteries are not counted.
+  disabled_days:
+    name: Automation long off after (days)
+    description: Disabled automations that have not run for longer than this are listed for clean-up.
+  allowed_users:
+    name: Allowed admins (optional)
+    description: Only administrators see the sidebar button. Enter usernames if not every administrator may see Onderhoud. Empty means all administrators.

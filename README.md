@@ -6,13 +6,21 @@ Store-repository voor Home Assistant. Hier staan de app-beschrijvingen; de code 
 
 ### UniFi Dashboard
 
-Live overzicht van je UniFi-netwerk: netwerkkaart, internetverkeer tot 24 uur terug, wat er op elke switchpoort zit, wifi-radio's en clients, met de afbeeldingen uit UniFi. [Documentatie](unifi_dashboard/DOCS.md) · code in [HomeAssistantUnifi](https://github.com/Fonfey/HomeAssistantUnifi)
+Live overzicht van je UniFi-netwerk: netwerkkaart, internetverkeer tot 24 uur terug, wat er op elke switchpoort zit, wifi-radio's en clients met SSID, VLAN en signaal. Met inzichten (netwerkcheck, dataverbruik per app, flows), het systeemlogboek, opslag en back-ups, en de afbeeldingen uit UniFi. [Documentatie](unifi_dashboard/DOCS.md) · code in [HomeAssistantUnifi](https://github.com/Fonfey/HomeAssistantUnifi)
 
-![UniFi Dashboard: overzicht met netwerkkaart en internetverkeer (voorbeeldgegevens)](docs/unifi-overzicht.png)
-*Het tabblad Overzicht: de netwerkkaart met je provider en het internetverkeer.*
+![UniFi Dashboard: overzicht met netwerkkaart en internetverkeer (voorbeeldgegevens)](docs/unifi-overzicht-v3.png)
+*Overzicht: de netwerkkaart met je provider en het internetverkeer. Klik op Internet, een apparaat of een client voor de details.*
 
-![UniFi Dashboard: pagina van een switch met per poort wat erop is aangesloten (voorbeeldgegevens)](docs/unifi-switch.png)
-*De pagina van een switch: per poort wat erop zit. Met je eigen console zie je de afbeeldingen en iconen uit UniFi.*
+![UniFi Dashboard: pagina van een switch met per poort wat erop is aangesloten (voorbeeldgegevens)](docs/unifi-switch-v3.png)
+*De pagina van een switch: per poort wat erop zit.*
+
+![UniFi Dashboard: pagina van een client met wifi-netwerk, signaal, VLAN en verbinding (voorbeeldgegevens)](docs/unifi-client-v3.png)
+*De pagina van een client: wifi-netwerk, signaal in dBm, band, VLAN en via welk apparaat en welke poort.*
+
+![UniFi Dashboard: inzichten met netwerkcheck, dataverbruik, flows en apps (voorbeeldgegevens)](docs/unifi-inzichten-v3.png)
+*Inzichten: netwerkcheck, dataverbruik per app en flows.*
+
+Met je eigen console zie je de echte afbeeldingen en iconen uit UniFi; de screenshots gebruiken voorbeeldgegevens.
 
 ### AdGuard DNS Dashboard
 

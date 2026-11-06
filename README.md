@@ -22,7 +22,7 @@ Statistieken van je AdGuard DNS-account, querylog, blokkeren en deblokkeren, blo
 
 Eén lijst met wat aandacht nodig heeft in je Home Assistant: back-ups, offline apparaten, batterijen, sensoren zonder data, automations die botsen of nooit draaien, en wat je kunt opruimen. [Documentatie](onderhoud/DOCS.md) · code in [HomeAssistantOnderhoud](https://github.com/Fonfey/HomeAssistantOnderhoud)
 
-![Onderhoud: lijst met punten op volgorde van belang (voorbeeldgegevens)](docs/onderhoud-lijst.png)
+![Onderhoud: lijst met punten op volgorde van belang (voorbeeldgegevens)](docs/onderhoud-overzicht.png)
 *Onderhoud met voorbeeldgegevens: de punten op volgorde van belang, van Belangrijk via Nalopen naar Opruimen.*
 
 ## Installeren in Home Assistant

@@ -38,5 +38,3 @@ Onderhoud maakt de sensor `sensor.onderhoud_punten` met het aantal open punten e
 - **Automation lang uit na (dagen)**: standaard 30.
 - **Sensor zonder data na (dagen)**: standaard 7.
 - **Toegestane beheerders (optioneel)**: alleen beheerders zien de knop in de zijbalk; vul gebruikersnamen in als niet elke beheerder Onderhoud mag zien.
-
-Onderhoud heeft geen API-key nodig: de app krijgt toegang via Home Assistant zelf.

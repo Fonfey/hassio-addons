@@ -22,6 +22,8 @@ Het dashboard heeft drie tabbladen. Klik op een apparaat of client om de eigen p
 - **Apparaten**: switchpoorten als frontpaneel (snelheid en PoE), wifi-radio's per toegangspunt, uptime, firmware, processor en geheugen. De pagina van een switch laat per poort zien wat erop is aangesloten.
 - **Clients**: zoeken, filteren op wifi of kabel en op het apparaat waarmee ze verbonden zijn, met het poortnummer bij bekabelde clients. Nieuwe clients van het afgelopen uur krijgen een label.
 
+De afbeeldingen van je apparaten komen uit de openbare productcatalogus van Ubiquiti (static.ui.com). De app haalt ze één keer op en bewaart ze; zonder internet zie je eenvoudige iconen.
+
 Welk apparaat op welke poort zit, haalt de app op met dezelfde API-key uit de klassieke Network-API. Staat je console dat niet toe, dan zie je de poorten nog wel, alleen zonder namen.
 
 ## Wie mag het dashboard zien

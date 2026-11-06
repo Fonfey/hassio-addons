@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.0
+
+### Nieuw
+- **Echte productafbeeldingen**: de app zoekt je apparaten op in de openbare productcatalogus van Ubiquiti en toont dezelfde afbeeldingen als UniFi zelf. Ze worden één keer opgehaald en in de app bewaard.
+- Wordt een model niet gevonden, of is er geen internet, dan zie je een eenvoudig icoon per soort apparaat. De log van de app noemt welke modellen geen afbeelding hebben.
+
+### Verwijderd
+- De zelfgetekende apparaten.
+
 ## 1.4.3
 
 ### Verbeterd

@@ -1,5 +1,5 @@
 name: UniFi Dashboard
-version: "1.4.3"
+version: "1.5.0"
 slug: unifi_dashboard
 description: Live overzicht van je UniFi-netwerk. API-key aanmaken in UniFi Network via Instellingen, Control Plane, Integraties.
 url: https://github.com/Fonfey/hassio-addons

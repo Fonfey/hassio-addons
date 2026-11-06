@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.1
+
+### Verbeterd
+- De pagina van de gateway (bijvoorbeeld de Dream Machine) toont nu ook de poorten en wat erop is aangesloten, naast download, upload en belasting.
+- De poort naar je provider staat in de lijst als **Internet (WAN)**.
+
 ## 1.4.0
 
 ### Nieuw

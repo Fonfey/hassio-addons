@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0
+
+### Nieuw
+- **Wat zit op welke poort**: per switchpoort zie je welk apparaat of welke client erop is aangesloten, inclusief de uplink naar de switch erboven. Klik op een poort om hem op te zoeken.
+- **Doorklikken**: tabbladen Overzicht, Apparaten en Clients in plaats van één lange pagina. Elk apparaat en elke client heeft een eigen pagina met de gegevens, de poort en wat er nog meer op hetzelfde apparaat zit.
+- In de clientlijst en bij apparaten staat nu ook het poortnummer, bijvoorbeeld "Switch meterkast, poort 10".
+
 ## 1.3.0
 
 ### Gewijzigd

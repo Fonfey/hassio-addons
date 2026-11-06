@@ -16,10 +16,13 @@ Zonder API-key draait de app in demomodus met voorbeeldgegevens.
 
 ## Wat je ziet
 
-- **Netwerkkaart**: je opstelling van internet via de gateway naar switches en toegangspunten. Bewegende lijnen tonen waar verkeer loopt; klik op een apparaat voor de details.
-- **Internetverkeer**: download en upload over 30 minuten, 6 uur of 24 uur. De geschiedenis blijft bewaard na een herstart.
-- **Apparaten**: switchpoorten als frontpaneel (snelheid en PoE), wifi-radio's per toegangspunt (band, kanaal, breedte), uptime, firmware, processor en geheugen.
-- **Clients**: zoeken, filteren op wifi of kabel en op het apparaat waarmee ze verbonden zijn. Nieuwe clients van het afgelopen uur krijgen een label.
+Het dashboard heeft drie tabbladen. Klik op een apparaat of client om de eigen pagina te openen.
+
+- **Overzicht**: de netwerkkaart, van internet via de gateway naar switches en toegangspunten, en het internetverkeer over 30 minuten, 6 uur of 24 uur. De geschiedenis blijft bewaard na een herstart.
+- **Apparaten**: switchpoorten als frontpaneel (snelheid en PoE), wifi-radio's per toegangspunt, uptime, firmware, processor en geheugen. De pagina van een switch laat per poort zien wat erop is aangesloten.
+- **Clients**: zoeken, filteren op wifi of kabel en op het apparaat waarmee ze verbonden zijn, met het poortnummer bij bekabelde clients. Nieuwe clients van het afgelopen uur krijgen een label.
+
+Welk apparaat op welke poort zit, haalt de app op met dezelfde API-key uit de klassieke Network-API. Staat je console dat niet toe, dan zie je de poorten nog wel, alleen zonder namen.
 
 ## Wie mag het dashboard zien
 

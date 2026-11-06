@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.0
+
+### Nieuw
+- **Iconen bij clients**: dezelfde iconen als in UniFi, op basis van de apparaatherkenning van je console (of het icoon dat je in UniFi zelf hebt gekozen). Je ziet ze in de clientlijst, op de pagina van een client, bij de poorten en bij Verbonden.
+- Herkent UniFi een client niet, dan zie je een wifi- of kabelpictogram.
+
 ## 1.5.1
 
 ### Privacy

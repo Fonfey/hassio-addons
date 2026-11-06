@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.3
+
+### Gewijzigd
+- De querylog toont het IP-adres van de client weer, net als op de site van AdGuard.
+
 ## 1.4.2
 
 ### Privacy

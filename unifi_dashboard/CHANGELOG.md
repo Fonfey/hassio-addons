@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.3
+
+### Gewijzigd
+- Het internetadres van je gateway is weer zichtbaar, op de pagina van de gateway als **Internetadres**. Als IP-adres staat daar het interne adres, als dat bekend is.
+
 ## 1.6.2
 
 ### Nieuw

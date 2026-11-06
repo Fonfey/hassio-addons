@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8.1
+
+### Opgelost
+- Het **Logboek** toont nu het systeemlogboek zoals in UniFi: volledige meldingen zoals "Wandtablet was blocked from accessing 8.8.8.8 by the Block Google DNS Firewall Policy." in plaats van alleen een code. Met het soort melding (zoals Blocked by Firewall of WiFi Client Roamed), de ernst in streepjes en de categorie in het Nederlands.
+
 ## 1.8.0
 
 ### Nieuw

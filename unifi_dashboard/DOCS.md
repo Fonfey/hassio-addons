@@ -24,6 +24,8 @@ Het dashboard heeft drie tabbladen. Klik op een apparaat of client om de eigen p
 
 De afbeeldingen van je apparaten komen uit de openbare productcatalogus van Ubiquiti (static.ui.com). De app haalt ze één keer op en bewaart ze; zonder internet zie je eenvoudige iconen.
 
+Daarnaast zijn er de tabbladen **Inzichten** (netwerkcheck, dataverbruik per app, flows) en **Logboek** (gebeurtenissen van de console). Op de pagina van de gateway staan ook de opslag en de laatste back-ups. Deze onderdelen gebruiken delen van de API die Ubiquiti niet officieel documenteert; geeft je console iets niet door, dan zie je dat bij **Inzichten → Technische controle**.
+
 Welk apparaat op welke poort zit, haalt de app op met dezelfde API-key uit de klassieke Network-API. Staat je console dat niet toe, dan zie je de poorten nog wel, alleen zonder namen.
 
 ## Wie mag het dashboard zien

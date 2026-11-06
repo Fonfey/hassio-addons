@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.8.0
+
+### Nieuw
+- **Clients**: per client het wifi-netwerk (SSID), het netwerk en de VLAN, de signaalsterkte in dBm met streepjes, de band en het kanaal, de wifi-ervaring en de linksnelheid. In de clientlijst kun je filteren op netwerk en sorteren op signaal.
+- **Inzichten** (nieuw tabblad):
+  - **Netwerkcheck**: een eigen controle op zwak signaal, slechte wifi-ervaring, storing op kanalen, offline toegangspunten, back-ups en firmware.
+  - **Dataverbruik** van de afgelopen 24 uur, met de apps die de meeste data gebruiken. Op de pagina van een client staan diens meest gebruikte apps.
+  - **Flows**: toegestaan, geblokkeerd en verdacht, met de topbestemmingen en topclients.
+  - **Technische controle**: welke onderdelen je console doorgeeft, met alleen veldnamen. Handig om te delen als iets niet werkt.
+- **Opslag en back-ups** op de pagina van de gateway: hoe vol de opslag is en de laatste back-ups van de Network-app.
+- Knop **UniFi openen** rechtsboven, naar unifi.ui.com.
+- **Logboek** (nieuw tabblad): de gebeurtenissen van je console van de afgelopen 48 uur, met zoeken en filteren. MAC-adressen worden vervangen door namen.
+
 ## 1.7.0
 
 ### Nieuw

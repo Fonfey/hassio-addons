@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.1
+
+### Privacy
+- Publieke IP-adressen, zoals het internetadres van je gateway, worden niet meer getoond. Bij de gateway staat nu het interne adres als dat bekend is, anders niets. Interne adressen (zoals 192.168.x.x) blijven zichtbaar.
+
 ## 1.5.0
 
 ### Nieuw

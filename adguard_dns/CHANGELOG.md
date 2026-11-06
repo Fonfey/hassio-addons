@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.2
+
+### Privacy
+- De querylog toont geen publieke IP-adressen meer. In de kolom Client staat bij je internetadres nu alleen het land; interne adressen blijven zichtbaar.
+
 ## 1.4.1
 
 ### Opgelost

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.2
+
+### Nieuw
+- De naam van je internetprovider staat bij Internet op de netwerkkaart en op de pagina van de gateway. Je IP-adres blijft verborgen.
+
 ## 1.6.1
 
 ### Verbeterd

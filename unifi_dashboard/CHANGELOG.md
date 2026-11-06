@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.3
+
+### Verbeterd
+- Nieuwe, ruimtelijke tekeningen van de apparaten die meer op de echte hardware lijken: de Cloud Gateway als staand blok met schermpje, desktop- en compacte switches met hun poorten aan de voorkant, rackapparaten met oren, ronde en vierkante plafond-AP's (zoals de U7 Pro). De tekeningen zijn ook groter.
+
 ## 1.4.2
 
 ### Verbeterd

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1
+
+### Verbeterd
+- Onderaan staat nu een uitklapbare lijst **Genegeerd**: per regel zie je wat je hebt genegeerd en bij welk punt het hoort, met een eigen knop **Terugzetten**. **Alles terugzetten** blijft ook mogelijk.
+- Genegeerde regels die inmiddels zijn opgelost, tellen niet meer mee.
+
 ## 1.1.0
 
 ### Nieuw

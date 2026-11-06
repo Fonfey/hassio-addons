@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8.2
+
+### Opgelost
+- Versie 1.8.1 gaf de foutmelding "NameError: name 'INSIGHTS' is not defined" en laadde daardoor geen gegevens meer. Dat is hersteld.
+
 ## 1.8.1
 
 ### Opgelost

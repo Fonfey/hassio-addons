@@ -14,10 +14,8 @@ Store-repository voor Home Assistant. Hier staan de app-beschrijvingen; de code 
 ## Installeren in Home Assistant
 
 1. Ga naar **Instellingen → Apps → App Store**.
-2. Klik rechtsboven op **⋮ → Repositories** en voeg deze repository toe.
-   Omdat de repository privé is, zet je er een GitHub-token in en eindig je de URL op `.git`:
-   `https://GEBRUIKERSNAAM:TOKEN@github.com/Fonfey/hassio-addons.git`
-   Gebruik een fine-grained token met alleen **Contents: Read-only** voor deze repository.
+2. Klik rechtsboven op **⋮ → Repositories** en voeg deze URL toe:
+   `https://github.com/Fonfey/hassio-addons`
 3. Beide apps staan nu onder **Fonfey's Home Assistant addons**. Installeer wat je wilt, vul op het tabblad **Configuratie** je API-key in en start de app.
 
-De images staan op `ghcr.io/fonfey`. Zijn die privé, voeg dan in Home Assistant bij **App Store → ⋮ → Registers** een login toe voor `ghcr.io` met een GitHub-token (classic) met alleen het recht `read:packages`.
+De apps worden geleverd als kant-en-klare images op `ghcr.io/fonfey`. Je hebt geen token of extra login nodig.

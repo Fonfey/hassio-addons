@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.1
+
+### Opgelost
+- Bij de topbestemmingen had de regel "Niet van toepassing" een grijze knopstijl. Die staat nu gewoon als tekst in de lijst.
+
 ## 1.4.0
 
 ### Gewijzigd

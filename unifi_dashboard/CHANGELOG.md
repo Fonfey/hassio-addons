@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.0
+
+### Nieuw
+- **Internet is klikbaar**: klik op Internet op de netwerkkaart voor een eigen pagina met de huidige download en upload, de grafiek van het internetverkeer (30 minuten, 6 of 24 uur), je provider, de gateway, je internetadres en de WAN-poort.
+
 ## 1.6.3
 
 ### Gewijzigd

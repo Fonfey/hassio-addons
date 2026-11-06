@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.1
+
+### Verbeterd
+- Ook UniFi-apparaten (AP's, switches en de gateway) hebben nu hun afbeelding in de poortlijst, bij Verbonden en bij "Verbonden met" op de pagina van een client.
+
 ## 1.6.0
 
 ### Nieuw

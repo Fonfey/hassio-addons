@@ -8,6 +8,9 @@ configuration:
   disabled_days:
     name: Automation long off after (days)
     description: Disabled automations that have not run for longer than this are listed for clean-up.
+  stale_days:
+    name: Sensor without data after (days)
+    description: Sensors that have not reported a new or changing value for this long are listed.
   allowed_users:
     name: Allowed admins (optional)
     description: Only administrators see the sidebar button. Enter usernames if not every administrator may see Onderhoud. Empty means all administrators.

@@ -1,5 +1,5 @@
 name: Onderhoud
-version: "1.1.1"
+version: "1.2.0"
 slug: onderhoud
 description: Eén overzicht van wat aandacht nodig heeft in je Home Assistant, op volgorde van belang.
 url: https://github.com/Fonfey/hassio-addons
@@ -22,10 +22,12 @@ options:
   check_interval_minutes: 60
   battery_threshold: 20
   disabled_days: 30
+  stale_days: 7
   allowed_users: []
 schema:
   check_interval_minutes: int(10,1440)
   battery_threshold: int(5,80)
   disabled_days: int(7,365)
+  stale_days: int(2,90)
   allowed_users:
     - str

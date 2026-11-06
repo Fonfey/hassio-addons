@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0
+
+### Nieuw
+- **Controle na het opstarten**: zodra Home Assistant (opnieuw) is opgestart, controleert Onderhoud vanzelf. Het wacht twee minuten, zodat apparaten eerst weer verbinding hebben. Ook `sensor.onderhoud_punten` staat daardoor direct na een herstart weer goed.
+- **Sensoren die al lang geen data geven**: geen statistieken meer, een waarde die dagen stilstaat, een meter die niet meer optelt, of al lang onbeschikbaar. Hoe lang is in te stellen met **Sensor zonder data na (dagen)**, standaard 7.
+- **Statistieken met een probleem**, dezelfde die Home Assistant toont bij Ontwikkelhulpmiddelen, Statistieken. Statistieken van sensoren die niet meer bestaan kun je per regel verwijderen, na bevestiging.
+
 ## 1.1.1
 
 ### Verbeterd

@@ -8,6 +8,9 @@ configuration:
   disabled_days:
     name: Automation lang uit na (dagen)
     description: Uitgeschakelde automations die langer dan dit aantal dagen niet hebben gedraaid, komen bij Opruimen.
+  stale_days:
+    name: Sensor zonder data na (dagen)
+    description: Sensoren die zo lang geen nieuwe of veranderende waarde geven, komen bij Nalopen.
   allowed_users:
     name: Toegestane beheerders (optioneel)
     description: Alleen beheerders zien de knop in de zijbalk. Vul hier gebruikersnamen in als niet elke beheerder Onderhoud mag zien. Leeg is alle beheerders.

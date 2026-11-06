@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.2
+
+### Verbeterd
+- Apparaten hebben nu een eigen tekening die op het model lijkt: een ronde schijf voor plafond-AP's, een staande behuizing voor mesh- en buiten-AP's, een compacte gateway zoals de Cloud Gateway, en desktop- of rackswitches. Het lampje in de tekening toont de status: blauw is online, rood is offline.
+- Clients tonen een wifi- of kabelpictogram.
+
 ## 1.4.1
 
 ### Verbeterd

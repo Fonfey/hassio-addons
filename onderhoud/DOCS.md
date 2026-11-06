@@ -17,9 +17,9 @@ Eén overzicht van wat aandacht nodig heeft in je Home Assistant, op volgorde va
 | Apparaten en entiteiten die nergens meer worden aangemaakt | Opruimen |
 | Automations die aan staan maar nooit zijn gestart, of al lang uit staan | Opruimen |
 
-Onderhoud verandert niets vanzelf. Knoppen openen de juiste pagina in Home Assistant; alleen **Starten** bij een app voert direct iets uit, na bevestiging.
+Onderhoud verandert niets vanzelf. Klik op een naam in een punt om dat apparaat, die automation of die entiteit in Home Assistant te openen. Direct iets uitvoeren kan alleen na bevestiging: een app **Starten**, of per regel **Verwijderen** bij entiteiten die nergens meer worden aangemaakt en automations die al lang uit staan.
 
-**Negeren** haalt een punt uit de lijst. Verandert er iets, bijvoorbeeld een extra offline apparaat, dan komt het punt terug.
+**Negeren** kan per regel of voor een heel punt. Een genegeerde regel blijft weg; komt er een nieuw geval bij, bijvoorbeeld een extra offline apparaat, dan zie je dat wel.
 
 ## Sensor
 

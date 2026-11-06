@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0
+
+### Nieuw
+- Elke regel in een punt is nu los te bedienen. Klik op de naam om dat apparaat, die automation of de geschiedenis van die entiteit in Home Assistant te openen.
+- **Negeren per regel**: houd je één sensor of apparaat bewust, negeer dan alleen die regel. De teller loopt mee terug.
+- **Verwijderen per regel**, na bevestiging: entiteiten die nergens meer worden aangemaakt en automations die al lang uit staan.
+- **Alles negeren** bij een punt negeert alleen de huidige regels; komt er later iets nieuws bij, dan zie je dat wel.
+
 ## 1.0.1
 
 ### Opgelost

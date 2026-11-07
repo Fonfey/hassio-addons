@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.7
+
+### Verbeterd
+- Geen voorstellen? Dan zie je nu wat de app heeft bekeken: hoeveel automations, hoeveel lampen en schakelaars die al bedienen, en hoe vaak er iets met de hand werd geschakeld. In de log van de app staat per stap hoeveel er overbleef.
+
 ## 1.0.6
 
 ### Opgelost

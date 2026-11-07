@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3
+
+### Nieuw
+- **Definitief verwijderen**: een kopie die je niet meer wilt, verwijder je in één keer uit Home Assistant én uit de Tijdmachine. Ook verwijderde onderdelen kun je definitief wissen, met al hun bewaarde versies. Na bevestiging, want dit kan niet ongedaan worden.
+
 ## 1.0.2
 
 ### Verbeterd

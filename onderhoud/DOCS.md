@@ -13,7 +13,7 @@ Eén overzicht van wat aandacht nodig heeft in je Home Assistant, op volgorde va
 | Offline apparaten: alle entiteiten zijn onbeschikbaar | Nalopen |
 | Batterijen onder de ingestelde grens (telefoons en thuisbatterijen tellen niet mee) | Nalopen |
 | Apps die vanzelf zouden starten maar uit staan, met een knop om ze te starten | Nalopen |
-| Automations die hetzelfde apparaat aansturen | Nalopen |
+| Automations die hetzelfde apparaat aansturen, en of ze elkaar de afgelopen 7 dagen echt tegenwerkten (binnen 90 minuten de andere kant op) | Nalopen |
 | Sensoren die al lang geen data geven: geen statistieken, een waarde die dagen stilstaat, een teller die niet meer optelt, of al lang onbeschikbaar | Nalopen |
 | Statistieken met een probleem, zoals statistieken van sensoren die niet meer bestaan | Opruimen |
 | Apparaten en entiteiten die nergens meer worden aangemaakt | Opruimen |

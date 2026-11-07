@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0
+
+### Verbeterd
+- **Automations die elkaar tegenwerken**: Onderhoud kijkt nu ook in het logboek van de afgelopen 7 dagen of twee automations hetzelfde apparaat echt kort na elkaar de andere kant op zetten, bijvoorbeeld de airco om 06:00 aan en om 06:30 weer uit. Je ziet hoe vaak het gebeurde en wanneer, met een link naar de geschiedenis. Automations die hetzelfde apparaat aansturen maar elkaar niet tegenwerkten, blijven als aandachtspunt in de lijst.
+
 ## 1.2.0
 
 ### Nieuw

@@ -19,7 +19,8 @@ Alleen wat je in Home Assistant zelf maakt, wordt bewaard. Onderdelen uit YAML-b
 - Kies links een onderdeel. Je ziet alle bewaarde versies, met wanneer en wat er veranderde.
 - Kies een versie en je ziet het verschil met nu: rood is wat er was, groen wat er nu staat.
 - **Deze versie terugzetten** zet het onderdeel terug, na bevestiging. Je huidige versie blijft bewaard, dus je kunt altijd terug.
-- **Als kopie terugzetten** maakt een nieuw onderdeel met de oude inhoud, naast het origineel.
+- **Als kopie terugzetten** maakt een nieuw onderdeel met de oude inhoud, naast het origineel. Een kopie van een automation staat meteen uit, zodat hij niet dubbel draait; zet hem aan in Home Assistant als je hem wilt gebruiken.
+- **Verwijderen** haalt een automation, script, scène of helper uit Home Assistant, na bevestiging. De versies blijven in de Tijdmachine, dus je kunt hem altijd terugzetten.
 
 De Tijdmachine merkt een wijziging meteen als Home Assistant die meldt, en controleert daarnaast zelf elke paar minuten. De eerste versie van elk onderdeel is de versie op het moment dat je de app installeert.
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.1
+
+### Verbeterd
+- **Kopieën**: een kopie van een automation staat na het maken meteen uit, zodat hij niet naast het origineel draait. Zet hem aan in Home Assistant als je hem wilt gebruiken.
+- Bij een kopie zie je van welk onderdeel hij een kopie is, en bij het origineel welke kopieën er zijn. Klik erop om erheen te gaan.
+- **Verwijderen**: automations, scripts, scènes en helpers kun je nu ook vanuit de Tijdmachine verwijderen, na bevestiging. De versies blijven bewaard, dus je zet ze altijd terug.
+- Heeft een onderdeel nog maar één versie, dan staat erbij dat terugzetten kan zodra het een keer is gewijzigd.
+
 ## 1.0.0
 
 ### Nieuw

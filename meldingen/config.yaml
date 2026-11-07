@@ -1,5 +1,5 @@
 name: Meldingen
-version: "1.0.0"
+version: "1.0.1"
 slug: meldingen
 description: "Zie welke meldingen Home Assistant verstuurt: wanneer, naar wie, door welke automation, en of er op een knop is gedrukt of iets mislukte."
 url: https://github.com/Fonfey/hassio-addons

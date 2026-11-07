@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.1
+
+### Verbeterd
+- Het lettertype wordt nu met de app meegeleverd. De pagina laadt daardoor niets meer van internet; alles draait lokaal.
+
 ## 1.3.0
 
 ### Verbeterd

@@ -10,6 +10,8 @@ De app kijkt elke nacht (en als je op **Opnieuw zoeken** drukt) naar:
 - **Welke apparaten je hebt** en in welke ruimte ze zitten. Een raamsensor en een thermostaat in dezelfde ruimte, een watersensor of een stekker met verbruiksmeting op de wasmachine leveren meteen een suggestie op.
 - **Je bestaande automations.** Doet een automation al hetzelfde, dan stelt de app het niet voor.
 
+Wat telt als "met de hand"? Alleen wat een persoon in huis doet: via een schakelaar, de app of de spraakassistent. Niet wat een automation, script, scène, blueprint of groep doet, ook niet als die een hele ruimte, een Hue- of Zigbee-groep of een label bedient. Ook niet wat Node-RED, AppDaemon of een andere koppeling met een eigen gebruiker doet. Gebeurt iets elke dag op precies dezelfde minuut zonder afzender, dan gaat de app uit van een schema buiten Home Assistant (bijvoorbeeld in de Hue-app of een Shelly) en stelt hij het niet voor. Twee lampen die altijd binnen een paar seconden samen schakelen, zijn al gekoppeld en worden niet voorgesteld.
+
 Alles wordt in je eigen Home Assistant berekend. Er gaat niets naar internet en er is geen AI voor nodig.
 
 ## Wat je ziet

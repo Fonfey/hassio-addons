@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.5
+
+### Verbeterd
+- Automations op basis van een blueprint, YAML-automations en -scripts: de app vraagt Home Assistant zelf wat ze bedienen, zodat die apparaten niet als gewoonte worden voorgesteld.
+- Alleen gebruikers die bij een persoon horen tellen als "met de hand". Wat Node-RED, AppDaemon of een andere koppeling met een eigen gebruiker doet, telt niet meer.
+- Iets wat elke dag op precies dezelfde minuut gebeurt zonder afzender, is een schema buiten Home Assistant (bijvoorbeeld de Hue-app, een Shelly of een timer) en wordt niet meer voorgesteld.
+- Twee lampen die steeds binnen een paar seconden samen schakelen, zijn al gekoppeld (scène, knop of relais) en worden niet meer voorgesteld om samen te schakelen.
+
 ## 1.0.4
 
 ### Opgelost

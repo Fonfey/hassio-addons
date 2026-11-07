@@ -1,0 +1,7 @@
+configuration:
+  history_days:
+    name: Historie bekijken (dagen)
+    description: Hoeveel dagen terug de app naar gewoontes zoekt. Home Assistant bewaart standaard 10 dagen; meer heeft alleen zin als je recorder langer bewaart.
+  allowed_users:
+    name: Toegestane beheerders (optioneel)
+    description: Alleen beheerders zien de knop in de zijbalk. Vul hier gebruikersnamen in als niet elke beheerder Suggesties mag zien. Leeg is alle beheerders.

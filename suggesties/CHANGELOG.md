@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.8
+
+### Verbeterd
+- Zonder voorstellen staat er alleen nog de uitleg, zonder lege kaart en filter ernaast.
+
 ## 1.0.7
 
 ### Verbeterd

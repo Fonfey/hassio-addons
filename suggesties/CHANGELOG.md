@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.4
+
+### Opgelost
+- Lampen in een Zigbee-groep worden nu ook als groep herkend. Lampen die in dezelfde groep zitten, of een groep en een lamp daarin, worden niet meer voorgesteld om samen te schakelen: dat doen ze al.
+- Alleen echte overgangen tellen nog, van aan naar uit en andersom. Een schakelaar die na een verbroken verbinding opnieuw uit meldt, telde eerst als schakelen.
+- Het label Suggesties werd niet gezet. Automations die al gemaakt zijn krijgen het label alsnog.
+
 ## 1.0.3
 
 ### Opgelost

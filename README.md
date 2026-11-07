@@ -43,13 +43,6 @@ Bewaart bij elke wijziging een versie van je automations, scripts, scènes, dash
 ![Tijdmachine: versies van een automation en het verschil met nu (voorbeeldgegevens)](docs/tijdmachine.png)
 *Tijdmachine met voorbeeldgegevens: links de onderdelen, rechts de versies van een automation en wat er veranderde.*
 
-### Waarom
-
-Kies een apparaat en zie in een tijdlijn wat het schakelde: een automation (met de trigger en de trace), een script, iemand in Home Assistant, een ander apparaat of het apparaat zelf. [Documentatie](waarom/DOCS.md) · code in [HA_Why](https://github.com/Fonfey/HA_Why)
-
-![Waarom: tijdlijn van een airco met per moment wie of wat hem schakelde (voorbeeldgegevens)](docs/waarom.png)
-*Waarom met voorbeeldgegevens: de tijdlijn van een airco, met de aanleiding van het gekozen moment.*
-
 ### Meldingen
 
 Zie welke meldingen Home Assistant verstuurt: wanneer, naar wie, door welke automation, en of er op een knop is gedrukt, de melding is weggeveegd of het versturen mislukte. [Documentatie](meldingen/DOCS.md) · code in [HA_Alerts](https://github.com/Fonfey/HA_Alerts)

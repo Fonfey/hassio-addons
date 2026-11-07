@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+### Verbeterd
+- Na **Als kopie terugzetten** zie je dat de kopie wordt aangemaakt. Zodra Home Assistant klaar is, springt de Tijdmachine er vanzelf naartoe. Duurt het langer dan normaal, dan zie je dat ook.
+- Hetzelfde bij het terugzetten van een verwijderd onderdeel.
+
 ## 1.0.1
 
 ### Verbeterd

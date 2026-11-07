@@ -25,6 +25,8 @@ Alleen wat je in Home Assistant zelf maakt, wordt bewaard. Onderdelen uit YAML-b
 
 De Tijdmachine merkt een wijziging meteen als Home Assistant die meldt, en controleert daarnaast zelf elke paar minuten. De eerste versie van elk onderdeel is de versie op het moment dat je de app installeert.
 
+Verwijder je een automation in de app **Onderhoud**, dan brengt de knop **Terugzetten in de Tijdmachine** je hier meteen naar die automation.
+
 ## Instellingen
 
 - **Versies bewaren (dagen)**: standaard 30.

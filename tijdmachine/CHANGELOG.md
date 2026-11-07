@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.5
+
+### Nieuw
+- Geopend via **Terugzetten in de Tijdmachine** in Onderhoud: de Tijdmachine controleert meteen opnieuw en toont de verwijderde automation, klaar om terug te zetten.
+
 ## 1.0.4
 
 ### Verbeterd

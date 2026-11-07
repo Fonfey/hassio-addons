@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.2
+
+### Nieuw
+- Na het verwijderen van een automation verschijnt de knop **Terugzetten in de Tijdmachine**, als je die app hebt. Die opent de Tijdmachine meteen bij de verwijderde automation. Bij het bevestigen staat erbij of je het kunt terugzetten.
+- Heb je de Tijdmachine niet, dan staat er één keer een tip onderaan. Die kun je verbergen.
+
 ## 1.3.1
 
 ### Verbeterd

@@ -21,6 +21,8 @@ Eén overzicht van wat aandacht nodig heeft in je Home Assistant, op volgorde va
 
 Onderhoud verandert niets vanzelf. Klik op een naam in een punt om dat apparaat, die automation of die entiteit in Home Assistant te openen. Direct iets uitvoeren kan alleen na bevestiging: een app **Starten**, of per regel **Verwijderen** bij entiteiten die nergens meer worden aangemaakt, automations die al lang uit staan en statistieken van sensoren die niet meer bestaan.
 
+Heb je ook de app **Tijdmachine**, dan kun je een automation die je hier verwijdert terugzetten. Na het verwijderen verschijnt onderin de knop **Terugzetten in de Tijdmachine**; die opent de Tijdmachine meteen bij die automation. Heb je de Tijdmachine niet, dan staat er één keer een tip onderaan, die je kunt verbergen.
+
 **Negeren** kan per regel of voor een heel punt. Een genegeerde regel blijft weg; komt er een nieuw geval bij, bijvoorbeeld een extra offline apparaat, dan zie je dat wel.
 
 ## Na een herstart

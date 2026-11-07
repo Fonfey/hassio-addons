@@ -40,3 +40,7 @@ Onderhoud maakt de sensor `sensor.onderhoud_punten` met het aantal open punten e
 - **Automation lang uit na (dagen)**: standaard 30.
 - **Sensor zonder data na (dagen)**: standaard 7.
 - **Toegestane beheerders (optioneel)**: alleen beheerders zien de knop in de zijbalk; vul gebruikersnamen in als niet elke beheerder Onderhoud mag zien.
+
+## Lokaal
+
+De app draait helemaal lokaal: hij praat alleen met je eigen Home Assistant en laadt niets van internet, ook geen lettertypen.

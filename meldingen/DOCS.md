@@ -22,3 +22,7 @@ Of een melding is gelezen, weet Home Assistant niet. De app verstuurt zelf niets
 
 - **Meldingen bewaren (dagen)**: standaard 30.
 - **Toegestane beheerders (optioneel)**: alleen beheerders zien de knop in de zijbalk; vul gebruikersnamen in als niet elke beheerder Meldingen mag zien.
+
+## Lokaal
+
+De app draait helemaal lokaal: hij praat alleen met je eigen Home Assistant en laadt niets van internet, ook geen lettertypen.

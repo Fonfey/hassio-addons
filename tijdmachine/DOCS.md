@@ -35,3 +35,7 @@ Verwijder je een automation in de app **Onderhoud**, dan brengt de knop **Terugz
 - **Toegestane beheerders (optioneel)**: alleen beheerders zien de knop in de zijbalk; vul gebruikersnamen in als niet elke beheerder de Tijdmachine mag zien.
 
 De versies staan in de opslag van de app en gaan dus mee in de back-ups van Home Assistant.
+
+## Lokaal
+
+De app draait helemaal lokaal: hij praat alleen met je eigen Home Assistant en laadt niets van internet, ook geen lettertypen.

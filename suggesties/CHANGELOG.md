@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3
+
+### Opgelost
+- Lampen in een Hue-ruimte of -zone, en lampen die via een Hue-scène aangaan, werden nog als gewoonte gezien terwijl een automation ze schakelt. De app kijkt nu door groepen en Hue-ruimtes heen tot op de losse lamp.
+- Meldt een lamp zijn nieuwe stand zonder afzender, vlak nadat een automation liep, dan telt dat niet meer als iets wat je zelf deed.
+
 ## 1.0.2
 
 ### Opgelost

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.6
+
+### Opgelost
+- Het vangnet voor lampen die hun stand zonder afzender melden was te streng. Bij een huis met automations die de hele dag door lopen (bijvoorbeeld op stroomverbruik), viel daardoor alles weg. Het vangnet geldt nu alleen nog voor automations waarvan de app niet weet wat ze bedienen, en die niet de hele dag door lopen.
+
 ## 1.0.5
 
 ### Verbeterd

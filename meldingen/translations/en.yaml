@@ -1,0 +1,7 @@
+configuration:
+  keep_days:
+    name: Keep notifications (days)
+    description: How long notifications are kept in the list.
+  allowed_users:
+    name: Allowed administrators (optional)
+    description: Only administrators see the sidebar item. Enter usernames if not every administrator may see it. Empty means all administrators.

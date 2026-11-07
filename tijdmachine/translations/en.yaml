@@ -1,0 +1,13 @@
+configuration:
+  keep_days:
+    name: Keep versions (days)
+    description: How long old versions are kept.
+  keep_min_versions:
+    name: Always keep per item
+    description: This many of the latest versions are always kept per item, even when older than the retention period.
+  scan_minutes:
+    name: Check every (minutes)
+    description: Besides every change Home Assistant reports, the app also checks this often for changes.
+  allowed_users:
+    name: Allowed administrators (optional)
+    description: Only administrators see the sidebar item. Enter usernames if not every administrator may see it. Empty means all administrators.

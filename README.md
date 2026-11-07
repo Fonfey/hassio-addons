@@ -36,6 +36,27 @@ Eén lijst met wat aandacht nodig heeft in je Home Assistant: back-ups, offline 
 ![Onderhoud: lijst met punten op volgorde van belang (voorbeeldgegevens)](docs/onderhoud-overzicht.png)
 *Onderhoud met voorbeeldgegevens: de punten op volgorde van belang, van Belangrijk via Nalopen naar Opruimen.*
 
+### Tijdmachine
+
+Bewaart bij elke wijziging een versie van je automations, scripts, scènes, dashboards en helpers. Je ziet per onderdeel wat er veranderde, regel voor regel, en zet één onderdeel terug, ook als je het hebt verwijderd. [Documentatie](tijdmachine/DOCS.md) · code in [HA_Timemachine](https://github.com/Fonfey/HA_Timemachine)
+
+![Tijdmachine: versies van een automation en het verschil met nu (voorbeeldgegevens)](docs/tijdmachine.png)
+*Tijdmachine met voorbeeldgegevens: links de onderdelen, rechts de versies van een automation en wat er veranderde.*
+
+### Waarom
+
+Kies een apparaat en zie in een tijdlijn wat het schakelde: een automation (met de trigger en de trace), een script, iemand in Home Assistant, een ander apparaat of het apparaat zelf. [Documentatie](waarom/DOCS.md) · code in [HA_Why](https://github.com/Fonfey/HA_Why)
+
+![Waarom: tijdlijn van een airco met per moment wie of wat hem schakelde (voorbeeldgegevens)](docs/waarom.png)
+*Waarom met voorbeeldgegevens: de tijdlijn van een airco, met de aanleiding van het gekozen moment.*
+
+### Meldingen
+
+Zie welke meldingen Home Assistant verstuurt: wanneer, naar wie, door welke automation, en of er op een knop is gedrukt, de melding is weggeveegd of het versturen mislukte. [Documentatie](meldingen/DOCS.md) · code in [HA_Alerts](https://github.com/Fonfey/HA_Alerts)
+
+![Meldingen: lijst met verstuurde meldingen en een overzicht per automation (voorbeeldgegevens)](docs/meldingen.png)
+*Meldingen met voorbeeldgegevens: de lijst, de details en de automations die de meeste meldingen sturen.*
+
 ## Installeren in Home Assistant
 
 1. Ga naar **Instellingen → Apps → App Store**.

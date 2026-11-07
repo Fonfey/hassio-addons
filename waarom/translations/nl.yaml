@@ -1,0 +1,4 @@
+configuration:
+  allowed_users:
+    name: Toegestane beheerders (optioneel)
+    description: Alleen beheerders zien de knop in de zijbalk. Vul hier gebruikersnamen in als niet elke beheerder Waarom mag zien. Leeg is alle beheerders.

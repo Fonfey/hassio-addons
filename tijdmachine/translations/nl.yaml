@@ -1,0 +1,13 @@
+configuration:
+  keep_days:
+    name: Versies bewaren (dagen)
+    description: Hoe lang de Tijdmachine oude versies bewaart.
+  keep_min_versions:
+    name: Altijd bewaren per onderdeel
+    description: Zoveel van de laatste versies blijven per onderdeel altijd bewaard, ook als ze ouder zijn dan de bewaartermijn.
+  scan_minutes:
+    name: Controleren elke (minuten)
+    description: Naast elke wijziging die Home Assistant meldt, kijkt de Tijdmachine ook zo vaak zelf of er iets veranderd is.
+  allowed_users:
+    name: Toegestane beheerders (optioneel)
+    description: Alleen beheerders zien de knop in de zijbalk. Vul hier gebruikersnamen in als niet elke beheerder de Tijdmachine mag zien. Leeg is alle beheerders.

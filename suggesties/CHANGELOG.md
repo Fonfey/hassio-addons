@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+### Opgelost
+- Lampen die al door een automation worden geschakeld, werden toch als gewoonte voorgesteld. Dat gebeurde als de automation een hele ruimte, een apparaat, een label, een scène, een groep of een script bedient in plaats van de lamp zelf, en bij lampen die hun nieuwe stand later doorgeven (zoals Hue). De app herkent nu wat je automations echt bedienen, ook na een vertraging in de automation.
+- Het aantal dagen klopte niet altijd ("10 van de 9 dagen").
+
 ## 1.0.1
 
 ### Verbeterd

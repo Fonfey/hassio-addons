@@ -1,5 +1,5 @@
 name: UniFi Dashboard
-version: "1.9.1"
+version: "1.9.2"
 slug: unifi_dashboard
 description: Live overview of your UniFi network. Create the API key in UniFi Network under Settings, Control Plane, Integrations.
 url: https://github.com/Fonfey/hassio-addons/tree/main/unifi_dashboard
@@ -13,7 +13,7 @@ boot: auto
 ingress: true
 ingress_port: 8099
 panel_admin: true
-panel_icon: mdi:router-network
+panel_icon: mdi:lan
 panel_title: UniFi
 options:
   unifi_host: "192.168.1.1"

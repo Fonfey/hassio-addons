@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.2
+
+- The sidebar icon now matches the app icon: the wrench.
+- Het icoon in de zijbalk past nu bij het app-icoon: de moersleutel.
+
 ## 1.4.1
 
 - The code now lives in the store repository [Fonfey/hassio-addons](https://github.com/Fonfey/hassio-addons), and the image is built from there. Nothing changes in how the app works.

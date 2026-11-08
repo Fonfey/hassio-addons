@@ -1,5 +1,5 @@
 name: AdGuard DNS Dashboard
-version: "1.5.1"
+version: "1.5.2"
 slug: adguard_dns_dashboard
 description: "Statistics of your AdGuard DNS account. Create an API key at adguard-dns.io, User preferences, API keys."
 url: https://github.com/Fonfey/hassio-addons/tree/main/adguard_dns
@@ -13,7 +13,7 @@ boot: auto
 ingress: true
 ingress_port: 8099
 panel_admin: true
-panel_icon: mdi:shield-check
+panel_icon: mdi:advertisements-off
 panel_title: AdGuard DNS
 options:
   api_key: ""

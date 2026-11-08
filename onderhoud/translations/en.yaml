@@ -1,7 +1,7 @@
 configuration:
   check_interval_minutes:
     name: Check every (minutes)
-    description: How often Onderhoud checks your Home Assistant. Use Opnieuw controleren in the app to check right away.
+    description: How often Maintenance checks your Home Assistant. Use Check again in the app to check right away.
   battery_threshold:
     name: Battery low below (%)
     description: Batteries below this percentage are listed. Phones and home batteries are not counted.
@@ -13,4 +13,4 @@ configuration:
     description: Sensors that have not reported a new or changing value for this long are listed.
   allowed_users:
     name: Allowed admins (optional)
-    description: Only administrators see the sidebar button. Enter usernames if not every administrator may see Onderhoud. Empty means all administrators.
+    description: Only administrators see the sidebar button. Enter usernames if not every administrator may see Maintenance. Empty means all administrators.

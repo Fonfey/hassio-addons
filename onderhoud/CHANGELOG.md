@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.0
+
+### New / Nieuw
+- The app is now available in English and follows the language of your Home Assistant: Dutch if Home Assistant is set to Dutch, English otherwise. The app is now called Maintenance. The sensor `sensor.onderhoud_punten` keeps its name and attributes, so existing automations keep working; the item titles in it follow the Home Assistant language.
+- De app is nu ook in het Engels en volgt de taal van je Home Assistant: Nederlands als Home Assistant Nederlands is, anders Engels. De app heet nu Maintenance. De sensor `sensor.onderhoud_punten` houdt zijn naam en attributen, dus bestaande automations blijven werken; de titels erin volgen de taal van Home Assistant.
+
 ## 1.3.2
 
 ### Nieuw

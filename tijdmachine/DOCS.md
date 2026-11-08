@@ -12,6 +12,8 @@ Home Assistant bewaart geen eerdere versies van wat je in de editor maakt. Sla j
 | Dashboards | Ja, in zijn geheel. Na verwijderen: maak het dashboard eerst opnieuw aan met dezelfde URL |
 | Helpers (schakelaars, getallen, keuzelijsten, tekst, datum en tijd, knoppen, tellers, timers, schema's) | Ja, ook als kopie en ook na verwijderen |
 
+Dashboards staan in de Tijdmachine onder de naam uit je zijbalk. Ingebouwde dashboards zoals Thuis, Verlichting, Beveiliging, Klimaat en Energie bouwt Home Assistant zelf op; daar is niets van te bewaren. Dashboards in een YAML-bestand, of waar nog niets in is opgeslagen, worden ook niet bewaard. Bij het filter Dashboards zie je welke dat zijn.
+
 Alleen wat je in Home Assistant zelf maakt, wordt bewaard. Onderdelen uit YAML-bestanden of pakketten beheer je in die bestanden, dus die slaat de Tijdmachine over.
 
 ## Zo werkt het

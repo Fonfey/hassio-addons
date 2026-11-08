@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.7
+
+### Verbeterd
+- Dashboards staan onder de naam uit je zijbalk, in plaats van de titel die in het dashboard zelf staat. Zo herken je ze meteen.
+- Bij het filter Dashboards staat uitgelegd waarom ingebouwde dashboards (Thuis, Verlichting, Beveiliging, Klimaat, Energie) er niet bij staan, en welke dashboards om een andere reden niet bewaard worden.
+
 ## 1.0.6
 
 ### Nieuw

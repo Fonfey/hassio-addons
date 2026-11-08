@@ -15,16 +15,7 @@ A live overview of your UniFi network: network map, internet traffic up to 24 ho
 ![UniFi Dashboard: overview with network map and internet traffic (sample data)](docs/unifi-overview-en.png)
 *Overview: the network map with your provider and the internet traffic. Click Internet, a device or a client for details.*
 
-![UniFi Dashboard: page of a switch showing what is connected to each port (sample data)](docs/unifi-switch-en.png)
-*The page of a switch: what is connected to each port.*
-
-![UniFi Dashboard: page of a client with network, VLAN and connection (sample data)](docs/unifi-client-en.png)
-*The page of a client: network, VLAN and via which device and port.*
-
-![UniFi Dashboard: insights with network check and data usage (sample data)](docs/unifi-insights-en.png)
-*Insights: network check, data usage per app and flows.*
-
-With your own console you see the real pictures and icons from UniFi; the screenshots use sample data.
+With your own console you see the real pictures and icons from UniFi; the screenshot uses sample data.
 
 #### <img src="adguard_dns/icon.png" width="32" height="32" align="absmiddle" alt=""> AdGuard DNS Dashboard
 
@@ -86,16 +77,7 @@ Live overzicht van je UniFi-netwerk: netwerkkaart, internetverkeer tot 24 uur te
 ![UniFi Dashboard: overzicht met netwerkkaart en internetverkeer (voorbeeldgegevens)](docs/unifi-overview-nl.png)
 *Overzicht: de netwerkkaart met je provider en het internetverkeer. Klik op Internet, een apparaat of een client voor de details.*
 
-![UniFi Dashboard: pagina van een switch met per poort wat erop is aangesloten (voorbeeldgegevens)](docs/unifi-switch-nl.png)
-*De pagina van een switch: per poort wat erop zit.*
-
-![UniFi Dashboard: pagina van een client met wifi-netwerk, signaal, VLAN en verbinding (voorbeeldgegevens)](docs/unifi-client-nl.png)
-*De pagina van een client: wifi-netwerk, signaal in dBm, band, VLAN en via welk apparaat en welke poort.*
-
-![UniFi Dashboard: inzichten met netwerkcheck, dataverbruik, flows en apps (voorbeeldgegevens)](docs/unifi-insights-nl.png)
-*Inzichten: netwerkcheck, dataverbruik per app en flows.*
-
-Met je eigen console zie je de echte afbeeldingen en iconen uit UniFi; de screenshots gebruiken voorbeeldgegevens.
+Met je eigen console zie je de echte afbeeldingen en iconen uit UniFi; de screenshot gebruikt voorbeeldgegevens.
 
 #### <img src="adguard_dns/icon.png" width="32" height="32" align="absmiddle" alt=""> AdGuard DNS Dashboard
 

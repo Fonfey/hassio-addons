@@ -6,6 +6,8 @@
 
 Statistics of your AdGuard DNS account (adguard-dns.io) right in Home Assistant.
 
+**Note:** this app is for **AdGuard DNS**, the cloud DNS service run by AdGuard (adguard-dns.io). It does not work with **AdGuard Home**, the free software you install and run yourself; for AdGuard Home, use the official AdGuard Home integration in Home Assistant.
+
 The dashboard follows the language of your Home Assistant: Dutch if Home Assistant is set to Dutch, English otherwise.
 
 ### Setting up
@@ -43,6 +45,8 @@ Only Home Assistant administrators see the sidebar item. If you have several adm
 Het dashboard volgt de taal van je Home Assistant: Nederlands als Home Assistant Nederlands is, anders Engels.
 
 Statistieken van je AdGuard DNS-account (adguard-dns.io) direct in Home Assistant.
+
+**Let op:** deze app is voor **AdGuard DNS**, de DNS-dienst in de cloud van AdGuard (adguard-dns.io). Hij werkt niet met **AdGuard Home**, de gratis software die je zelf installeert en draait; gebruik voor AdGuard Home de officiële AdGuard Home-integratie van Home Assistant.
 
 ### Instellen
 

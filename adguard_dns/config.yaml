@@ -1,7 +1,7 @@
 name: AdGuard DNS Dashboard
-version: "1.4.3"
+version: "1.5.0"
 slug: adguard_dns_dashboard
-description: Statistieken van je AdGuard DNS-account. API-key aanmaken via adguard-dns.io, User preferences, API keys.
+description: "Statistics of your AdGuard DNS account. Create an API key at adguard-dns.io, User preferences, API keys."
 url: https://github.com/Fonfey/hassio-addons
 image: ghcr.io/fonfey/{arch}-adguard-dns-dashboard
 arch:

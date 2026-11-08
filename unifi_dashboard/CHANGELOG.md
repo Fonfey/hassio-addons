@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.0
+
+### New
+- The dashboard is now also available in English. It follows the language of your Home Assistant: Dutch if Home Assistant is set to Dutch, English otherwise. Dates, times and numbers follow the same language.
+- The documentation is now in English, with the Dutch text below it.
+
+### Nieuw
+- Het dashboard is nu ook in het Engels beschikbaar. Het volgt de taal van je Home Assistant: Nederlands als Home Assistant Nederlands is, anders Engels. Datums, tijden en getallen volgen dezelfde taal.
+- De documentatie staat nu in het Engels, met de Nederlandse tekst eronder.
+
 ## 1.8.2
 
 ### Opgelost

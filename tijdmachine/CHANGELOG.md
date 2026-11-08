@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.6
+
+### Nieuw
+- Een losse versie weggooien die je niet meer nodig hebt: kies de versie en druk op **Deze versie weggooien**. De andere versies en het onderdeel zelf blijven staan. De huidige versie kun je niet weggooien.
+
 ## 1.0.5
 
 ### Nieuw

@@ -1,5 +1,5 @@
 name: Tijdmachine
-version: "1.0.5"
+version: "1.0.6"
 slug: tijdmachine
 description: Bewaart eerdere versies van je automations, scripts, scènes, dashboards en helpers, zodat je er één kunt terugzetten.
 url: https://github.com/Fonfey/hassio-addons

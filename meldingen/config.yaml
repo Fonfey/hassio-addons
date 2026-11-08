@@ -1,7 +1,7 @@
-name: Meldingen
-version: "1.0.1"
+name: Notifications
+version: "1.1.0"
 slug: meldingen
-description: "Zie welke meldingen Home Assistant verstuurt: wanneer, naar wie, door welke automation, en of er op een knop is gedrukt of iets mislukte."
+description: "See which notifications Home Assistant sends: when, to whom, by which automation, and whether a button was pressed or it failed."
 url: https://github.com/Fonfey/hassio-addons
 image: ghcr.io/fonfey/{arch}-ha-meldingen
 arch:
@@ -14,7 +14,7 @@ ingress: true
 ingress_port: 8099
 panel_admin: true
 panel_icon: mdi:bell-ring-outline
-panel_title: Meldingen
+panel_title: Notifications
 homeassistant_api: true
 options:
   keep_days: 30

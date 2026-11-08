@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+### New / Nieuw
+- The app is now available in English and follows the language of your Home Assistant: Dutch if Home Assistant is set to Dutch, English otherwise. The app is now called Notifications.
+- De app is nu ook in het Engels en volgt de taal van je Home Assistant: Nederlands als Home Assistant Nederlands is, anders Engels. De app heet nu Notifications.
+
 ## 1.0.1
 
 ### Verbeterd

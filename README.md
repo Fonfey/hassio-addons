@@ -6,15 +6,6 @@ Store repository for Home Assistant. Each app has its own folder with the code, 
 
 ## The apps
 
-### <img src="unifi_dashboard/icon.png" width="32" height="32" align="absmiddle" alt=""> UniFi Dashboard
-
-A live overview of your UniFi network: network map, internet traffic up to 24 hours back, what is connected to every switch port, Wi-Fi radios and clients with SSID, VLAN and signal. With insights (network check, data usage per app, flows), the system log, storage and backups, and the pictures from UniFi. [Documentation](unifi_dashboard/DOCS.md) · code in [`unifi_dashboard/`](unifi_dashboard)
-
-![UniFi Dashboard: overview with network map and internet traffic (sample data)](docs/unifi-overview-en.png)
-*Overview: the network map with your provider and the internet traffic. Click Internet, a device or a client for details.*
-
-With your own console you see the real pictures and icons from UniFi; the screenshot uses sample data.
-
 ### <img src="adguard_dns/icon.png" width="32" height="32" align="absmiddle" alt=""> AdGuard DNS Dashboard
 
 Statistics of your AdGuard DNS account, query log, blocking and unblocking, blocklists and server settings. [Documentation](adguard_dns/DOCS.md) · code in [`adguard_dns/`](adguard_dns)
@@ -29,6 +20,13 @@ One list of what needs attention in your Home Assistant: backups, offline device
 ![Maintenance: list of items in order of importance (sample data)](docs/maintenance-en.png)
 *Maintenance with sample data: the items in order of importance, from Important via Check to Clean up.*
 
+### <img src="notifications/icon.png" width="32" height="32" align="absmiddle" alt=""> Notifications
+
+See which notifications Home Assistant sends: when, to whom, from which automation, and whether a button was pressed, the notification was dismissed or sending failed. [Documentation](notifications/DOCS.md) · code in [`notifications/`](notifications)
+
+![Notifications: list of sent notifications and an overview per automation (sample data)](docs/notifications-en.png)
+*Notifications with sample data: the list, the details and the automations that send the most notifications.*
+
 ### <img src="time_machine/icon.png" width="32" height="32" align="absmiddle" alt=""> Time Machine
 
 Keeps a version of your automations, scripts, scenes, dashboards and helpers on every change. Per item you see what changed, line by line, and restore a single item, even if you deleted it, for example from Maintenance. Versions you no longer need can be discarded one by one. [Documentation](time_machine/DOCS.md) · code in [`time_machine/`](time_machine)
@@ -36,12 +34,14 @@ Keeps a version of your automations, scripts, scenes, dashboards and helpers on 
 ![Time Machine: versions of an automation and the difference with now (sample data)](docs/time-machine-en.png)
 *Time Machine with sample data: the items on the left, the versions of an automation and what changed on the right.*
 
-### <img src="notifications/icon.png" width="32" height="32" align="absmiddle" alt=""> Notifications
+### <img src="unifi_dashboard/icon.png" width="32" height="32" align="absmiddle" alt=""> UniFi Dashboard
 
-See which notifications Home Assistant sends: when, to whom, from which automation, and whether a button was pressed, the notification was dismissed or sending failed. [Documentation](notifications/DOCS.md) · code in [`notifications/`](notifications)
+A live overview of your UniFi network: network map, internet traffic up to 24 hours back, what is connected to every switch port, Wi-Fi radios and clients with SSID, VLAN and signal. With insights (network check, data usage per app, flows), the system log, storage and backups, and the pictures from UniFi. [Documentation](unifi_dashboard/DOCS.md) · code in [`unifi_dashboard/`](unifi_dashboard)
 
-![Notifications: list of sent notifications and an overview per automation (sample data)](docs/notifications-en.png)
-*Notifications with sample data: the list, the details and the automations that send the most notifications.*
+![UniFi Dashboard: overview with network map and internet traffic (sample data)](docs/unifi-overview-en.png)
+*Overview: the network map with your provider and the internet traffic. Click Internet, a device or a client for details.*
+
+With your own console you see the real pictures and icons from UniFi; the screenshot uses sample data.
 
 ## Installing in Home Assistant
 

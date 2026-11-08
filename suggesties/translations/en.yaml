@@ -1,7 +1,0 @@
-configuration:
-  history_days:
-    name: History to look at (days)
-    description: How many days back the app looks for habits. Home Assistant keeps 10 days by default; more only helps if your recorder keeps more.
-  allowed_users:
-    name: Allowed administrators (optional)
-    description: Only administrators see the sidebar item. Enter usernames if not every administrator may see it. Empty means all administrators.

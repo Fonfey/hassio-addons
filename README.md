@@ -50,13 +50,6 @@ Zie welke meldingen Home Assistant verstuurt: wanneer, naar wie, door welke auto
 ![Meldingen: lijst met verstuurde meldingen en een overzicht per automation (voorbeeldgegevens)](docs/meldingen.png)
 *Meldingen met voorbeeldgegevens: de lijst, de details en de automations die de meeste meldingen sturen.*
 
-### Suggesties
-
-Stelt kant-en-klare automations voor op basis van je eigen apparaten en wat je met de hand doet, bijvoorbeeld een lamp die je elke avond rond zonsondergang aanzet of een melding als de wasmachine klaar is. Jij kiest wat er gemaakt wordt; alles wordt lokaal berekend. [Documentatie](suggesties/DOCS.md) · code in [HA_Suggestion](https://github.com/Fonfey/HA_Suggestion)
-
-![Suggesties: lijst met voorstellen en de uitleg van één suggestie (voorbeeldgegevens)](docs/suggesties.png)
-*Suggesties met voorbeeldgegevens van een verzonnen huis: links de voorstellen, rechts waarom deze suggestie en wat er gemaakt wordt.*
-
 ## Installeren in Home Assistant
 
 1. Ga naar **Instellingen → Apps → App Store**.
@@ -66,4 +59,4 @@ Stelt kant-en-klare automations voor op basis van je eigen apparaten en wat je m
 
 De apps worden geleverd als kant-en-klare images op `ghcr.io/fonfey`. Je hebt geen token of extra login nodig.
 
-Onderhoud, Tijdmachine, Meldingen en Suggesties draaien helemaal lokaal: ze praten alleen met je eigen Home Assistant en laden niets van internet, ook geen lettertypen. Het UniFi Dashboard praat daarnaast met je eigen UniFi-console, en het AdGuard DNS Dashboard met de AdGuard DNS-dienst.
+Onderhoud, Tijdmachine en Meldingen draaien helemaal lokaal: ze praten alleen met je eigen Home Assistant en laden niets van internet, ook geen lettertypen. Het UniFi Dashboard praat daarnaast met je eigen UniFi-console, en het AdGuard DNS Dashboard met de AdGuard DNS-dienst.

@@ -8,7 +8,7 @@ Store repository for Home Assistant. This is where the app descriptions live; th
 
 ### The apps
 
-#### UniFi Dashboard
+#### <img src="unifi_dashboard/icon.png" width="32" height="32" align="absmiddle" alt=""> UniFi Dashboard
 
 A live overview of your UniFi network: network map, internet traffic up to 24 hours back, what is connected to every switch port, Wi-Fi radios and clients with SSID, VLAN and signal. With insights (network check, data usage per app, flows), the system log, storage and backups, and the pictures from UniFi. [Documentation](unifi_dashboard/DOCS.md) · code in [HomeAssistantUnifi](https://github.com/Fonfey/HomeAssistantUnifi)
 
@@ -26,28 +26,28 @@ A live overview of your UniFi network: network map, internet traffic up to 24 ho
 
 With your own console you see the real pictures and icons from UniFi; the screenshots use sample data.
 
-#### AdGuard DNS Dashboard
+#### <img src="adguard_dns/icon.png" width="32" height="32" align="absmiddle" alt=""> AdGuard DNS Dashboard
 
 Statistics of your AdGuard DNS account, query log, blocking and unblocking, blocklists and server settings. [Documentation](adguard_dns/DOCS.md) · code in [HomeAssistantAdguard](https://github.com/Fonfey/HomeAssistantAdguard)
 
 ![AdGuard DNS Dashboard: overview of requests and blocks (sample data)](docs/adguard-dns-dashboard-en.png)
 *AdGuard DNS Dashboard with sample data: the overview with requests, blocks, servers and devices.*
 
-#### Maintenance
+#### <img src="onderhoud/icon.png" width="32" height="32" align="absmiddle" alt=""> Maintenance
 
 One list of what needs attention in your Home Assistant: backups, offline devices, batteries, sensors without data, automations that work against each other or never run, and what you can clean up. If you delete an automation and have Time Machine, you restore it with one button. [Documentation](onderhoud/DOCS.md) · code in [HomeAssistantOnderhoud](https://github.com/Fonfey/HomeAssistantOnderhoud)
 
 ![Maintenance: list of items in order of importance (sample data)](docs/onderhoud-overzicht-en.png)
 *Maintenance with sample data: the items in order of importance, from Important via Check to Clean up.*
 
-#### Time Machine
+#### <img src="tijdmachine/icon.png" width="32" height="32" align="absmiddle" alt=""> Time Machine
 
 Keeps a version of your automations, scripts, scenes, dashboards and helpers on every change. Per item you see what changed, line by line, and restore a single item, even if you deleted it, for example from Maintenance. Versions you no longer need can be discarded one by one. [Documentation](tijdmachine/DOCS.md) · code in [HA_Timemachine](https://github.com/Fonfey/HA_Timemachine)
 
 ![Time Machine: versions of an automation and the difference with now (sample data)](docs/tijdmachine-en.png)
 *Time Machine with sample data: the items on the left, the versions of an automation and what changed on the right.*
 
-#### Notifications
+#### <img src="meldingen/icon.png" width="32" height="32" align="absmiddle" alt=""> Notifications
 
 See which notifications Home Assistant sends: when, to whom, from which automation, and whether a button was pressed, the notification was dismissed or sending failed. [Documentation](meldingen/DOCS.md) · code in [HA_Alerts](https://github.com/Fonfey/HA_Alerts)
 
@@ -71,7 +71,7 @@ Store-repository voor Home Assistant. Hier staan de app-beschrijvingen; de code 
 
 ### De apps
 
-#### UniFi Dashboard
+#### <img src="unifi_dashboard/icon.png" width="32" height="32" align="absmiddle" alt=""> UniFi Dashboard
 
 Live overzicht van je UniFi-netwerk: netwerkkaart, internetverkeer tot 24 uur terug, wat er op elke switchpoort zit, wifi-radio's en clients met SSID, VLAN en signaal. Met inzichten (netwerkcheck, dataverbruik per app, flows), het systeemlogboek, opslag en back-ups, en de afbeeldingen uit UniFi. [Documentatie](unifi_dashboard/DOCS.md) · code in [HomeAssistantUnifi](https://github.com/Fonfey/HomeAssistantUnifi)
 
@@ -89,28 +89,28 @@ Live overzicht van je UniFi-netwerk: netwerkkaart, internetverkeer tot 24 uur te
 
 Met je eigen console zie je de echte afbeeldingen en iconen uit UniFi; de screenshots gebruiken voorbeeldgegevens.
 
-#### AdGuard DNS Dashboard
+#### <img src="adguard_dns/icon.png" width="32" height="32" align="absmiddle" alt=""> AdGuard DNS Dashboard
 
 Statistieken van je AdGuard DNS-account, querylog, blokkeren en deblokkeren, blokkeerlijsten en serverinstellingen. [Documentatie](adguard_dns/DOCS.md) · code in [HomeAssistantAdguard](https://github.com/Fonfey/HomeAssistantAdguard)
 
 ![AdGuard DNS Dashboard: overzicht van verzoeken en blokkades (voorbeeldgegevens)](docs/adguard-dns-dashboard.png)
 *AdGuard DNS Dashboard met voorbeeldgegevens: het overzicht met verzoeken, blokkades, servers en apparaten.*
 
-#### Maintenance (Onderhoud)
+#### <img src="onderhoud/icon.png" width="32" height="32" align="absmiddle" alt=""> Maintenance (Onderhoud)
 
 Eén lijst met wat aandacht nodig heeft in je Home Assistant: back-ups, offline apparaten, batterijen, sensoren zonder data, automations die elkaar tegenwerken of nooit draaien, en wat je kunt opruimen. Verwijder je een automation en heb je de Tijdmachine, dan zet je hem met één knop terug. [Documentatie](onderhoud/DOCS.md) · code in [HomeAssistantOnderhoud](https://github.com/Fonfey/HomeAssistantOnderhoud)
 
 ![Onderhoud: lijst met punten op volgorde van belang (voorbeeldgegevens)](docs/onderhoud-overzicht.png)
 *Onderhoud met voorbeeldgegevens: de punten op volgorde van belang, van Belangrijk via Nalopen naar Opruimen.*
 
-#### Time Machine (Tijdmachine)
+#### <img src="tijdmachine/icon.png" width="32" height="32" align="absmiddle" alt=""> Time Machine (Tijdmachine)
 
 Bewaart bij elke wijziging een versie van je automations, scripts, scènes, dashboards en helpers. Je ziet per onderdeel wat er veranderde, regel voor regel, en zet één onderdeel terug, ook als je het hebt verwijderd, bijvoorbeeld vanuit Onderhoud. Versies die je niet meer nodig hebt, gooi je een voor een weg. [Documentatie](tijdmachine/DOCS.md) · code in [HA_Timemachine](https://github.com/Fonfey/HA_Timemachine)
 
 ![Tijdmachine: versies van een automation en het verschil met nu (voorbeeldgegevens)](docs/tijdmachine.png)
 *Tijdmachine met voorbeeldgegevens: links de onderdelen, rechts de versies van een automation en wat er veranderde.*
 
-#### Notifications (Meldingen)
+#### <img src="meldingen/icon.png" width="32" height="32" align="absmiddle" alt=""> Notifications (Meldingen)
 
 Zie welke meldingen Home Assistant verstuurt: wanneer, naar wie, door welke automation, en of er op een knop is gedrukt, de melding is weggeveegd of het versturen mislukte. [Documentatie](meldingen/DOCS.md) · code in [HA_Alerts](https://github.com/Fonfey/HA_Alerts)
 

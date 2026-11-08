@@ -1,7 +1,7 @@
-name: Tijdmachine
-version: "1.0.7"
+name: Time Machine
+version: "1.1.0"
 slug: tijdmachine
-description: Bewaart eerdere versies van je automations, scripts, scènes, dashboards en helpers, zodat je er één kunt terugzetten.
+description: "Keeps earlier versions of your automations, scripts, scenes, dashboards and helpers, so you can restore one."
 url: https://github.com/Fonfey/hassio-addons
 image: ghcr.io/fonfey/{arch}-ha-tijdmachine
 arch:
@@ -14,7 +14,7 @@ ingress: true
 ingress_port: 8099
 panel_admin: true
 panel_icon: mdi:history
-panel_title: Tijdmachine
+panel_title: Time Machine
 homeassistant_api: true
 options:
   keep_days: 30

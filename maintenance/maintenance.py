@@ -9,7 +9,7 @@ apparaten, lege batterijen, gestopte apps, automations die elkaar in de weg
 zitten of nooit draaien, en verweesde entiteiten.
 
 Draait als Home Assistant-app (gebruikt de Supervisor-token, geen API-key nodig).
-Los starten zonder Home Assistant toont voorbeeldgegevens:  python3 onderhoud.py --demo
+Los starten zonder Home Assistant toont voorbeeldgegevens:  python3 maintenance.py --demo
 """
 
 import base64

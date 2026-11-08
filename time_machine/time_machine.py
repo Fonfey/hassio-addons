@@ -7,7 +7,7 @@ Bewaart bij elke wijziging een versie van je automations, scripts, scènes,
 dashboards en helpers. Je ziet per onderdeel wat er veranderde en zet één
 onderdeel terug naar een eerdere versie, ook als je het hebt verwijderd.
 
-Los starten zonder Home Assistant toont voorbeeldgegevens:  python3 tijdmachine.py --demo
+Los starten zonder Home Assistant toont voorbeeldgegevens:  python3 time_machine.py --demo
 """
 
 import difflib

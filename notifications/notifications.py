@@ -7,7 +7,7 @@ Houdt bij welke meldingen Home Assistant verstuurt: wanneer, naar wie, door
 welke automation of welk script, en wat ermee gebeurde (een knop gekozen,
 weggeveegd op Android, of mislukt). Alleen kijken; de app verstuurt zelf niets.
 
-Los starten zonder Home Assistant toont voorbeeldgegevens:  python3 meldingen.py --demo
+Los starten zonder Home Assistant toont voorbeeldgegevens:  python3 notifications.py --demo
 """
 
 import os

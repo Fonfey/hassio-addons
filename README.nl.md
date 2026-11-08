@@ -1,5 +1,7 @@
 # Fonfey's Home Assistant addons
 
+![Home Assistant-apps: AdGuard DNS Dashboard, Maintenance, Notifications, Time Machine en UniFi Dashboard](docs/social-preview.png)
+
 🇬🇧 [Read in English](README.md)
 
 Store-repository voor Home Assistant. Elke app heeft een eigen map met de code, de documentatie en de changelog, en wordt als kant-en-klaar image geleverd. Elke app volgt de taal van je Home Assistant: Nederlands als Home Assistant Nederlands is, anders Engels.

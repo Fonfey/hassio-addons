@@ -1,9 +1,9 @@
 name: Notifications
-version: "1.1.0"
+version: "1.1.1"
 slug: meldingen
 description: "See which notifications Home Assistant sends: when, to whom, by which automation, and whether a button was pressed or it failed."
-url: https://github.com/Fonfey/hassio-addons
-image: ghcr.io/fonfey/{arch}-ha-meldingen
+url: https://github.com/Fonfey/hassio-addons/tree/main/meldingen
+image: ghcr.io/fonfey/{arch}-hassio-notifications
 arch:
   - aarch64
   - amd64

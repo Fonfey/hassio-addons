@@ -1,9 +1,9 @@
 name: Maintenance
-version: "1.4.0"
+version: "1.4.1"
 slug: onderhoud
 description: "One overview of what needs attention in your Home Assistant, in order of importance."
-url: https://github.com/Fonfey/hassio-addons
-image: ghcr.io/fonfey/{arch}-ha-onderhoud
+url: https://github.com/Fonfey/hassio-addons/tree/main/onderhoud
+image: ghcr.io/fonfey/{arch}-hassio-maintenance
 arch:
   - aarch64
   - amd64

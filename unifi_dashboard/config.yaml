@@ -1,9 +1,9 @@
 name: UniFi Dashboard
-version: "1.9.0"
+version: "1.9.1"
 slug: unifi_dashboard
 description: Live overview of your UniFi network. Create the API key in UniFi Network under Settings, Control Plane, Integrations.
-url: https://github.com/Fonfey/hassio-addons
-image: ghcr.io/fonfey/{arch}-unifi-dashboard
+url: https://github.com/Fonfey/hassio-addons/tree/main/unifi_dashboard
+image: ghcr.io/fonfey/{arch}-hassio-unifi-dashboard
 arch:
   - aarch64
   - amd64

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1
+
+- The code now lives in the store repository [Fonfey/hassio-addons](https://github.com/Fonfey/hassio-addons), and the image is built from there. Nothing changes in how the app works.
+- De code staat nu in de store-repository [Fonfey/hassio-addons](https://github.com/Fonfey/hassio-addons) en het image wordt daar gebouwd. Aan de werking van de app verandert niets.
+
 ## 1.1.0
 
 ### New / Nieuw

@@ -72,6 +72,16 @@ Maintenance, Time Machine and Notifications run completely locally: they only ta
 
 Every app folder contains everything for that app: `config.yaml`, the code, the `Dockerfile`, `DOCS.md`, `CHANGELOG.md` and the translations. When a folder changes on `main`, GitHub Actions builds the image for amd64 and aarch64 and publishes it on `ghcr.io/fonfey`. For a new version, raise `version` in `config.yaml` and add it to `CHANGELOG.md`; Home Assistant then offers the update.
 
-Most apps also run without Home Assistant, with sample data: for example `python3 maintenance/maintenance.py --demo`. Add `?lang=en` or `?lang=nl` to the address to choose a language.
+To try an app or work on the code without Home Assistant, every app also runs on its own computer with sample data. You only need Python 3; nothing has to be installed. Run the command from the root of this repository and open the address in your browser:
+
+| App | Command | Address |
+| --- | --- | --- |
+| AdGuard DNS Dashboard | `python3 adguard_dns/adguard_dashboard.py --demo` | http://localhost:8081 |
+| Maintenance | `python3 maintenance/maintenance.py --demo` | http://localhost:8082 |
+| Notifications | `python3 notifications/notifications.py --demo` | http://localhost:8093 |
+| Time Machine | `python3 time_machine/time_machine.py --demo` | http://localhost:8091 |
+| UniFi Dashboard | `python3 unifi_dashboard/unifi_dashboard.py --demo` | http://localhost:8080 |
+
+Add `?lang=en` or `?lang=nl` to the address to choose a language. This is only for testing: to use the apps, install them in Home Assistant as described above.
 
 Licensed under the [MIT license](LICENSE). The bundled IBM Plex fonts are under the SIL Open Font License (see `fonts/OFL.txt` in the app folders).

@@ -72,6 +72,16 @@ Onderhoud, Tijdmachine en Meldingen draaien helemaal lokaal: ze praten alleen me
 
 Elke app-map bevat alles van die app: `config.yaml`, de code, de `Dockerfile`, `DOCS.md`, `CHANGELOG.md` en de vertalingen. Verandert een map op `main`, dan bouwt GitHub Actions het image voor amd64 en aarch64 en zet het op `ghcr.io/fonfey`. Voor een nieuwe versie verhoog je `version` in `config.yaml` en vul je `CHANGELOG.md` aan; Home Assistant biedt dan de update aan.
 
-De meeste apps draaien ook zonder Home Assistant, met voorbeeldgegevens: bijvoorbeeld `python3 maintenance/maintenance.py --demo`. Zet `?lang=en` of `?lang=nl` achter het adres om een taal te kiezen.
+Wil je een app uitproberen of aan de code werken zonder Home Assistant, dan draait elke app ook los op je computer, met voorbeeldgegevens. Je hebt alleen Python 3 nodig; er hoeft niets geïnstalleerd te worden. Voer het commando uit in de hoofdmap van deze repository en open het adres in je browser:
+
+| App | Commando | Adres |
+| --- | --- | --- |
+| AdGuard DNS Dashboard | `python3 adguard_dns/adguard_dashboard.py --demo` | http://localhost:8081 |
+| Maintenance | `python3 maintenance/maintenance.py --demo` | http://localhost:8082 |
+| Notifications | `python3 notifications/notifications.py --demo` | http://localhost:8093 |
+| Time Machine | `python3 time_machine/time_machine.py --demo` | http://localhost:8091 |
+| UniFi Dashboard | `python3 unifi_dashboard/unifi_dashboard.py --demo` | http://localhost:8080 |
+
+Zet `?lang=en` of `?lang=nl` achter het adres om een taal te kiezen. Dit is alleen om te testen: om de apps te gebruiken installeer je ze in Home Assistant, zoals hierboven beschreven.
 
 Valt onder de [MIT-licentie](LICENSE). De meegeleverde IBM Plex-lettertypen vallen onder de SIL Open Font License (zie `fonts/OFL.txt` in de app-mappen).

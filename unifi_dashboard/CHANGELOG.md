@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.3
+
+- Safer handling of the product images: a requested image name can never point outside the image folder. Found by code scanning; the existing checks already blocked this, now it is also enforced on the full path.
+- Veiliger omgaan met de productafbeeldingen: een opgevraagde afbeeldingsnaam kan nooit buiten de afbeeldingenmap uitkomen. Gevonden door code scanning; de bestaande controles hielden dit al tegen, nu wordt het ook op het volledige pad afgedwongen.
+
 ## 1.9.2
 
 - The sidebar icon now matches the app icon: the network symbol.

@@ -25,6 +25,7 @@ from html import escape as html_escape
 import math
 import os
 import random
+import re
 import ssl
 import sys
 import threading
@@ -390,18 +391,30 @@ FP_URL = "https://static.ui.com/fingerprint/0/{id}_{s}x{s}.png"
 _fp_fail = {"logged": False}
 
 
+def img_path(name):
+    """Pad binnen IMG_DIR; None als de naam buiten die map zou uitkomen."""
+    base = os.path.realpath(IMG_DIR)
+    path = os.path.realpath(os.path.join(base, name))
+    if not path.startswith(base + os.sep):
+        return None
+    return path
+
+
 def fp_file(fp_id, want):
     """Bewaard client-icoon (zelfde als in UniFi); None als het niet bestaat."""
     if not str(fp_id).isdigit() or len(str(fp_id)) > 9:
         return None
+    fp_num = int(fp_id)
     s = 257 if want > 129 else 129
     os.makedirs(IMG_DIR, exist_ok=True)
-    path = os.path.join(IMG_DIR, f"fp{fp_id}_{s}.png")
+    path = img_path(f"fp{fp_num}_{s}.png")
+    if not path:
+        return None
     if os.path.exists(path + ".none"):
         return None
     if not os.path.exists(path):
         try:
-            req = urllib.request.Request(FP_URL.format(id=fp_id, s=s), headers={"User-Agent": "unifi-dashboard-ha-app"})
+            req = urllib.request.Request(FP_URL.format(id=fp_num, s=s), headers={"User-Agent": "unifi-dashboard-ha-app"})
             with urllib.request.urlopen(req, timeout=15) as r:
                 data = r.read()
         except urllib.error.HTTPError as e:
@@ -482,13 +495,15 @@ def image_for(*names):
 
 def icon_file(icon_id, want):
     """Pad naar de bewaarde afbeelding; haalt hem op als hij er nog niet is."""
-    if not all(c in "0123456789abcdef-" for c in icon_id.lower()) or len(icon_id) > 64:
+    if not re.fullmatch(r"[0-9a-fA-F-]{1,64}", str(icon_id)):
         return None
     res = next((r for k, r in (_uidb["index"] or {}).items() if r[0] == icon_id), (icon_id, [[129, 129], [257, 257]]))[1]
     sizes = sorted((int(w), int(h)) for w, h in res if int(w) == int(h))
     w, h = next(((a, b) for a, b in sizes if a >= want), sizes[-1] if sizes else (129, 129))
     os.makedirs(IMG_DIR, exist_ok=True)
-    path = os.path.join(IMG_DIR, f"{icon_id}_{w}.png")
+    path = img_path(f"{icon_id.lower()}_{int(w)}.png")
+    if not path:
+        return None
     if not os.path.exists(path):
         req = urllib.request.Request(ICON_URL.format(id=icon_id, w=w, h=h), headers={"User-Agent": "unifi-dashboard-ha-app"})
         with urllib.request.urlopen(req, timeout=15) as r:

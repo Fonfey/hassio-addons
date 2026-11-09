@@ -14,38 +14,47 @@ Statistics of your AdGuard DNS account, query log, blocking and unblocking, bloc
 
 **Note:** this app is for **AdGuard DNS**, the cloud DNS service run by AdGuard (adguard-dns.io). It does not work with **AdGuard Home**, the free software you install and run yourself; for AdGuard Home, use the official AdGuard Home integration in Home Assistant.
 
-![AdGuard DNS Dashboard: overview of requests and blocks (sample data)](docs/adguard-dns-dashboard-en.png)
-*AdGuard DNS Dashboard with sample data: the overview with requests, blocks, servers and devices.*
+<img width="1046" height="571" alt="image" src="https://github.com/user-attachments/assets/58497767-21b4-4cfc-80bc-e3d82154c687" />
+<img width="1055" height="523" alt="image" src="https://github.com/user-attachments/assets/d1961a7f-eace-49da-932c-1fa25f783c41" />
+<img width="1055" height="427" alt="image" src="https://github.com/user-attachments/assets/1acc6074-78a6-4a11-9cbf-0dfd472e78c3" />
+*AdGuard DNS Dashboard with the overview with requests, blocks, servers and devices.*
 
 ### <img src="maintenance/icon.png" width="32" height="32" align="absmiddle" alt=""> Maintenance
 
 One list of what needs attention in your Home Assistant: backups, offline devices, batteries, sensors without data, automations that work against each other or never run, and what you can clean up. If you delete an automation and have Time Machine, you restore it with one button. [Documentation](maintenance/DOCS.md) · code in [`maintenance/`](maintenance)
 
-![Maintenance: list of items in order of importance (sample data)](docs/maintenance-en.png)
+<img width="687" height="305" alt="image" src="https://github.com/user-attachments/assets/9baff171-ecbf-4d3b-87ca-642462cbe611" />
+<img width="683" height="203" alt="image" src="https://github.com/user-attachments/assets/724ccec7-1a21-4e40-9dea-f4507989f30f" />
+<img width="688" height="186" alt="image" src="https://github.com/user-attachments/assets/64129f2a-5f82-4792-84da-93304948bf65" />
+
+
+
 *Maintenance with sample data: the items in order of importance, from Important via Check to Clean up.*
 
 ### <img src="notifications/icon.png" width="32" height="32" align="absmiddle" alt=""> Notifications
 
 See which notifications Home Assistant sends: when, to whom, from which automation, and whether a button was pressed, the notification was dismissed or sending failed. [Documentation](notifications/DOCS.md) · code in [`notifications/`](notifications)
 
-![Notifications: list of sent notifications and an overview per automation (sample data)](docs/notifications-en.png)
+<img width="1025" height="766" alt="image" src="https://github.com/user-attachments/assets/3e75aba5-4dbb-4605-b845-4954acce1208" />
 *Notifications with sample data: the list, the details and the automations that send the most notifications.*
 
 ### <img src="time_machine/icon.png" width="32" height="32" align="absmiddle" alt=""> Time Machine
 
 Keeps a version of your automations, scripts, scenes, dashboards and helpers on every change. Per item you see what changed, line by line, and restore a single item, even if you deleted it, for example from Maintenance. Versions you no longer need can be discarded one by one. [Documentation](time_machine/DOCS.md) · code in [`time_machine/`](time_machine)
 
-![Time Machine: versions of an automation and the difference with now (sample data)](docs/time-machine-en.png)
+<img width="1027" height="658" alt="image" src="https://github.com/user-attachments/assets/41731250-8312-4e27-9dbd-17b6f7492365" />
+<img width="1026" height="815" alt="image" src="https://github.com/user-attachments/assets/63412184-3b3c-4395-bec0-b4802771b156" />
 *Time Machine with sample data: the items on the left, the versions of an automation and what changed on the right.*
 
 ### <img src="unifi_dashboard/icon.png" width="32" height="32" align="absmiddle" alt=""> UniFi Dashboard
 
 A live overview of your UniFi network: network map, internet traffic up to 24 hours back, what is connected to every switch port, Wi-Fi radios and clients with SSID, VLAN and signal. With insights (network check, data usage per app, flows), the system log, storage and backups, and the pictures from UniFi. [Documentation](unifi_dashboard/DOCS.md) · code in [`unifi_dashboard/`](unifi_dashboard)
 
-![UniFi Dashboard: overview with network map and internet traffic (sample data)](docs/unifi-overview-en.png)
-*Overview: the network map with your provider and the internet traffic. Click Internet, a device or a client for details.*
+<img width="1172" height="683" alt="image" src="https://github.com/user-attachments/assets/9ac1a019-38e6-48f7-ae77-9ffd643171b6" />
+<img width="1166" height="649" alt="image" src="https://github.com/user-attachments/assets/524ed98d-fccf-428f-9e7e-051b553013a6" />
+<img width="850" height="269" alt="image" src="https://github.com/user-attachments/assets/a19149cf-6ea2-4647-9c4d-b858c9925f44" />
 
-With your own console you see the real pictures and icons from UniFi; the screenshot uses sample data.
+*Overview: the network map with your provider and the internet traffic. Click Internet, a device or a client for details.*
 
 ## Installing in Home Assistant
 

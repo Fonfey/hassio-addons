@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.3
+
+- Safer file handling: files are only opened by names from a fixed list or from the app's own data, never from the text of a request. Found by code scanning; the existing checks already blocked misuse.
+- Veiliger omgaan met bestanden: bestanden worden alleen geopend met namen uit een vaste lijst of uit de eigen gegevens van de app, nooit met de tekst uit een verzoek. Gevonden door code scanning; de bestaande controles hielden misbruik al tegen.
+
 ## 1.1.2
 
 - The sidebar icon now matches the app icon: the bell.

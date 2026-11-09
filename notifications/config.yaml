@@ -1,5 +1,5 @@
 name: Notifications
-version: "1.1.2"
+version: "1.1.3"
 slug: meldingen
 description: "See which notifications Home Assistant sends: when, to whom, by which automation, and whether a button was pressed or it failed."
 url: https://github.com/Fonfey/hassio-addons/tree/main/notifications

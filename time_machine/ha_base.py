@@ -326,10 +326,12 @@ class BaseHandler(BaseHTTPRequestHandler):
 
     def font(self, name):
         """Lettertypen worden met de app meegeleverd, zodat de pagina niets van internet laadt."""
-        if name not in FONT_FILES:
+        # alleen een bestandsnaam uit de vaste lijst gebruiken, nooit de opgevraagde tekst zelf
+        fname = next((f for f in sorted(FONT_FILES) if f == name), None)
+        if fname is None:
             self.send(404, "", "text/plain")
             return
-        with open(os.path.join(FONT_DIR, name), "rb") as f:
+        with open(os.path.join(FONT_DIR, fname), "rb") as f:
             data = f.read()
         self.send_response(200)
         self.send_header("Content-Type", "font/woff2")

@@ -364,7 +364,8 @@ def purge(key):
                 other.pop("copyOf", None)
                 save(other)
         try:
-            os.remove(_file(key))
+            # bestandsnaam van het bewaarde onderdeel, niet van de opgevraagde sleutel
+            os.remove(_file(it["key"]))
         except OSError:
             pass
     return hb.tx("Definitief verwijderd.", "Permanently deleted.")

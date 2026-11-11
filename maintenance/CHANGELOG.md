@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.3
+
+- New sidebar icon: a toolbox. The wrench was the same icon as the File editor app, which made them easy to mix up.
+- Nieuw icoon in de zijbalk: een gereedschapskist. De moersleutel was hetzelfde icoon als de app File editor, waardoor je ze makkelijk door elkaar haalde.
+
 ## 1.4.2
 
 - The sidebar icon now matches the app icon: the wrench.

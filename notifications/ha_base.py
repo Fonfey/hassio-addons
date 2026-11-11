@@ -392,9 +392,45 @@ class BaseHandler(BaseHTTPRequestHandler):
         pass
 
 
+def refresh_panel(marker_dir):
+    """Zet de knop in de zijbalk opnieuw neer na een update.
+
+    Home Assistant leest de naam en het icoon van de zijbalkknop alleen bij het aanzetten van
+    'Toon in zijbalk'. Na een nieuwe versie doen we dat hier zelf: de knop eruit en er weer in,
+    zodat een nieuwe naam of een nieuw icoon meteen zichtbaar is. Gebeurt één keer per versie.
+    """
+    marker = os.path.join(marker_dir, ".panel_version")
+    for attempt in range(6):
+        time.sleep(20 if attempt == 0 else 60)
+        try:
+            info = http_json("GET", "http://supervisor/addons/self/info")
+            info = info.get("data", info) if isinstance(info, dict) else {}
+            slug, version = info.get("slug"), str(info.get("version") or "")
+            if not slug or not version:
+                continue
+            try:
+                with open(marker, encoding="utf-8") as f:
+                    if f.read().strip() == version:
+                        return
+            except OSError:
+                pass
+            if info.get("ingress_panel"):
+                url = f"http://supervisor/core/api/hassio_push/panel/{slug}"
+                http_json("DELETE", url)
+                time.sleep(1)
+                http_json("POST", url)
+            with open(marker, "w", encoding="utf-8") as f:
+                f.write(version)
+            return
+        except Exception as err:  # noqa: BLE001 - nooit de app laten stoppen hierom
+            print(f"Zijbalkknop bijwerken lukte niet (poging {attempt + 1}): {err}", flush=True)
+
+
 def serve(handler, port_ha=8099, port_local=8090):
     port = port_ha if HA_APP else int(os.environ.get("PORT", str(port_local)))
     srv = ThreadingHTTPServer((LISTEN, port), handler)
+    if HA_APP and TOKEN:
+        start_thread(refresh_panel, "/data")
     print(f"Luistert op http://{LISTEN}:{port}" + (" (voorbeeldgegevens)" if DEMO else ""), flush=True)
     srv.serve_forever()
 

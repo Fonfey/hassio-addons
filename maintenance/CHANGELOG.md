@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.4
+
+- After an update, the sidebar button now refreshes by itself, so a new name or icon shows right away. You no longer have to switch "Show in sidebar" off and on.
+- Na een update werkt de knop in de zijbalk zichzelf bij, zodat een nieuwe naam of een nieuw icoon meteen zichtbaar is. Je hoeft "Toon in zijbalk" niet meer uit en aan te zetten.
+
 ## 1.4.3
 
 - New sidebar icon: a toolbox. The wrench was the same icon as the File editor app, which made them easy to mix up.

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.4
+
+- After an update, the sidebar button now refreshes by itself, so a new name or icon shows right away. You no longer have to switch "Show in sidebar" off and on.
+- Na een update werkt de knop in de zijbalk zichzelf bij, zodat een nieuwe naam of een nieuw icoon meteen zichtbaar is. Je hoeft "Toon in zijbalk" niet meer uit en aan te zetten.
+
 ## 1.1.3
 
 - Safer file handling: files are only opened by names from a fixed list or from the app's own data, never from the text of a request. Found by code scanning; the existing checks already blocked misuse.

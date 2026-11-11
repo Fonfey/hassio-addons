@@ -1,5 +1,5 @@
 name: Maintenance
-version: "1.4.3"
+version: "1.4.4"
 slug: onderhoud
 description: "One overview of what needs attention in your Home Assistant, in order of importance."
 url: https://github.com/Fonfey/hassio-addons/tree/main/maintenance

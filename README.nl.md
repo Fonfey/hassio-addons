@@ -30,6 +30,15 @@ Eén lijst met wat aandacht nodig heeft in je Home Assistant: back-ups, offline 
 
 *Punten uit een echte Home Assistant: een reparatie, een offline apparaat en een automation die nooit is gestart.*
 
+### <img src="media_manager/icon.png" width="32" height="32" align="absmiddle" alt=""> Media manager
+
+De mediamap met echte miniaturen, de volledige bestandsnaam en de datum waarop de foto is gemaakt, in plaats van grijze iconen met afgekapte namen. Uploaden door te slepen, hernoemen, verplaatsen, downloaden en verwijderen, met een prullenbak om vergissingen terug te draaien. Kopieer het `media-source://`-adres of het bestandspad om een bestand in een kaart of automation te gebruiken. Je kiest zelf welke map hij toont. [Documentatie](media_manager/DOCS.md) · code in [`media_manager/`](media_manager)
+
+<img src="docs/media-manager-screenshot.png" width="1060" height="860" alt="Media manager: mappen en foto's met miniaturen, gegroepeerd per jaar">
+<img src="docs/media-manager-viewer.png" width="1060" height="780" alt="Media manager: een foto groot bekeken, met de gegevens en de paden om hem in Home Assistant te gebruiken">
+
+*Het overzicht en een foto groot bekeken, met voorbeeldfoto's.*
+
 ### <img src="notifications/icon.png" width="32" height="32" align="absmiddle" alt=""> Notifications (Meldingen)
 
 Zie welke meldingen Home Assistant verstuurt: wanneer, naar wie, door welke automation, en of er op een knop is gedrukt, de melding is weggeveegd of het versturen mislukte. [Documentatie](notifications/DOCS.md) · code in [`notifications/`](notifications)
@@ -66,7 +75,7 @@ Live overzicht van je UniFi-netwerk: netwerkkaart, internetverkeer tot 24 uur te
 
 De apps worden geleverd als kant-en-klare images op `ghcr.io/fonfey`. Je hebt geen token of extra login nodig.
 
-Onderhoud, Tijdmachine en Meldingen draaien helemaal lokaal: ze praten alleen met je eigen Home Assistant en laden niets van internet, ook geen lettertypen. Het UniFi Dashboard praat daarnaast met je eigen UniFi-console, en het AdGuard DNS Dashboard met de AdGuard DNS-dienst.
+Onderhoud, Media manager, Tijdmachine en Meldingen draaien helemaal lokaal: ze praten alleen met je eigen Home Assistant en laden niets van internet, ook geen lettertypen. Het UniFi Dashboard praat daarnaast met je eigen UniFi-console, en het AdGuard DNS Dashboard met de AdGuard DNS-dienst.
 
 ## Voor ontwikkelaars
 
@@ -78,10 +87,11 @@ Wil je een app uitproberen of aan de code werken zonder Home Assistant, dan draa
 | --- | --- | --- |
 | AdGuard DNS Dashboard | `python3 adguard_dns/adguard_dashboard.py --demo` | http://localhost:8081 |
 | Maintenance | `python3 maintenance/maintenance.py --demo` | http://localhost:8082 |
+| Media manager | `python3 media_manager/media_manager.py --demo` | http://localhost:8095 |
 | Notifications | `python3 notifications/notifications.py --demo` | http://localhost:8093 |
 | Time Machine | `python3 time_machine/time_machine.py --demo` | http://localhost:8091 |
 | UniFi Dashboard | `python3 unifi_dashboard/unifi_dashboard.py --demo` | http://localhost:8080 |
 
-Zet `?lang=en` of `?lang=nl` achter het adres om een taal te kiezen. Dit is alleen om te testen: om de apps te gebruiken installeer je ze in Home Assistant, zoals hierboven beschreven.
+Media manager maakt de eerste keer voorbeeldfoto's in `media_manager/demo_media`; daarvoor en voor de miniaturen heeft hij de Python-beeldbibliotheek Pillow nodig (`pip install pillow`). Zonder Pillow draait hij ook, maar zonder miniaturen. Zet `?lang=en` of `?lang=nl` achter het adres om een taal te kiezen. Dit is alleen om te testen: om de apps te gebruiken installeer je ze in Home Assistant, zoals hierboven beschreven.
 
 Valt onder de [MIT-licentie](LICENSE). De meegeleverde IBM Plex-lettertypen vallen onder de SIL Open Font License (zie `fonts/OFL.txt` in de app-mappen).

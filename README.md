@@ -1,6 +1,6 @@
 # Fonfey's Home Assistant addons
 
-![Home Assistant apps: AdGuard DNS Dashboard, Maintenance, Notifications, Time Machine and UniFi Dashboard](docs/social-preview.png)
+![Home Assistant apps: AdGuard DNS Dashboard, Maintenance, Media manager, Notifications, Time Machine and UniFi Dashboard](docs/social-preview.png)
 
 🇳🇱 [Lees in het Nederlands](README.nl.md)
 

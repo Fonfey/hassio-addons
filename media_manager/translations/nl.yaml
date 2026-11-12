@@ -1,0 +1,10 @@
+configuration:
+  folder:
+    name: Map
+    description: Welke map de app toont. Standaard /media, de map van Mijn media in Home Assistant. Je kunt ook een map daarin kiezen, zoals /media/fotos, of een map in /share.
+  trash_days:
+    name: Prullenbak bewaren (dagen)
+    description: Hoe lang verwijderde bestanden in de prullenbak blijven, zodat je ze kunt terugzetten. 0 is meteen definitief verwijderen.
+  allowed_users:
+    name: Toegestane beheerders (optioneel)
+    description: Alleen beheerders zien de knop in de zijbalk. Vul hier gebruikersnamen in als niet elke beheerder Media manager mag gebruiken. Leeg is alle beheerders.

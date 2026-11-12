@@ -1,2 +1,4 @@
 __pycache__/
 *.pyc
+media_manager/demo_media/
+media_manager/data/

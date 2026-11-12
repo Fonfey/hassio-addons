@@ -1,0 +1,10 @@
+configuration:
+  folder:
+    name: Folder
+    description: Which folder the app shows. /media by default, the folder behind My media in Home Assistant. You can also choose a folder inside it, such as /media/photos, or a folder in /share.
+  trash_days:
+    name: Keep trash (days)
+    description: How long deleted files stay in the trash so you can restore them. 0 deletes right away.
+  allowed_users:
+    name: Allowed administrators (optional)
+    description: Only administrators see the sidebar item. Enter usernames if not every administrator may use Media manager. Empty means all administrators.

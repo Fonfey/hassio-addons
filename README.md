@@ -30,6 +30,15 @@ One list of what needs attention in your Home Assistant: backups, offline device
 
 *Items from a real Home Assistant: a repair, an offline device and an automation that has never run.*
 
+### <img src="media_manager/icon.png" width="32" height="32" align="absmiddle" alt=""> Media manager
+
+The media folder with real thumbnails, the full file name and the date the photo was taken, instead of grey icons with cut-off names. Upload by dragging, rename, move, download and delete, with a trash to undo mistakes. Copy the `media-source://` address or the file path to use a file in a card or automation. You choose which folder it shows. [Documentation](media_manager/DOCS.md) · code in [`media_manager/`](media_manager)
+
+<img src="docs/media-manager-screenshot.png" width="1060" height="860" alt="Media manager: folders and photos with thumbnails, grouped by year">
+<img src="docs/media-manager-viewer.png" width="1060" height="780" alt="Media manager: a photo viewed large, with its details and the paths to use it in Home Assistant">
+
+*The overview and a photo viewed large, with sample photos.*
+
 ### <img src="notifications/icon.png" width="32" height="32" align="absmiddle" alt=""> Notifications
 
 See which notifications Home Assistant sends: when, to whom, from which automation, and whether a button was pressed, the notification was dismissed or sending failed. [Documentation](notifications/DOCS.md) · code in [`notifications/`](notifications)
@@ -66,7 +75,7 @@ A live overview of your UniFi network: network map, internet traffic up to 24 ho
 
 The apps are delivered as ready-made images on `ghcr.io/fonfey`. You do not need a token or extra login.
 
-Maintenance, Time Machine and Notifications run completely locally: they only talk to your own Home Assistant and load nothing from the internet, not even fonts. The UniFi Dashboard also talks to your own UniFi console, and the AdGuard DNS Dashboard to the AdGuard DNS service.
+Maintenance, Media manager, Time Machine and Notifications run completely locally: they only talk to your own Home Assistant and load nothing from the internet, not even fonts. The UniFi Dashboard also talks to your own UniFi console, and the AdGuard DNS Dashboard to the AdGuard DNS service.
 
 ## For developers
 
@@ -78,10 +87,11 @@ To try an app or work on the code without Home Assistant, every app also runs on
 | --- | --- | --- |
 | AdGuard DNS Dashboard | `python3 adguard_dns/adguard_dashboard.py --demo` | http://localhost:8081 |
 | Maintenance | `python3 maintenance/maintenance.py --demo` | http://localhost:8082 |
+| Media manager | `python3 media_manager/media_manager.py --demo` | http://localhost:8095 |
 | Notifications | `python3 notifications/notifications.py --demo` | http://localhost:8093 |
 | Time Machine | `python3 time_machine/time_machine.py --demo` | http://localhost:8091 |
 | UniFi Dashboard | `python3 unifi_dashboard/unifi_dashboard.py --demo` | http://localhost:8080 |
 
-Add `?lang=en` or `?lang=nl` to the address to choose a language. This is only for testing: to use the apps, install them in Home Assistant as described above.
+Media manager makes sample photos in `media_manager/demo_media` the first time; for those and for the thumbnails it needs the Python image library Pillow (`pip install pillow`). Without Pillow it still runs, but without thumbnails. Add `?lang=en` or `?lang=nl` to the address to choose a language. This is only for testing: to use the apps, install them in Home Assistant as described above.
 
 Licensed under the [MIT license](LICENSE). The bundled IBM Plex fonts are under the SIL Open Font License (see `fonts/OFL.txt` in the app folders).

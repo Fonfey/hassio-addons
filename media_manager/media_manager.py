@@ -135,11 +135,20 @@ def clean_rel(rel):
     return "/".join(parts)
 
 
+def inside(path, root=None):
+    """Elk pad dat (deels) uit een verzoek komt, gaat hierdoor: opgezocht en binnen de gekozen map, of geweigerd."""
+    root = root or ROOT
+    path = os.path.realpath(path)
+    if path.startswith(root + os.sep):
+        return path
+    if path == root:
+        return root
+    raise Fail(400, "Dat pad valt buiten de mediamap.", "That path is outside the media folder.")
+
+
 def full_path(rel, must_exist=True):
     rel = clean_rel(rel)
-    full = os.path.realpath(os.path.join(ROOT, *rel.split("/"))) if rel else ROOT
-    if full != ROOT and not full.startswith(ROOT + os.sep):
-        raise Fail(400, "Dat pad valt buiten de mediamap.", "That path is outside the media folder.")
+    full = inside(os.path.join(ROOT, *rel.split("/"))) if rel else ROOT
     if must_exist and not os.path.lexists(full):
         raise Fail(404, "Dat bestand of die map bestaat niet (meer).", "That file or folder does not exist (any more).")
     return full, rel
@@ -154,10 +163,10 @@ def check_name(name):
     return name
 
 
-def unique_target(folder, name):
+def unique_target(folder, name, root=None):
     base, ext = os.path.splitext(name)
     cand, n = name, 2
-    while os.path.lexists(os.path.join(folder, cand)):
+    while os.path.lexists(inside(os.path.join(folder, cand), root)):
         cand, n = f"{base} ({n}){ext}", n + 1
     return cand
 
@@ -480,7 +489,7 @@ def carry(old_rel, new_full):
 def do_mkdir(parent, name):
     pfull, _ = full_path(parent)
     name = check_name(name)
-    target = os.path.join(pfull, name)
+    target = inside(os.path.join(pfull, name))
     if os.path.lexists(target):
         raise Fail(409, "Er is al iets met die naam.", "Something with that name already exists.")
     os.mkdir(target)
@@ -493,7 +502,7 @@ def do_rename(rel, name):
     if not rel:
         raise Fail(400, "De hoofdmap kan niet worden hernoemd.", "The main folder cannot be renamed.")
     name = check_name(name)
-    target = os.path.join(os.path.dirname(full), name)
+    target = inside(os.path.join(os.path.dirname(full), name))
     if os.path.basename(full) == name:
         return rel
     if os.path.lexists(target) and os.path.basename(full).lower() != name.lower():
@@ -518,8 +527,9 @@ def do_move(rels, to):
         if os.path.dirname(full) == tfull:
             continue
         name = unique_target(tfull, os.path.basename(full))
-        shutil.move(full, os.path.join(tfull, name))
-        carry(rel, os.path.join(tfull, name))
+        dest = inside(os.path.join(tfull, name))
+        shutil.move(full, dest)
+        carry(rel, dest)
         moved.append(name)
     changed()
     return moved
@@ -539,7 +549,7 @@ def do_delete(rels, who):
             tid = uuid.uuid4().hex[:16]
             dest = os.path.join(TRASH, tid)
             os.mkdir(dest)
-            shutil.move(full, os.path.join(dest, os.path.basename(full)))
+            shutil.move(full, inside(os.path.join(dest, os.path.basename(full)), TRASH))
             with LOCK:
                 TRASHED.append({"id": tid, "name": os.path.basename(full), "orig": rel, "root": ROOT, "label": ROOT_LABEL,
                                 "t": time.time(), "size": size, "dir": is_dir})
@@ -561,7 +571,7 @@ def trash_item(tid):
 
 def trash_path(it):
     # de map is een id dat de app zelf maakte, de naam komt uit de eigen gegevens
-    return os.path.join(TRASH, re.sub(r"[^0-9a-f]", "", it["id"]), os.path.basename(it["name"]))
+    return inside(os.path.join(TRASH, re.sub(r"[^0-9a-f]", "", it["id"]) or "x", os.path.basename(it["name"])), TRASH)
 
 
 def do_restore(ids):
@@ -574,15 +584,16 @@ def do_restore(ids):
         root = it.get("root") or ROOT
         if not hb.HA_APP or not any(root == b or root.startswith(b + "/") for b in ALLOWED_BASES) or not os.path.isdir(root):
             root = ROOT   # de map van toen bestaat niet meer of mag niet: terug naar de huidige map
-        pfull = os.path.join(root, *parent_rel.split("/")) if parent_rel else root
+        pfull = inside(os.path.join(root, *parent_rel.split("/")), root) if parent_rel else root
         os.makedirs(pfull, exist_ok=True)
-        name = unique_target(pfull, os.path.basename(orig))
+        name = unique_target(pfull, os.path.basename(orig), root)
+        dest = inside(os.path.join(pfull, name), root)
         if os.path.lexists(src):
-            shutil.move(src, os.path.join(pfull, name))
+            shutil.move(src, dest)
         shutil.rmtree(os.path.dirname(src), ignore_errors=True)
         with LOCK:
             TRASHED[:] = [x for x in TRASHED if x["id"] != it["id"]]
-        back.append(os.path.join(pfull, name)[len(root):].strip("/") if root != ROOT else rel_of(os.path.join(pfull, name)))
+        back.append(dest[len(root):].strip("/") if root != ROOT else rel_of(dest))
     save_trash()
     changed()
     return back
@@ -834,7 +845,7 @@ class Handler(hb.BaseHandler):
             raise Fail(400, "Ongeldige upload.", "Invalid upload.")
         if total > MAX_UPLOAD or off < 0 or off > total:
             raise Fail(413, "Dit bestand is te groot (maximaal 8 GB).", "This file is too large (8 GB at most).")
-        part = os.path.join(dfull, PART_PREFIX + uid)
+        part = inside(os.path.join(dfull, PART_PREFIX + uid))
         have = os.path.getsize(part) if os.path.exists(part) else 0
         if off != have:
             if off == 0:
@@ -856,10 +867,11 @@ class Handler(hb.BaseHandler):
         if have < total:
             return self.json({"ok": True, "have": have})
         final = unique_target(dfull, name)
-        os.replace(part, os.path.join(dfull, final))
+        dest = inside(os.path.join(dfull, final))
+        os.replace(part, dest)
         changed()
-        print(f"Geüpload: {rel_of(os.path.join(dfull, final))}" + (f" door {hb.user_label(self.headers)}" if hb.user_label(self.headers) else ""), flush=True)
-        self.json({"ok": True, "done": True, "name": final, "path": rel_of(os.path.join(dfull, final))})
+        print(f"Geüpload: {rel_of(dest)}" + (f" door {hb.user_label(self.headers)}" if hb.user_label(self.headers) else ""), flush=True)
+        self.json({"ok": True, "done": True, "name": final, "path": rel_of(dest)})
 
     def post_api(self, path, b):
         who = hb.user_label(self.headers)

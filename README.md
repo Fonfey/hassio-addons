@@ -70,7 +70,7 @@ A live overview of your UniFi network: network map, internet traffic up to 24 ho
 
 The quickest way is this button. It opens your own Home Assistant with this repository already filled in:
 
-[![Add this repository to your Home Assistant](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2FFonfey%2Fhassio-addons)
+[![Add this repository to your Home Assistant](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2FFonfey%2Fhassio-addons.git)
 
 Or add it by hand:
 

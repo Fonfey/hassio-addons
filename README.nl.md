@@ -68,6 +68,12 @@ Live overzicht van je UniFi-netwerk: netwerkkaart, internetverkeer tot 24 uur te
 
 ## Installeren in Home Assistant
 
+Het snelst gaat het met deze knop. Hij opent je eigen Home Assistant met deze repository al ingevuld:
+
+[![Voeg deze repository toe aan je Home Assistant](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2FFonfey%2Fhassio-addons)
+
+Of voeg hem met de hand toe:
+
 1. Ga naar **Instellingen → Apps → App Store**.
 2. Klik rechtsboven op **⋮ → Repositories** en voeg deze URL toe:
    `https://github.com/Fonfey/hassio-addons`

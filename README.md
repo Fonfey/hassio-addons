@@ -68,6 +68,12 @@ A live overview of your UniFi network: network map, internet traffic up to 24 ho
 
 ## Installing in Home Assistant
 
+The quickest way is this button. It opens your own Home Assistant with this repository already filled in:
+
+[![Add this repository to your Home Assistant](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2FFonfey%2Fhassio-addons)
+
+Or add it by hand:
+
 1. Go to **Settings → Apps → App Store**.
 2. Click **⋮ → Repositories** in the top right and add this URL:
    `https://github.com/Fonfey/hassio-addons`

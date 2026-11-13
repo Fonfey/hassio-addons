@@ -76,7 +76,7 @@ Of voeg hem met de hand toe:
 
 1. Ga naar **Instellingen → Apps → App Store**.
 2. Klik rechtsboven op **⋮ → Repositories** en voeg deze URL toe:
-   `https://github.com/Fonfey/hassio-addons`
+   `https://github.com/Fonfey/hassio-addons.git`
 3. De apps staan nu onder **Fonfey's Home Assistant addons**. Installeer wat je wilt en start de app. UniFi en AdGuard vragen op het tabblad **Configuratie** om een API-key.
 
 De apps worden geleverd als kant-en-klare images op `ghcr.io/fonfey`. Je hebt geen token of extra login nodig.

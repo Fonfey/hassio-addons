@@ -76,7 +76,7 @@ Or add it by hand:
 
 1. Go to **Settings → Apps → App Store**.
 2. Click **⋮ → Repositories** in the top right and add this URL:
-   `https://github.com/Fonfey/hassio-addons`
+   `https://github.com/Fonfey/hassio-addons.git`
 3. The apps now appear under **Fonfey's Home Assistant addons**. Install what you want and start the app. UniFi and AdGuard ask for an API key on the **Configuration** tab.
 
 The apps are delivered as ready-made images on `ghcr.io/fonfey`. You do not need a token or extra login.

@@ -297,6 +297,169 @@ def flip_flops(target, automations):
     return sorted(out, key=lambda f: f["ta"], reverse=True)
 
 
+# Wat een actie met een apparaat doet, per soort: ("aan", "on"/"off"/"toggle"), ("modus", "heat"), ("temp", "19") ...
+# Twee automations kunnen elkaar alleen tegenwerken als ze voor dezelfde soort iets anders instellen.
+TOGGLE, UNKNOWN = "toggle", "?"
+EFFECTS = {
+    "turn_on": ("aan", "on"), "turn_off": ("aan", "off"), "toggle": ("aan", TOGGLE),
+    "open_cover": ("stand", "open"), "close_cover": ("stand", "closed"), "toggle_cover": ("stand", TOGGLE),
+    "open_valve": ("stand", "open"), "close_valve": ("stand", "closed"), "toggle_valve": ("stand", TOGGLE),
+    "lock": ("slot", "locked"), "unlock": ("slot", "unlocked"), "open": ("slot", "unlocked"),
+    "media_play": ("speelt", "playing"), "media_pause": ("speelt", "paused"), "media_stop": ("speelt", "idle"),
+    "media_play_pause": ("speelt", TOGGLE),
+    "start": ("aan", "on"), "stop": ("aan", "off"), "return_to_base": ("aan", "off"),
+}
+DATA_EFFECTS = {"hvac_mode": "modus", "temperature": "temp", "target_temp_low": "temp_laag", "target_temp_high": "temp_hoog",
+                "position": "stand", "percentage": "snelheid", "preset_mode": "preset", "humidity": "vocht"}
+
+
+def _val(v):
+    s = str(v).strip()
+    return UNKNOWN if "{{" in s or "{%" in s else s
+
+
+def node_targets(node):
+    """De entity_id's die één actie aanstuurt (zonder dieper te zoeken)."""
+    out = set()
+    for key in ("target", "data"):
+        val = node.get(key)
+        if isinstance(val, dict):
+            ids = val.get("entity_id")
+            if isinstance(ids, str):
+                out.update(x.strip() for x in ids.split(","))
+            elif isinstance(ids, list):
+                out.update(str(x) for x in ids)
+    ids = node.get("entity_id")
+    if isinstance(ids, str):
+        out.update(x.strip() for x in ids.split(","))
+    elif isinstance(ids, list):
+        out.update(map(str, ids))
+    return out
+
+
+def collect_effects(node, out):
+    """Per aangestuurd apparaat: wat de automation ermee doet, als {soort: {waarden}}."""
+    if isinstance(node, dict):
+        svc = node.get("action") or node.get("service")
+        if isinstance(svc, str) and "." in svc:
+            srv = svc.split(".", 1)[1]
+            data = node.get("data") if isinstance(node.get("data"), dict) else {}
+            eff = []
+            if "{{" in svc:
+                eff.append(("aan", UNKNOWN))
+            elif srv in EFFECTS:
+                eff.append(EFFECTS[srv])
+            elif srv == "set_hvac_mode":
+                mode = _val(data.get("hvac_mode", UNKNOWN))
+                eff += [("aan", "off" if mode == "off" else ("on" if mode != UNKNOWN else UNKNOWN)), ("modus", mode)]
+            elif srv == "set_cover_position":
+                eff.append(("stand", _val(data.get("position", UNKNOWN))))
+            for key, kind in DATA_EFFECTS.items():
+                if key in data and not (srv == "set_hvac_mode" and key == "hvac_mode"):
+                    eff.append((kind, _val(data[key])))
+                    if key == "hvac_mode":
+                        m = _val(data[key])
+                        eff.append(("aan", "off" if m == "off" else ("on" if m != UNKNOWN else UNKNOWN)))
+            if eff:
+                for t in node_targets(node):
+                    for kind, v in eff:
+                        out.setdefault(t, {}).setdefault(kind, set()).add(v)
+        for v in node.values():
+            collect_effects(v, out)
+    elif isinstance(node, list):
+        for x in node:
+            collect_effects(x, out)
+
+
+def contradicts(a, b):
+    """True als twee automations voor hetzelfde apparaat iets anders kunnen instellen."""
+    for kind in set(a) & set(b):
+        va, vb = a[kind], b[kind]
+        if TOGGLE in va or TOGGLE in vb or UNKNOWN in va or UNKNOWN in vb:
+            return True
+        if any(x != y for x in va for y in vb):
+            return True
+    return False
+
+
+def fixed_minutes(cfg):
+    """Minuten van de dag waarop de automation start, als hij alleen op vaste tijden start; anders None."""
+    trig = cfg.get("triggers") or cfg.get("trigger") or []
+    trig = trig if isinstance(trig, list) else [trig]
+    out = set()
+    for t in trig:
+        if not isinstance(t, dict) or (t.get("trigger") or t.get("platform")) != "time":
+            return None
+        ats = t.get("at")
+        for at in (ats if isinstance(ats, list) else [ats]):
+            parts = str(at).split(":")
+            if len(parts) < 2 or not all(p.isdigit() for p in parts[:2]):
+                return None  # bijv. een input_datetime of een sensor met een tijd
+            out.add(int(parts[0]) * 60 + int(parts[1]))
+    return out or None
+
+
+def can_coincide(ma, mb):
+    """Kunnen twee automations binnen FLIP_MIN minuten na elkaar draaien, alleen kijkend naar hun triggers?"""
+    if ma is None or mb is None:
+        return True
+    return any(min(abs(x - y), 1440 - abs(x - y)) <= FLIP_MIN for x in ma for y in mb)
+
+
+def trigger_times(entity_id, cache):
+    """Wanneer een automation de afgelopen FLIP_DAYS dagen is gestart (uit het logboek)."""
+    if entity_id not in cache:
+        start = (datetime.now(timezone.utc) - timedelta(days=FLIP_DAYS)).isoformat()
+        try:
+            rows = http_json("GET", f"{CORE}/logbook/{urllib.parse.quote(start)}?entity={urllib.parse.quote(entity_id)}", timeout=40) or []
+        except Exception as e:
+            print(f"Logboek van {entity_id} niet te lezen: {e}", flush=True)
+            rows = None
+        cache[entity_id] = None if rows is None else sorted(
+            t for t in (parse_time(r.get("when")) for r in rows if r.get("entity_id") == entity_id and r.get("state") is None) if t)
+    return cache[entity_id]
+
+
+def co_runs(ta, tb):
+    """Hoe vaak twee automations binnen FLIP_MIN minuten na elkaar draaiden."""
+    if not ta or not tb:
+        return 0
+    n, j = 0, 0
+    for t in ta:
+        while j < len(tb) and (t - tb[j]).total_seconds() > FLIP_MIN * 60:
+            j += 1
+        if j < len(tb) and abs((tb[j] - t).total_seconds()) <= FLIP_MIN * 60:
+            n += 1
+    return n
+
+
+CO_RUNS_OK = 3  # zo vaak samen gedraaid zonder elkaar tegen te werken = bewezen dat het samengaat
+
+UNIT = {"temp": " °C", "temp_laag": " °C", "temp_hoog": " °C", "stand": "", "snelheid": "%", "vocht": "%"}
+KIND_ORDER = ["aan", "modus", "temp", "temp_laag", "temp_hoog", "stand", "slot", "speelt", "snelheid", "preset", "vocht"]
+
+
+def describe_effects(eff):
+    """Korte tekst van wat een automation met het apparaat doet, bv. 'aan / uit' of 'verwarmen, 19 / 17 °C'."""
+    nl, en = [], []
+    for kind in KIND_ORDER:
+        if kind not in eff or (kind == "aan" and "modus" in eff and "off" not in eff["aan"]):
+            continue
+        first = {"on": 0, "open": 0, "locked": 0, "playing": 0, "off": 1}
+        vals = sorted(eff[kind], key=lambda v: (first.get(v, 2), float(v) if v.replace(".", "", 1).isdigit() else 0, v))
+        def word(v, lg):
+            if v == TOGGLE:
+                return "wisselt" if lg == "nl" else "toggles"
+            if v == UNKNOWN:
+                return "wisselend (template)" if lg == "nl" else "varies (template)"
+            if kind in UNIT:
+                return v + UNIT[kind]
+            return (STATE_NL if lg == "nl" else STATE_EN).get(v, v)
+        nl.append(" / ".join(word(v, "nl") for v in vals))
+        en.append(" / ".join(word(v, "en") for v in vals))
+    return L(", ".join(nl) or "stuurt aan", ", ".join(en) or "controls")
+
+
 def local(dt):
     return dt.astimezone().strftime("%d-%m %H:%M") if dt else "–"
 
@@ -560,7 +723,7 @@ def check_live():
                              [link(OPEN_AUTO, "/config/automation/dashboard")]))
 
     # Conflicten: actieve automations met triggers die hetzelfde apparaat aansturen
-    users = {}
+    users, effects, minutes, runs = {}, {}, {}, {}
     for s in autos:
         aid = s["attributes"].get("id")
         if s["state"] != "on" or not aid:
@@ -572,7 +735,12 @@ def check_live():
         if not isinstance(cfg, dict) or not (cfg.get("triggers") or cfg.get("trigger")):
             continue
         targets = set()
-        find_targets(cfg.get("actions") or cfg.get("action") or [], targets)
+        acts = cfg.get("actions") or cfg.get("action") or []
+        find_targets(acts, targets)
+        eff = {}
+        collect_effects(acts, eff)
+        effects[s["entity_id"]] = eff
+        minutes[s["entity_id"]] = fixed_minutes(cfg)
         for t in targets:
             if t.split(".")[0] in CONFLICT_DOMAINS:
                 users.setdefault(t, []).append((s["entity_id"], aid))
@@ -582,6 +750,37 @@ def check_live():
         ids = {e: a for e, a in autolist}
         flips = flip_flops(target, set(ids))
         hid = "conflict:" + target + ":" + short_hash(e for e, _ in autolist)
+        if not flips:
+            # Geen botsing gezien. Kunnen ze elkaar in theorie tegenwerken? Alleen als ze iets anders instellen,
+            # op hetzelfde moment kunnen draaien en dat nog niet vaak goed is gegaan.
+            ents = [e for e, _ in autolist]
+            risky = []
+            for i, a in enumerate(ents):
+                for b in ents[i + 1:]:
+                    ea, eb = effects.get(a, {}).get(target, {}), effects.get(b, {}).get(target, {})
+                    if not contradicts(ea, eb) or not can_coincide(minutes.get(a), minutes.get(b)):
+                        continue
+                    ta, tb = trigger_times(a, runs), trigger_times(b, runs)
+                    if ta is not None and tb is not None and co_runs(ta, tb) >= CO_RUNS_OK:
+                        continue
+                    risky.append((a, b))
+            rows = [row(name(e), describe_effects(effects.get(e, {}).get(target, {})), href=f"/config/automation/edit/{a}") for e, a in autolist]
+            if risky:
+                a, b = risky[0]
+                items.append(item(hid, "na", L(f"Automations kunnen {name(target)} tegenwerken", f"Automations can work against {name(target)}"),
+                                  L(f"{name(a)} en {name(b)} zetten {name(target)} anders en kunnen kort na elkaar draaien. "
+                                    f"In de afgelopen {FLIP_DAYS} dagen ging het nog niet mis. Kijk of de een de ander kan overschrijven.",
+                                    f"{name(a)} and {name(b)} set {name(target)} differently and can run shortly after each other. "
+                                    f"It did not go wrong in the last {FLIP_DAYS} days. Check whether one can override the other."),
+                                  rows, [link(OPEN_AUTO, "/config/automation/dashboard")]))
+            else:
+                items.append(item(hid, "info", L(f"{len(autolist)} automations sturen {name(target)}", f"{len(autolist)} automations control {name(target)}"),
+                                  L("Ze zitten elkaar niet in de weg: ze stellen hetzelfde in, draaien op andere momenten, "
+                                    f"of draaiden de afgelopen {FLIP_DAYS} dagen vaak samen zonder elkaar tegen te werken.",
+                                    "They do not get in each other's way: they set the same thing, run at different times, "
+                                    f"or often ran together in the last {FLIP_DAYS} days without working against each other."),
+                                  rows, [link(OPEN_AUTO, "/config/automation/dashboard")]))
+            continue
         if flips:
             per = {}
             for f in flips:
@@ -590,23 +789,14 @@ def check_live():
             rows = [row(L(f"{local(f['ta'])} en {f['tb'].astimezone().strftime('%H:%M')}", f"{local(f['ta'])} and {f['tb'].astimezone().strftime('%H:%M')}"),
                         L(f"{name(f['a'])}: {f['sa']['nl']}, daarna {name(f['b'])}: {f['sb']['nl']}", f"{name(f['a'])}: {f['sa']['en']}, then {name(f['b'])}: {f['sb']['en']}"),
                         rid=None, href=f"/history?entity_id={target}") for f in flips[:6]]
-            rows += [row(name(e), CONTROLS, href=f"/config/automation/edit/{a}") for e, a in autolist]
-            items.append(item(hid, "na", L(f"Automations werken {name(target)} tegen", f"Automations work against {name(target)}"),
+            rows += [row(name(e), describe_effects(effects.get(e, {}).get(target, {})), href=f"/config/automation/edit/{a}") for e, a in autolist]
+            items.append(item(hid, "hoog", L(f"Automations werken {name(target)} tegen", f"Automations work against {name(target)}"),
                               L(f"{name(pa)} en {name(pb)} zetten {name(target)} {n} keer binnen {FLIP_MIN} minuten de andere kant op, "
                                 f"in de afgelopen {FLIP_DAYS} dagen. Laat ze op verschillende momenten draaien, of voeg ze samen.",
                                 f"{name(pa)} and {name(pb)} switched {name(target)} the other way {n} times within {FLIP_MIN} minutes "
                                 f"in the last {FLIP_DAYS} days. Let them run at different times, or merge them."),
                               rows, [link(L("Geschiedenis openen", "Open history"), f"/history?entity_id={target}"),
                                      link(OPEN_AUTO, "/config/automation/dashboard")]))
-        else:
-            names = [name(e) for e, _ in autolist]
-            items.append(item(hid, "na", L(f"{len(autolist)} automations sturen {name(target)}", f"{len(autolist)} automations control {name(target)}"),
-                              L(f"Ze kunnen elkaar in de weg zitten. In de afgelopen {FLIP_DAYS} dagen werkten ze elkaar niet tegen; "
-                                "kijk of dat ook geldt als ze op hetzelfde moment draaien.",
-                                f"They can get in each other's way. In the last {FLIP_DAYS} days they did not work against each other; "
-                                "check whether that also holds when they run at the same time."),
-                              [row(n, CONTROLS, href=f"/config/automation/edit/{a}") for n, (_, a) in zip(names, autolist)],
-                              [link(OPEN_AUTO, "/config/automation/dashboard")]))
 
     return items, ok
 
@@ -763,7 +953,7 @@ def check_demo():
                  dev(L("Remote keuken", "Kitchen remote"), kitchen), dev(L("Schakelaar 4", "Switch 4"), noarea), dev(L("Schakelaar 5", "Switch 5"), noarea),
                  dev(L("Schakelaar 6", "Switch 6"), noarea), dev(L("Schakelaar_2", "Switch_2"), garden)],
                 [link(OPEN_DEV, "/config/devices/dashboard")]),
-        item("conflict:demo", "na", L("Automations werken Airco woonkamer tegen", "Automations work against Living room air con"),
+        item("conflict:demo", "hoog", L("Automations werken Airco woonkamer tegen", "Automations work against Living room air con"),
              L("Airco - Woonkamer Ochtend opwarmen en Verwarming woonkamer regelen zetten Airco woonkamer 4 keer binnen 90 minuten "
                "de andere kant op, in de afgelopen 7 dagen. Laat ze op verschillende momenten draaien, of voeg ze samen.",
                "Air con - Living room morning warm-up and Living room heating control switched Living room air con the other way "
@@ -774,6 +964,22 @@ def check_demo():
              [row(L("Airco - Woonkamer Ochtend opwarmen", "Air con - Living room morning warm-up"), CONTROLS, href="/config/automation/dashboard"),
               row(L("Verwarming woonkamer regelen (Nest + airco)", "Living room heating control (Nest + air con)"), CONTROLS, href="/config/automation/dashboard")],
              [link(L("Geschiedenis openen", "Open history"), "/history"), link(OPEN_AUTO, "/config/automation/dashboard")]),
+        item("conflict:demo2", "na", L("Automations kunnen Rolluik slaapkamer tegenwerken", "Automations can work against Bedroom shutter"),
+             L("Rolluik bij zonsondergang en Rolluik bij wind zetten Rolluik slaapkamer anders en kunnen kort na elkaar draaien. "
+               "In de afgelopen 7 dagen ging het nog niet mis. Kijk of de een de ander kan overschrijven.",
+               "Shutter at sunset and Shutter on wind set Bedroom shutter differently and can run shortly after each other. "
+               "It did not go wrong in the last 7 days. Check whether one can override the other."),
+             [row(L("Rolluik bij zonsondergang", "Shutter at sunset"), L("dicht", "closed"), href="/config/automation/dashboard"),
+              row(L("Rolluik bij wind", "Shutter on wind"), L("open", "open"), href="/config/automation/dashboard")],
+             [link(OPEN_AUTO, "/config/automation/dashboard")]),
+        item("conflict:demo3", "info", L("2 automations sturen TV lamp", "2 automations control TV lamp"),
+             L("Ze zitten elkaar niet in de weg: ze stellen hetzelfde in, draaien op andere momenten, "
+               "of draaiden de afgelopen 7 dagen vaak samen zonder elkaar tegen te werken.",
+               "They do not get in each other's way: they set the same thing, run at different times, "
+               "or often ran together in the last 7 days without working against each other."),
+             [row(L("Lampen: Algemeen", "Lights: General"), L("aan / uit", "on / off"), href="/config/automation/dashboard"),
+              row(L("Lampen samen schakelen", "Switch lights together"), L("aan / uit", "on / off"), href="/config/automation/dashboard")],
+             [link(OPEN_AUTO, "/config/automation/dashboard")]),
         item("addon:demo", "na", L("Mosquitto broker staat uit", "Mosquitto broker is stopped"), ADDON_WHY,
              [row("App", "Mosquitto broker")],
              [{"label": L("Starten", "Start"), "kind": "start_addon", "slug": "core_mosquitto", "confirm": L("Mosquitto broker starten?", "Start Mosquitto broker?")}]),
@@ -806,12 +1012,13 @@ def check_demo():
     return items, [L("alles bijgewerkt", "everything up to date"), L("geen reparaties open", "no open repairs")]
 
 
-ORDER = {"hoog": 0, "na": 1, "op": 2}
+ORDER = {"hoog": 0, "na": 1, "op": 2, "info": 3}  # info = "Ter controle": niets aan de hand, alleen ter informatie
 
 
 def publish_sensor(items):
-    visible = visible_items(items, IGNORED)
-    cnt = {k: sum(1 for i in visible if i["sev"] == k) for k in ORDER}
+    shown = visible_items(items, IGNORED)
+    cnt = {k: sum(1 for i in shown if i["sev"] == k) for k in ORDER}
+    visible = [i for i in shown if i["sev"] != "info"]  # ter controle telt niet mee als open punt
     try:  # de sensor volgt de taal van Home Assistant; de namen van de attributen blijven gelijk voor bestaande automations
         lg = "nl" if str((http_json("GET", CORE + "/config") or {}).get("language") or "nl").lower().startswith("nl") else "en"
     except Exception:
@@ -821,7 +1028,7 @@ def publish_sensor(items):
             "state": len(visible),
             "attributes": {"friendly_name": "Onderhoud" if lg == "nl" else "Maintenance", "icon": "mdi:wrench-check",
                            "unit_of_measurement": "punten" if lg == "nl" else "items",
-                           "belangrijk": cnt["hoog"], "nalopen": cnt["na"], "opruimen": cnt["op"],
+                           "belangrijk": cnt["hoog"], "nalopen": cnt["na"], "opruimen": cnt["op"], "ter_controle": cnt["info"],
                            "punten": [resolve(i["title"], lg) for i in visible]}})
     except Exception as e:
         print(f"Sensor bijwerken mislukt: {e}", flush=True)
@@ -1095,10 +1302,10 @@ PAGE = r"""<!doctype html>
 @font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:600;font-display:swap;src:url("fonts/ibm-plex-sans-600.woff2") format("woff2")}
 :root{--bg:#EDF1F6;--surface:#fff;--line:#D5DDE8;--line2:#E4E9F0;--text:#14213A;--muted:#5C6C84;--faint:#93A1B5;
   --accent:#0B978B;--accentText:#fff;--okbg:#E7F6EE;--okline:#BFE5CF;--oktext:#1C6B45;--ok:#24945F;
-  --hoogbg:#FBE7E7;--hoog:#B33232;--nabg:#FCEFDF;--na:#9A5A10;--opbg:#E9EDF3;--op:#4A5A70;--link:#2F7CC0}
+  --hoogbg:#FBE7E7;--hoog:#B33232;--nabg:#FCEFDF;--na:#9A5A10;--opbg:#E9EDF3;--op:#4A5A70;--infobg:#EEF1F5;--info:#6B7A90;--link:#2F7CC0}
 @media (prefers-color-scheme: dark){:root{--bg:#0E1622;--surface:#152030;--line:#233249;--line2:#1C293C;--text:#E4EBF5;--muted:#93A3BA;--faint:#5E6F88;
   --accent:#3CC5B6;--accentText:#0E1622;--okbg:#12241F;--okline:#1F4636;--oktext:#A8D9BF;--ok:#4CC787;
-  --hoogbg:#3D2324;--hoog:#F58A8A;--nabg:#3A2A1E;--na:#F0A257;--opbg:#26303E;--op:#B4C0D0;--link:#69ACE6}}
+  --hoogbg:#3D2324;--hoog:#F58A8A;--nabg:#3A2A1E;--na:#F0A257;--opbg:#26303E;--op:#B4C0D0;--infobg:#1E2734;--info:#93A3BA;--link:#69ACE6}}
 *{box-sizing:border-box}
 html{color-scheme:light dark;scrollbar-color:var(--line) transparent}
 body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -1123,7 +1330,7 @@ ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10p
 li.it{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .head{width:100%;background:none;border:0;padding:16px 18px;display:flex;align-items:flex-start;gap:14px;text-align:left;cursor:pointer}
 .tag{flex:none;margin-top:2px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;min-width:84px;text-align:center}
-.tag.hoog{background:var(--hoogbg);color:var(--hoog)} .tag.na{background:var(--nabg);color:var(--na)} .tag.op{background:var(--opbg);color:var(--op)}
+.tag.hoog{background:var(--hoogbg);color:var(--hoog)} .tag.na{background:var(--nabg);color:var(--na)} .tag.op{background:var(--opbg);color:var(--op)} .tag.info{background:var(--infobg);color:var(--info)}
 .tx{flex:1;min-width:0} .tt{display:block;font-size:16px;font-weight:600;line-height:1.35} .tw{display:block;margin-top:3px;font-size:14px;color:var(--muted)}
 .chev{flex:none;margin-top:4px;color:var(--faint);transition:transform .15s}
 .it.open .chev{transform:rotate(180deg)}
@@ -1151,6 +1358,9 @@ li.it{background:var(--surface);border:1px solid var(--line);border-radius:14px;
 .ignhead svg{transition:transform .15s}
 .ignhead[aria-expanded="true"] svg{transform:rotate(180deg)}
 #ignbody{padding-bottom:14px}
+#infobody{padding-bottom:14px}
+#infobody ol{gap:8px}
+.infotip{margin:0 0 10px;font-size:13px;color:var(--muted)}
 #ignbody .rows{margin-bottom:12px}
 .rw .cat{color:var(--faint);font-size:12px;display:block;margin-top:1px}
 .who{max-width:780px;margin:0 auto;padding:0 16px 24px;font-size:13px;color:var(--faint)}
@@ -1185,6 +1395,13 @@ li.it{background:var(--surface);border:1px solid var(--line);border-radius:14px;
   <ol id="list"></ol>
   <div class="note undo" id="undo" role="status" hidden></div>
   <p class="done" id="done" hidden data-en="Everything has been checked. New items appear here by themselves as soon as there is something.">Alles is nagelopen. Je ziet hier vanzelf nieuwe punten zodra er iets is.</p>
+  <section class="ign" id="infosec" hidden>
+    <button class="ignhead" id="infohead" aria-expanded="false"></button>
+    <div id="infobody" hidden>
+      <p class="infotip" data-en="Nothing is wrong here. Several automations control the same device, but they do not get in each other's way. Check them when you change an automation.">Hier is niets mis. Meerdere automations sturen hetzelfde apparaat aan, maar ze zitten elkaar niet in de weg. Kijk ze na als je een automation verandert.</p>
+      <ol id="infolist"></ol>
+    </div>
+  </section>
   <section class="ign" id="ign" hidden>
     <button class="ignhead" id="ignhead" aria-expanded="false"></button>
     <div id="ignbody" hidden>
@@ -1208,8 +1425,8 @@ document.documentElement.lang = LANG;
 if (LANG === 'en') document.querySelectorAll('[data-en]').forEach(el => { el.textContent = el.dataset.en; });
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const SEV = {hoog: t('Belangrijk', 'Important'), na: t('Nalopen', 'Check'), op: t('Opruimen', 'Clean up')};
-let data = null, open = null, polling = null, ignOpen = false; const removed = new Set();
+const SEV = {hoog: t('Belangrijk', 'Important'), na: t('Nalopen', 'Check'), op: t('Opruimen', 'Clean up'), info: t('Ter controle', 'Review')};
+let data = null, open = null, polling = null, ignOpen = false, infoOpen = false; const removed = new Set();
 const CAT = {stale: t('Geen data', 'No data'), statistics: t('Statistieken', 'Statistics'), offline: t('Offline apparaten', 'Offline devices'), gone: t('Bestaan niet meer', 'No longer exist'),
   orphans: t('Nergens meer aangemaakt', 'No longer provided'), battery: t('Batterijen', 'Batteries'), updates: 'Updates', 'auto:nooit': t('Nooit gestart', 'Never run'),
   'auto:uit': t('Al lang uit', 'Off for a long time'), 'auto:kapot': t('Laden niet', 'Do not load')};
@@ -1267,10 +1484,11 @@ async function ignore(ids, msg){
 function render(){
   const d = data, ign = new Set(d.ignored || []);
   const items = visible(d.items || [], ign);
+  const main = items.filter(i => i.sev !== 'info'), infos = items.filter(i => i.sev === 'info');
   const ignList = ignoredEntries(d.items || [], ign);
-  const cnt = k => items.filter(i => i.sev === k).length;
+  const cnt = k => main.filter(i => i.sev === k).length;
   const parts = [['hoog', t('belangrijk', 'important')], ['na', t('nalopen', 'to check')], ['op', t('opruimen', 'to clean up')]].filter(([k]) => cnt(k)).map(([k, l]) => `${cnt(k)} ${l}`);
-  $('#sum').textContent = !d.checked ? (d.error ? t('De controle is niet gelukt.', 'The check did not succeed.') : t('Eerste controle loopt…', 'First check running…')) : items.length ? `${items.length} ${items.length === 1 ? t('punt', 'item') : t('punten', 'items')}: ${parts.join(', ')}.` : t('Niets te doen.', 'Nothing to do.');
+  $('#sum').textContent = !d.checked ? (d.error ? t('De controle is niet gelukt.', 'The check did not succeed.') : t('Eerste controle loopt…', 'First check running…')) : main.length ? `${main.length} ${main.length === 1 ? t('punt', 'item') : t('punten', 'items')}: ${parts.join(', ')}.` : t('Niets te doen.', 'Nothing to do.');
   const when = d.checked ? new Date(d.checked * 1000).toLocaleTimeString(t('nl-NL', 'en-GB'), {hour: '2-digit', minute: '2-digit'}) : '';
   $('#meta').innerHTML = (d.running ? t('Bezig met controleren…', 'Checking…') : when ? t(`Gecontroleerd om ${when}`, `Checked at ${when}`) : '') + `<br><button id="again">${t('Opnieuw controleren', 'Check again')}</button>`;
   $('#again').onclick = async () => { try { await post('api/check'); data.running = true; render(); poll(); } catch (e) { toast(e.message); } };
@@ -1279,7 +1497,7 @@ function render(){
   else if (d.demo) { n.hidden = false; n.className = 'note'; n.textContent = t('Je bekijkt voorbeeldgegevens. Als Home Assistant-app controleert Onderhoud je eigen installatie.', 'You are looking at sample data. As a Home Assistant app, Maintenance checks your own installation.'); }
   else n.hidden = true;
   $('#ok').hidden = !(d.ok || []).length; $('#oktext').textContent = t('In orde: ', 'All good: ') + (d.ok || []).join(', ') + '.';
-  $('#list').innerHTML = items.map(i => `<li class="it ${open === i.id ? 'open' : ''}" data-id="${esc(i.id)}">
+  const itemHtml = i => `<li class="it ${open === i.id ? 'open' : ''}" data-id="${esc(i.id)}">
     <button class="head" aria-expanded="${open === i.id}"><span class="tag ${i.sev}">${SEV[i.sev] || ''}</span>
       <span class="tx"><span class="tt">${esc(i.title)}</span><span class="tw">${esc(i.why)}</span></span>
       <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -1287,8 +1505,15 @@ function render(){
         <span class="v">${esc(x.v)}</span><span class="ra">${(x.acts || []).map((a, k) => `<button class="mini del" data-row="${r}" data-ract="${k}">${esc(a.label)}</button>`).join('')}${x.rid ? `<button class="mini" data-rign="${r}" aria-label="${esc(x.k)} ${t('negeren', 'ignore')}">${t('Negeren', 'Ignore')}</button>` : ''}</span></li>`).join('')}</ul>` : ''}
       <div class="acts">${i.actions.map((a, k) => a.kind === 'link' ? `<a class="btn ${k ? 'sec' : 'pri'}" href="${esc(haLink(a.href))}" target="_top">${esc(a.label)}</a>`
         : `<button class="btn ${k ? 'sec' : 'pri'}" data-act="${k}">${esc(a.label)}</button>`).join('')}
-        <button class="btn lnk" data-ignore>${i.details.some(x => x.rid) ? t('Alles negeren', 'Ignore all') : t('Negeren', 'Ignore')}</button></div></div></li>`).join('');
-  $('#done').hidden = !(d.checked && !items.length);
+        <button class="btn lnk" data-ignore>${i.details.some(x => x.rid) ? t('Alles negeren', 'Ignore all') : t('Negeren', 'Ignore')}</button></div></div></li>`;
+  $('#list').innerHTML = main.map(itemHtml).join('');
+  $('#done').hidden = !(d.checked && !main.length);
+  const isec = $('#infosec'); isec.hidden = !infos.length;
+  if (!infos.length) infoOpen = false;
+  $('#infohead').setAttribute('aria-expanded', infoOpen);
+  $('#infohead').innerHTML = `<span>${t('Ter controle', 'Review')} (${infos.length})</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
+  $('#infobody').hidden = !infoOpen;
+  $('#infolist').innerHTML = infos.map(itemHtml).join('');
   tmTip();
   const sec = $('#ign'); sec.hidden = !ignList.length;
   if (!ignList.length) ignOpen = false;
@@ -1324,6 +1549,7 @@ function render(){
   });
 }
 $('#ignhead').onclick = () => { ignOpen = !ignOpen; render(); };
+$('#infohead').onclick = () => { infoOpen = !infoOpen; render(); };
 // Na het verwijderen van een automation: terugzetten via de Tijdmachine (als die er is).
 function undone(name, id){
   const u = $('#undo'), tm = data.tijdmachine && data.tijdmachine.running ? data.tijdmachine : null;

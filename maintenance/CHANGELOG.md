@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.0
+
+- Automations that control the same device are now judged more sharply. **Important**: they really worked against each other in the last 7 days. **Check**: they set the device differently (for example 19 and 22 °C, or on and off) and can run shortly after each other. **Review**: they do not get in each other's way, because they set the same thing, run at fixed times far apart, or already ran together at least 3 times without trouble. Review items are collapsed at the bottom and do not count as open items in `sensor.onderhoud_punten` (new attribute `ter_controle`).
+- Each automation in such an item now shows what it does with the device, for example "heat, 17 °C / 19 °C" or "on / off".
+- Automations die hetzelfde apparaat aansturen worden nu scherper beoordeeld. **Belangrijk**: ze werkten elkaar de afgelopen 7 dagen echt tegen. **Nalopen**: ze stellen het apparaat anders in (bijvoorbeeld 19 en 22 °C, of aan en uit) en kunnen kort na elkaar draaien. **Ter controle**: ze zitten elkaar niet in de weg, omdat ze hetzelfde instellen, op vaste tijden ver uit elkaar draaien, of al minstens 3 keer zonder problemen samen draaiden. Punten ter controle staan ingeklapt onderaan en tellen niet mee als open punt in `sensor.onderhoud_punten` (nieuw attribuut `ter_controle`).
+- Bij elke automation in zo'n punt staat nu wat hij met het apparaat doet, bijvoorbeeld "verwarmen, 17 °C / 19 °C" of "aan / uit".
+
 ## 1.4.4
 
 - After an update, the sidebar button now refreshes by itself, so a new name or icon shows right away. You no longer have to switch "Show in sidebar" off and on.

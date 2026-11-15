@@ -19,7 +19,9 @@ The app follows the language of your Home Assistant: Dutch if Home Assistant is 
 | Offline devices: all entities are unavailable | Check |
 | Batteries below the set threshold (phones and home batteries are not counted) | Check |
 | Apps that should start by themselves but are stopped, with a button to start them | Check |
-| Automations that control the same device, and whether they actually worked against each other in the last 7 days (switching it the other way within 90 minutes) | Check |
+| Automations that actually worked against each other in the last 7 days: one switched a device and another switched it back within 90 minutes | Important |
+| Automations that set the same device differently (for example on and off, or 19 and 22 °C) and can run within 90 minutes of each other, unless they already did so at least 3 times in the last 7 days without trouble | Check |
+| Automations that control the same device but do not get in each other's way: they set the same thing, only run at fixed times far apart, or often ran together without trouble | Review (collapsed at the bottom, not counted as an item) |
 | Sensors that have not given data for a long time: no statistics, a value stuck for days, a meter that no longer counts up, or unavailable for a long time | Check |
 | Statistics with a problem, such as statistics of sensors that no longer exist | Clean up |
 | Devices and entities that are no longer provided | Clean up |
@@ -37,7 +39,7 @@ Maintenance checks by itself as soon as Home Assistant has (re)started. It then 
 
 ### Sensor
 
-Maintenance creates the sensor `sensor.onderhoud_punten` with the number of open items and the attributes `belangrijk` (important), `nalopen` (check), `opruimen` (clean up) and `punten` (the item titles, in the language of Home Assistant). Use it for a notification or a tile on your dashboard. The sensor is updated after every check, also right after a Home Assistant restart. The entity and attribute names stay the same in every language, so your automations keep working.
+Maintenance creates the sensor `sensor.onderhoud_punten` with the number of open items and the attributes `belangrijk` (important), `nalopen` (check), `opruimen` (clean up), `ter_controle` (review; not counted in the number of items) and `punten` (the item titles, in the language of Home Assistant). Use it for a notification or a tile on your dashboard. The sensor is updated after every check, also right after a Home Assistant restart. The entity and attribute names stay the same in every language, so your automations keep working.
 
 ### Settings
 
@@ -68,7 +70,9 @@ Eén overzicht van wat aandacht nodig heeft in je Home Assistant, op volgorde va
 | Offline apparaten: alle entiteiten zijn onbeschikbaar | Nalopen |
 | Batterijen onder de ingestelde grens (telefoons en thuisbatterijen tellen niet mee) | Nalopen |
 | Apps die vanzelf zouden starten maar uit staan, met een knop om ze te starten | Nalopen |
-| Automations die hetzelfde apparaat aansturen, en of ze elkaar de afgelopen 7 dagen echt tegenwerkten (binnen 90 minuten de andere kant op) | Nalopen |
+| Automations die elkaar de afgelopen 7 dagen echt tegenwerkten: de ene zette een apparaat om en een andere zette het binnen 90 minuten terug | Belangrijk |
+| Automations die hetzelfde apparaat anders instellen (bijvoorbeeld aan en uit, of 19 en 22 °C) en binnen 90 minuten na elkaar kunnen draaien, tenzij ze dat de afgelopen 7 dagen al minstens 3 keer zonder problemen deden | Nalopen |
+| Automations die hetzelfde apparaat aansturen maar elkaar niet in de weg zitten: ze stellen hetzelfde in, draaien alleen op vaste tijden ver uit elkaar, of draaiden vaak samen zonder problemen | Ter controle (ingeklapt onderaan, telt niet als punt) |
 | Sensoren die al lang geen data geven: geen statistieken, een waarde die dagen stilstaat, een teller die niet meer optelt, of al lang onbeschikbaar | Nalopen |
 | Statistieken met een probleem, zoals statistieken van sensoren die niet meer bestaan | Opruimen |
 | Apparaten en entiteiten die nergens meer worden aangemaakt | Opruimen |
@@ -86,7 +90,7 @@ Onderhoud controleert vanzelf zodra Home Assistant (opnieuw) is opgestart. Het w
 
 ### Sensor
 
-Onderhoud maakt de sensor `sensor.onderhoud_punten` met het aantal open punten en de attributen `belangrijk`, `nalopen`, `opruimen` en `punten`. Gebruik hem voor een melding of een tegel op je dashboard. De sensor wordt na elke controle bijgewerkt, ook meteen na een herstart van Home Assistant.
+Onderhoud maakt de sensor `sensor.onderhoud_punten` met het aantal open punten en de attributen `belangrijk`, `nalopen`, `opruimen`, `ter_controle` (telt niet mee in het aantal punten) en `punten`. Gebruik hem voor een melding of een tegel op je dashboard. De sensor wordt na elke controle bijgewerkt, ook meteen na een herstart van Home Assistant.
 
 ### Instellingen
 

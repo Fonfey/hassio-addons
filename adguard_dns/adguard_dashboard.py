@@ -910,6 +910,8 @@ button.htile[data-go]:hover{background:#3a4350}
 .csub{color:var(--muted);font-size:14px;margin:-10px 0 14px}
 .setcard .csub{margin:0 0 12px}
 .list td.pc{width:150px;padding-left:20px}
+.lscroll{max-height:372px;overflow-y:auto;margin-right:-10px;padding-right:10px;scrollbar-width:thin;scrollbar-color:#4a5361 transparent}
+.lscroll::-webkit-scrollbar{width:6px} .lscroll::-webkit-scrollbar-thumb{background:#4a5361;border-radius:3px}
 .pc{white-space:nowrap}
 .pbar{display:inline-block;vertical-align:middle;width:84px;height:5px;background:#262c36;border-radius:3px;overflow:hidden;margin-right:8px}
 .pbar i{display:block;height:100%;border-radius:3px}
@@ -1725,20 +1727,20 @@ async function viewHomeDashboard(){
       <section class="card"><h2>Algemene statistieken</h2><p class="csub">${esc(period24)}</p><table class="list">
         ${st.map(([l, n, c, go]) => `<tr><td class="nm">${go ? `<button class="nmlink" ${goAttr('querylog', go)}>${l}</button>` : l}</td><td class="n ${c}">${N(n)}</td></tr>`).join('')}
         <tr><td class="nm">Gemiddelde verwerkingstijd</td><td class="n">${esc(dec1(o.avg_ms))} ms</td></tr></table></section>
-      <section class="card"><div class="cardhead"><h2>Actiefste clients</h2><a class="right" href="#instellingen/clients" style="font-size:14px">Clients beheren</a></div><table class="list">
-        ${cl.map(c => pctRow(`${devIcon('')}<span>${esc(c.name || c.id)}${c.name ? `<span class="muted"> ${esc(c.id)}</span>` : ''}</span>`, c.n, q, 'var(--blue)', goAttr('querylog', {device: c.id}))).join('') || none}</table></section>
+      <section class="card"><div class="cardhead"><h2>Actiefste clients</h2><a class="right" href="#instellingen/clients" style="font-size:14px">Clients beheren</a></div><div class="lscroll"><table class="list">
+        ${cl.map(c => pctRow(`${devIcon('')}<span>${esc(c.name || c.id)}${c.name ? `<span class="muted"> ${esc(c.id)}</span>` : ''}</span>`, c.n, q, 'var(--blue)', goAttr('querylog', {device: c.id}))).join('') || none}</table></div></section>
     </div>
     <div class="grid2">
-      <section class="card"><h2>Meest opgevraagde domeinen</h2><table class="list">
-        ${tq.map(d => pctRow(`${favicon(d.domain)}<span class="dname">${esc(d.domain)}</span>`, d.n, q, 'var(--blue)', goAttr('querylog', {logSearch: d.domain}))).join('') || none}</table></section>
-      <section class="card"><h2>Meest geblokkeerde domeinen</h2><table class="list">
-        ${tb.map(d => pctRow(`${favicon(d.domain)}<span class="dname">${esc(d.domain)}</span>`, d.n, o.blocked || 1, 'var(--red)', goAttr('querylog', {logSearch: d.domain, logStatus: 'b'}))).join('') || none}</table></section>
+      <section class="card"><h2>Meest opgevraagde domeinen</h2><div class="lscroll"><table class="list">
+        ${tq.map(d => pctRow(`${favicon(d.domain)}<span class="dname">${esc(d.domain)}</span>`, d.n, q, 'var(--blue)', goAttr('querylog', {logSearch: d.domain}))).join('') || none}</table></div></section>
+      <section class="card"><h2>Meest geblokkeerde domeinen</h2><div class="lscroll"><table class="list">
+        ${tb.map(d => pctRow(`${favicon(d.domain)}<span class="dname">${esc(d.domain)}</span>`, d.n, o.blocked || 1, 'var(--red)', goAttr('querylog', {logSearch: d.domain, logStatus: 'b'}))).join('') || none}</table></div></section>
     </div>
     <div class="grid2">
-      <section class="card"><div class="cardhead"><h2>Upstreams</h2><a class="right" href="#instellingen/dns" style="font-size:14px">DNS-instellingen</a></div><p class="csub">Antwoorden per upstream DNS-server</p><table class="list">
-        ${up.map(u => pctRow(`<span class="dname mono">${esc(u.addr)}</span>`, u.n, sum(up), 'var(--green)')).join('') || none}</table></section>
-      <section class="card"><h2>Reactietijd upstreams</h2><p class="csub">Gemiddelde tijd tot een antwoord</p><table class="list">
-        ${upms.map(u => `<tr><td class="nm"><span class="dname mono">${esc(u.addr)}</span></td><td class="n">${esc(dec1(u.ms))} ms</td></tr>`).join('') || none}</table></section>
+      <section class="card"><div class="cardhead"><h2>Upstreams</h2><a class="right" href="#instellingen/dns" style="font-size:14px">DNS-instellingen</a></div><p class="csub">Antwoorden per upstream DNS-server</p><div class="lscroll"><table class="list">
+        ${up.map(u => pctRow(`<span class="dname mono">${esc(u.addr)}</span>`, u.n, sum(up), 'var(--green)')).join('') || none}</table></div></section>
+      <section class="card"><h2>Reactietijd upstreams</h2><p class="csub">Gemiddelde tijd tot een antwoord</p><div class="lscroll"><table class="list">
+        ${upms.map(u => `<tr><td class="nm"><span class="dname mono">${esc(u.addr)}</span></td><td class="n">${esc(dec1(u.ms))} ms</td></tr>`).join('') || none}</table></div></section>
     </div>`;
   const draw = () => barChart($('#chart'), time.stats || [], 'blocked');
   draw(); window.__redraw = draw;

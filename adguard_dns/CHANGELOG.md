@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.1
+
+- AdGuard Home: the lists on the dashboard (clients, domains, upstreams) now scroll inside their card, so the page stays short.
+- AdGuard Home: de lijsten op het dashboard (clients, domeinen, upstreams) scrollen nu binnen hun kaart, zodat de pagina kort blijft.
+
 ## 1.7.0
 
 ### New / Nieuw

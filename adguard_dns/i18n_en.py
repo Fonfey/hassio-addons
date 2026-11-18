@@ -1,4 +1,4 @@
-"""Engelse vertaling van de teksten in het AdGuard DNS Dashboard. Sleutel: Nederlandse tekst zoals hij op de pagina staat."""
+"""Engelse vertaling van de teksten in het AdGuard Dashboard. Sleutel: Nederlandse tekst zoals hij op de pagina staat."""
 
 EXACT = {
     # navigatie en algemeen

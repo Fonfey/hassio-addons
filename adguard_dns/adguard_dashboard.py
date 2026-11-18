@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AdGuard DNS Dashboard
+AdGuard Dashboard
 =====================
 
 Statistieken van je AdGuard DNS-account (de clouddienst op adguard-dns.io) als

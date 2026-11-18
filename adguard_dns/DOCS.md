@@ -1,40 +1,70 @@
-# AdGuard DNS Dashboard
+# AdGuard Dashboard
 
 [English](#english) · [Nederlands](#nederlands)
 
 ## English
 
-Statistics of your AdGuard DNS account (adguard-dns.io) right in Home Assistant.
+Statistics, query log and blocking for AdGuard right in Home Assistant. The app works with either of the two AdGuard products; you choose which one at **Source** on the **Configuration** tab:
 
-**Note:** this app is for **AdGuard DNS**, the cloud DNS service run by AdGuard (adguard-dns.io). It does not work with **AdGuard Home**, the free software you install and run yourself; for AdGuard Home, use the official AdGuard Home integration in Home Assistant.
+| Source | What it is | What the app needs |
+| --- | --- | --- |
+| `cloud` | **AdGuard DNS**, the cloud DNS service at adguard-dns.io | An API key |
+| `home` | **AdGuard Home**, the free software you run yourself, for example as an app in Home Assistant or on a Raspberry Pi | The address, username and password of AdGuard Home |
 
 The dashboard follows the language of your Home Assistant: Dutch if Home Assistant is set to Dutch, English otherwise.
 
-### Setting up
+### Setting up AdGuard DNS (cloud)
 
 1. Create an API key at https://adguard-dns.io/en/dashboard/ : click your account at the top right, choose **User preferences** and go to **API keys**. Copy the key right away; it is shown only once.
 2. Fill in on the **Configuration** tab of this app:
+   - `source`: `cloud`
    - `api_key`: your AdGuard DNS API key
-   - `refresh_seconds`: how often the dashboard refreshes (60 seconds by default)
-   - `home_country`: country code of where you live, for the pin on the world map (`NL` by default)
-3. Start the app and open **AdGuard DNS** in the sidebar.
+3. Start the app and open **AdGuard** in the sidebar.
 
-Without an API key the app runs with sample data.
+### Setting up AdGuard Home
+
+1. Fill in on the **Configuration** tab of this app:
+   - `source`: `home`
+   - `home_url`: the address of the AdGuard Home web interface, for example `http://192.168.1.2:3000`
+   - `home_username` and `home_password`: the username and password you log in to AdGuard Home with
+2. Start the app and open **AdGuard** in the sidebar.
+
+**Using the AdGuard Home app in Home Assistant?** That app is normally only reachable through Home Assistant itself. Open the AdGuard Home app, go to the **Configuration** tab and set a port at **Web interface** under **Network**, for example `3000`. Restart AdGuard Home and fill in `http://<IP address of Home Assistant>:3000` at `home_url`, with the username and password of AdGuard Home.
+
+Without an API key or address, the app runs with sample data.
+
+### Other settings
+
+- `refresh_seconds`: how often the dashboard refreshes (60 seconds by default)
+- `home_country`: country code of where you live, for the pin on the world map (`NL` by default, AdGuard DNS only)
+- `allow_blocking`: whether the dashboard may change things; turn off for a view-only dashboard
+- `allowed_users`: see "Who may see the dashboard" below
 
 ### What you see
+
+With **AdGuard DNS**:
 
 - **Dashboard**: usage of your plan, blocked requests and companies per hour with the change compared to the previous period, and your DNS servers with their devices.
 - **Statistics**: requests per period, types of requests, top companies, top destinations, top domains and a world map. Filter by period, server, device and country.
 - **Companies**: the most requested and most blocked company and a table with the top companies.
 - **Query log**: the latest DNS requests, searchable and filterable by blocked or allowed.
 
+With **AdGuard Home**:
+
+- **Dashboard**: requests, number of clients and average processing time, blocked requests per hour, the protection switch and your clients with their number of requests.
+- **Statistics**: requests per period, the most requested and most blocked domains, and the most active clients. AdGuard Home keeps statistics as long as set in AdGuard Home under Settings, General settings.
+- **Query log**: the latest DNS requests with the rule that blocked or allowed them, searchable and filterable by client and status.
+
+AdGuard Home does not know companies, countries or categories of requests, so those parts are not shown.
+
 ### Blocking and unblocking
 
-In the query log, each request has a menu with three dots. Choose **Block domain** or **Unblock domain** and confirm. The dashboard then adds a user rule to the DNS server: `||domain^` to block, `@@||domain^` to allow. Through **User rules** at your DNS server you see all rules and can remove them again. Turn off **Allow changes** if the dashboard may only view.
+In the query log, each request has a menu with three dots. Choose **Block domain** or **Unblock domain** and confirm. The dashboard then adds a user rule: `||domain^` to block, `@@||domain^` to allow. Through **User rules** you see all rules and can remove them again. Turn off **Allow changes** if the dashboard may only view.
 
 ### Changing settings
 
-Through **Server settings** and **Blocklists** at your DNS server, and **Settings** at a device, you change everything in the dashboard itself. Only connecting a new device is done on the AdGuard DNS website. Turn off **Allow changes** if the dashboard may only view.
+- **AdGuard DNS**: through **Server settings** and **Blocklists** at your DNS server, and **Settings** at a device, you change everything in the dashboard itself. Only connecting a new device is done on the AdGuard DNS website.
+- **AdGuard Home**: through **Settings** you change protection, blocking mode, safe browsing, parental control and safe search, and through **Blocklists** you turn lists on or off. Adding lists and managing clients is done in AdGuard Home itself.
 
 ### Who may see the dashboard
 
@@ -42,37 +72,67 @@ Only Home Assistant administrators see the sidebar item. If you have several adm
 
 ## Nederlands
 
+Statistieken, querylog en blokkeren voor AdGuard, direct in Home Assistant. De app werkt met allebei de producten van AdGuard; welke je gebruikt, kies je bij **Bron** op het tabblad **Configuratie**:
+
+| Bron | Wat het is | Wat de app nodig heeft |
+| --- | --- | --- |
+| `cloud` | **AdGuard DNS**, de DNS-dienst in de cloud op adguard-dns.io | Een API-key |
+| `home` | **AdGuard Home**, de gratis software die je zelf draait, bijvoorbeeld als app in Home Assistant of op een Raspberry Pi | Het adres, de gebruikersnaam en het wachtwoord van AdGuard Home |
+
 Het dashboard volgt de taal van je Home Assistant: Nederlands als Home Assistant Nederlands is, anders Engels.
 
-Statistieken van je AdGuard DNS-account (adguard-dns.io) direct in Home Assistant.
-
-**Let op:** deze app is voor **AdGuard DNS**, de DNS-dienst in de cloud van AdGuard (adguard-dns.io). Hij werkt niet met **AdGuard Home**, de gratis software die je zelf installeert en draait; gebruik voor AdGuard Home de officiële AdGuard Home-integratie van Home Assistant.
-
-### Instellen
+### AdGuard DNS (cloud) instellen
 
 1. Maak een API-key aan op https://adguard-dns.io/en/dashboard/ : klik rechtsboven op je account, kies **User preferences** en ga naar **API keys**. Kopieer de key direct, je ziet hem maar één keer.
 2. Vul op het tabblad **Configuratie** van deze app in:
+   - `source`: `cloud`
    - `api_key`: je AdGuard DNS API-key
-   - `refresh_seconds`: hoe vaak het dashboard ververst (standaard 60 seconden)
-   - `home_country`: landcode van waar je woont, voor de speld op de wereldkaart (standaard `NL`)
-3. Start de app en open **AdGuard DNS** in de zijbalk.
+3. Start de app en open **AdGuard** in de zijbalk.
 
-Zonder API-key draait de app met voorbeeldgegevens.
+### AdGuard Home instellen
+
+1. Vul op het tabblad **Configuratie** van deze app in:
+   - `source`: `home`
+   - `home_url`: het adres van de webinterface van AdGuard Home, bijvoorbeeld `http://192.168.1.2:3000`
+   - `home_username` en `home_password`: de gebruikersnaam en het wachtwoord waarmee je inlogt bij AdGuard Home
+2. Start de app en open **AdGuard** in de zijbalk.
+
+**Gebruik je de AdGuard Home-app in Home Assistant?** Die app is normaal alleen via Home Assistant zelf bereikbaar. Open de AdGuard Home-app, ga naar het tabblad **Configuratie** en vul onder **Netwerk** een poort in bij **Web interface**, bijvoorbeeld `3000`. Start AdGuard Home opnieuw en vul bij `home_url` `http://<IP-adres van Home Assistant>:3000` in, met de gebruikersnaam en het wachtwoord van AdGuard Home.
+
+Zonder API-key of adres draait de app met voorbeeldgegevens.
+
+### Overige instellingen
+
+- `refresh_seconds`: hoe vaak het dashboard ververst (standaard 60 seconden)
+- `home_country`: landcode van waar je woont, voor de speld op de wereldkaart (standaard `NL`, alleen bij AdGuard DNS)
+- `allow_blocking`: of het dashboard iets mag wijzigen; zet uit voor een dashboard dat alleen mag kijken
+- `allowed_users`: zie "Wie mag het dashboard zien" hieronder
 
 ### Wat je ziet
+
+Met **AdGuard DNS**:
 
 - **Dashboard**: verbruik van je abonnement, geblokkeerde verzoeken en bedrijven per uur met de verandering ten opzichte van de vorige periode, en je DNS-servers met hun apparaten.
 - **Statistieken**: verzoeken per periode, soorten verzoeken, topbedrijven, topbestemmingen, topdomeinen en een wereldkaart. Filter op periode, server, apparaat en land.
 - **Bedrijven**: het meest opgevraagde en meest geblokkeerde bedrijf en een tabel met de topbedrijven.
 - **Querylog**: de laatste DNS-verzoeken, te doorzoeken en te filteren op geblokkeerd of toegestaan.
 
+Met **AdGuard Home**:
+
+- **Dashboard**: verzoeken, aantal clients en gemiddelde verwerkingstijd, geblokkeerde verzoeken per uur, de schakelaar voor de bescherming en je clients met hun aantal verzoeken.
+- **Statistieken**: verzoeken per periode, de meest opgevraagde en meest geblokkeerde domeinen en de actiefste clients. AdGuard Home bewaart statistieken zo lang als ingesteld in AdGuard Home bij Instellingen, Algemene instellingen.
+- **Querylog**: de laatste DNS-verzoeken met de regel die ze blokkeerde of toeliet, te doorzoeken en te filteren op client en status.
+
+AdGuard Home kent geen bedrijven, landen of soorten verzoeken; die onderdelen staan er dan niet.
+
 ### Blokkeren en deblokkeren
 
-In de querylog staat achter elk verzoek een menu met drie puntjes. Kies **Domein blokkeren** of **Domein deblokkeren** en bevestig. Het dashboard voegt dan een gebruikersregel toe aan de DNS-server: `||domein^` om te blokkeren, `@@||domein^` om toe te staan. Via **Gebruikersregels** bij je DNS-server zie je alle regels en kun je ze weer verwijderen. Zet **Blokkeren en deblokkeren toestaan** uit als het dashboard alleen mag kijken.
+In de querylog staat achter elk verzoek een menu met drie puntjes. Kies **Domein blokkeren** of **Domein deblokkeren** en bevestig. Het dashboard voegt dan een gebruikersregel toe: `||domein^` om te blokkeren, `@@||domein^` om toe te staan. Via **Gebruikersregels** zie je alle regels en kun je ze weer verwijderen. Zet **Wijzigingen toestaan** uit als het dashboard alleen mag kijken.
 
 ### Instellingen wijzigen
 
-Via **Serverinstellingen** en **Blokkeerlijsten** bij je DNS-server, en **Instellingen** bij een apparaat, wijzig je alles in het dashboard zelf. Alleen een nieuw apparaat koppelen doe je op de site van AdGuard DNS. Zet **Wijzigingen toestaan** uit als het dashboard alleen mag kijken.
+- **AdGuard DNS**: via **Serverinstellingen** en **Blokkeerlijsten** bij je DNS-server, en **Instellingen** bij een apparaat, wijzig je alles in het dashboard zelf. Alleen een nieuw apparaat koppelen doe je op de site van AdGuard DNS.
+- **AdGuard Home**: via **Instellingen** wijzig je de bescherming, de blokkeermodus, veilig surfen, ouderlijk toezicht en veilig zoeken, en via **Blokkeerlijsten** zet je lijsten aan of uit. Lijsten toevoegen en clients beheren doe je in AdGuard Home zelf.
 
 ### Wie mag het dashboard zien
 

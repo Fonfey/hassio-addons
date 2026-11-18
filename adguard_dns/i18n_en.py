@@ -103,6 +103,25 @@ EXACT = {
     "Wijzigingen staan uit in de instellingen van de app.": "Changes are turned off in the app settings.", "Ongeldig verzoek.": "Invalid request.",
     "AdGuard DNS staat deze wijziging niet toe. Controleer of je API-key schrijfrechten heeft.": "AdGuard DNS does not allow this change. Check whether your API key has write permission.",
     "Domein geblokkeerd.": "Domain blocked.", "Domein gedeblokkeerd.": "Domain unblocked.",
+    # AdGuard Home
+    "Zoek client": "Search client", "Actiefste clients": "Most active clients", "AdGuard Home openen": "Open AdGuard Home",
+    "Clients beheren in AdGuard Home": "Manage clients in AdGuard Home", "Gemiddelde verwerkingstijd": "Average processing time",
+    "IP-adres": "IP address", "Meest geblokkeerde domeinen": "Most blocked domains", "Meest opgevraagde domeinen": "Most requested domains",
+    "Verzoeken, 24 uur": "Requests, 24 hours", "Instellingen": "Settings", "Client": "Client", "Clients": "Clients",
+    "Je eigen AdGuard Home en de clients die het gebruiken": "Your own AdGuard Home and the clients that use it",
+    "AdGuard Home bewaart statistieken zo lang als ingesteld bij Instellingen, Algemene instellingen": "AdGuard Home keeps statistics as long as set under Settings, General settings",
+    "Blokkeert advertenties, trackers en gevaarlijke domeinen voor alle clients van AdGuard Home.": "Blocks ads, trackers and dangerous domains for all clients of AdGuard Home.",
+    "Blokkeert websites voor volwassenen.": "Blocks adult websites.",
+    "Voor Google, Bing, YouTube en andere zoekmachines.": "For Google, Bing, YouTube and other search engines.",
+    "Zonder bescherming worden advertenties, trackers en gevaarlijke domeinen niet meer geblokkeerd op je hele netwerk.": "Without protection, ads, trackers and dangerous domains are no longer blocked on your whole network.",
+    "AdGuard Home heeft nog geen clients gezien.": "AdGuard Home has not seen any clients yet.",
+    "Je bekijkt voorbeeldgegevens. Vul het adres van je AdGuard Home en je gebruikersnaam en wachtwoord in op het tabblad Configuratie van de app om je eigen statistieken te zien.": "You are looking at sample data. Enter the address of your AdGuard Home and your username and password on the Configuration tab of the app to see your own statistics.",
+    "AdGuard Home weigert de gebruikersnaam of het wachtwoord. Controleer ze in de instellingen van de app.": "AdGuard Home refuses the username or password. Check them in the app settings.",
+    "AdGuard Home kent deze functie niet. Werk AdGuard Home bij naar de nieuwste versie.": "AdGuard Home does not know this function. Update AdGuard Home to the latest version.",
+    "Deze instelling bestaat niet in AdGuard Home.": "This setting does not exist in AdGuard Home.",
+    "Dit onderdeel bestaat niet in AdGuard Home.": "This part does not exist in AdGuard Home.",
+    "Bescherming per apparaat stel je in AdGuard Home zelf in, bij Instellingen, Clientinstellingen.": "Protection per device is set in AdGuard Home itself, under Settings, Client settings.",
+    "Ongeldige blokkeermodus.": "Invalid blocking mode.", "Blokkeerlijst niet gevonden.": "Blocklist not found.",
 }
 
 PATTERNS = [
@@ -138,4 +157,9 @@ PATTERNS = [
     [r"AdGuard DNS gaf een fout: HTTP (\d+)\.", "AdGuard DNS returned an error: HTTP $1."],
     [r"AdGuard DNS is niet bereikbaar \((.+)\)\.", "AdGuard DNS is not reachable ($1)."],
     [r"Bedrijf (\d+)", "Company $1"],
+    [r"Verzoeken, (\d+) dagen", "Requests, $1 days"],
+    [r"Clients (\d+)", "Clients $1"],
+    [r"AdGuard Home is niet bereikbaar op (\S+) \((.+)\)\. Controleer het adres in de instellingen van de app\.", "AdGuard Home cannot be reached at $1 ($2). Check the address in the app settings."],
+    [r"AdGuard Home is niet bereikbaar op (\S+) \((.+)\)\.", "AdGuard Home cannot be reached at $1 ($2)."],
+    [r"AdGuard Home gaf een fout: HTTP (\d+)\.(.*)", "AdGuard Home returned an error: HTTP $1.$2"],
 ]

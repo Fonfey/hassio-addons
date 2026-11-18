@@ -49,17 +49,23 @@ def _opt(key, default):
 
 
 ADGUARD_API_KEY = _opt("ADGUARD_API_KEY", "")
+MODE = "home" if str(_opt("SOURCE", "") or _opt("MODE", "cloud")).strip().lower() == "home" else "cloud"
+HOME_URL = str(_opt("HOME_URL", "")).strip()
+HOME = MODE == "home"
 REFRESH_SECONDS = int(_opt("REFRESH_SECONDS", "60"))
 HOME_COUNTRY = str(_opt("HOME_COUNTRY", "NL")).upper()[:2]
 _ab = _OPTS.get("allow_blocking", os.environ.get("ALLOW_BLOCKING", "true"))
 ALLOW_BLOCKING = _ab if isinstance(_ab, bool) else str(_ab).lower() not in ("0", "false", "nee", "no")
 LISTEN = "0.0.0.0" if HA_APP else os.environ.get("LISTEN", "127.0.0.1")
 PORT = 8099 if HA_APP else int(os.environ.get("PORT", "8081"))
-DEMO = "--demo" in sys.argv or not ADGUARD_API_KEY
+DEMO = "--demo" in sys.argv or (not HOME and not ADGUARD_API_KEY) or (HOME and not HOME_URL)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import agh_home  # noqa: E402
+agh_home.configure(HOME_URL, _opt("HOME_USERNAME", ""), _opt("HOME_PASSWORD", ""))
 
 API_BASE = "https://api.adguard-dns.io/oapi/"
 ALLOWED = ("v1/account/limits", "v1/account/license", "v2/dns_servers", "v2/devices", "v1/stats/", "v1/query_log",
-           "v1/dns_servers/", "v2/filter_lists")
+           "v1/dns_servers/", "v2/filter_lists", "home/")
 HERE = os.path.dirname(os.path.abspath(__file__))
 CACHE, CACHE_LOCK = {}, threading.Lock()
 
@@ -142,6 +148,10 @@ def change_rules(payload):
         raise ValueError("Geen geldige server opgegeven.")
     kwargs = dict(domain=payload.get("domain"), action=payload.get("action"),
                   filtering_type=payload.get("filtering_type"), add=payload.get("add") or [], remove=payload.get("remove") or [])
+    if HOME and not DEMO:
+        new, msg = apply_rules(agh_home.read_rules(), **kwargs)
+        agh_home.set_rules(new)
+        return {"ok": True, "message": msg, "rules": new}
     if DEMO:
         server = next((x for x in DEMO_SERVERS if x["id"] == srv), None)
         if not server:
@@ -218,6 +228,16 @@ def _merge(dst, src):
 
 def change_settings(payload):
     srv = _safe_id(payload.get("server_id"))
+    if HOME and not DEMO:
+        if payload.get("filter_id") is not None:
+            on = bool(payload.get("enabled"))
+            agh_home.toggle_list(payload["filter_id"], on)
+            return {"ok": True, "message": "Blokkeerlijst ingeschakeld." if on else "Blokkeerlijst uitgeschakeld."}
+        patch = clean_patch(payload.get("patch"))
+        if not patch:
+            raise ValueError("Er is niets om te wijzigen.")
+        agh_home.change_settings(patch)
+        return {"ok": True, "message": "Instelling opgeslagen."}
     if payload.get("filter_id") is not None:
         fid, on = str(payload["filter_id"]), bool(payload.get("enabled"))
         if DEMO:
@@ -251,6 +271,8 @@ def change_settings(payload):
 
 
 def change_device(payload):
+    if HOME and not DEMO:
+        raise ValueError("Bescherming per apparaat stel je in AdGuard Home zelf in, bij Instellingen, Clientinstellingen.")
     dev = _safe_id(payload.get("device_id"))
     on = payload.get("protection_enabled")
     if not isinstance(on, bool):
@@ -265,6 +287,8 @@ def change_device(payload):
 
 
 def read_rules(srv):
+    if HOME and not DEMO:
+        return agh_home.read_rules()
     if DEMO:
         server = next((x for x in DEMO_SERVERS if x["id"] == srv), None)
         return (server or {}).get("settings", {}).get("user_rules_settings", {}).get("rules", [])
@@ -549,7 +573,8 @@ class Handler(BaseHTTPRequestHandler):
             return
         url = urllib.parse.urlparse(self.path)
         if url.path in ("/", "/index.html"):
-            page = PAGE.replace("__CONFIG__", json.dumps({"demo": DEMO, "refresh": REFRESH_SECONDS,
+            page = PAGE.replace("__CONFIG__", json.dumps({"demo": DEMO, "refresh": REFRESH_SECONDS, "mode": "cloud" if DEMO else MODE, "want": MODE,
+                                                          "home_url": agh_home.CFG["url"] if HOME else "",
                                                           "home": HOME_COUNTRY, "blocking": ALLOW_BLOCKING}))
             self.send(200, page.replace("</body>", user_footer(self.headers) + "</body>"), "text/html; charset=utf-8")
         elif url.path == "/map.json":
@@ -567,11 +592,17 @@ class Handler(BaseHTTPRequestHandler):
             if not path or ".." in path or not path.startswith(ALLOWED):
                 self.send(400, json.dumps({"error": "Pad niet toegestaan."}), "application/json")
                 return
-            if DEMO:
+            if DEMO or HOME:
                 params = {}
                 for k, v in rest:
                     params.setdefault(k, []).append(v)
-                self.send(200, json.dumps(demo_response(path, params)), "application/json")
+                if DEMO:
+                    self.send(200, json.dumps(demo_response(path, params)), "application/json")
+                    return
+                try:
+                    self.send(200, json.dumps(agh_home.respond(path, params)), "application/json")
+                except agh_home.HomeError as e:
+                    self.send(502, json.dumps({"error": str(e)}), "application/json")
                 return
             code, body = fetch_api(path, urllib.parse.urlencode(rest))
             self.send(code, body, "application/json")
@@ -607,6 +638,8 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def describe_err(e):
+    if isinstance(e, agh_home.HomeError):
+        return str(e)
     if isinstance(e, urllib.error.HTTPError):
         if e.code in (401, 403):
             return "AdGuard DNS staat deze wijziging niet toe. Controleer of je API-key schrijfrechten heeft."
@@ -650,6 +683,8 @@ a{color:var(--link)} button,select,input{font:inherit;color:inherit}
 .note[hidden]{display:none}
 
 /* limieten */
+body.home .c-co{display:none}
+.muted{color:var(--soft)} .qtable .rule{font-size:12px;margin-top:3px;font-family:ui-monospace,monospace;overflow-wrap:anywhere}
 .limits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:18px 26px;align-items:center;margin-bottom:16px}
 .lim{display:grid;grid-template-columns:44px 1fr;column-gap:12px;align-items:center}
 .lim svg{color:#c6ccd6}
@@ -923,7 +958,10 @@ const RANGES = {'24h': ['Afgelopen 24 uur', 864e5], '7d': ['Afgelopen 7 dagen', 
 const CAT = {ADS:['Advertenties','ads'], TRACKERS:['Trackers','trk'], SOCIAL_MEDIA:['Sociale media','soc'], CDN:['CDN','cdn'], OTHERS:['Overig','oth']};
 const regionNames = (() => { try { return new Intl.DisplayNames([LANG], {type: 'region'}); } catch (e) { return null; } })();
 const countryName = c => !c || c.length !== 2 ? 'Niet van toepassing' : (regionNames ? regionNames.of(c.toUpperCase()) : c.toUpperCase());
-const ADG = 'https://adguard-dns.io/en/dashboard/';
+const HOME = CFG.mode === 'home';
+const ADG = HOME ? (CFG.home_url || '#') : 'https://adguard-dns.io/en/dashboard/';
+const C = html => HOME ? '' : html;
+if (HOME) { document.body.classList.add('home'); const bc = document.querySelector('.nav a[href="#bedrijven"]'); if (bc) bc.remove(); }
 
 const state = {range: '24h', server: '', device: '', country: '', kpi: 'blocked', sort: 'blocked', search: '', logStatus: '', logSearch: ''};
 let meta = {servers: [], devices: [], countries: [], companies: []}, timer = null, logTimer = null, mapData = null, mapZoom = 1;
@@ -1028,7 +1066,8 @@ async function loadMeta(){
 }
 function showError(e){ const n = $('#note'); n.hidden = false; n.className = 'note err'; n.textContent = e.message || String(e); }
 function showDemo(){ const n = $('#note'); if (CFG.demo) { n.hidden = false; n.className = 'note';
-  n.textContent = 'Je bekijkt voorbeeldgegevens. Vul je AdGuard DNS API-key in op het tabblad Configuratie van de app om je eigen statistieken te zien.'; } else n.hidden = true; }
+  n.textContent = CFG.want === 'home' ? 'Je bekijkt voorbeeldgegevens. Vul het adres van je AdGuard Home en je gebruikersnaam en wachtwoord in op het tabblad Configuratie van de app om je eigen statistieken te zien.'
+    : 'Je bekijkt voorbeeldgegevens. Vul je AdGuard DNS API-key in op het tabblad Configuratie van de app om je eigen statistieken te zien.'; } else n.hidden = true; }
 
 /* ---------------- iconen ---------------- */
 const SVG = {
@@ -1112,6 +1151,7 @@ function barChart(el, stats, mode){
 
 /* ---------------- dashboard ---------------- */
 async function viewDashboard(){
+  if (HOME) return viewHomeDashboard();
   const P = period(), Q = period(true);
   const [lim, lic, time, ptime, comps, pcomps, devstats] = await Promise.all([
     api('v1/account/limits'), api('v1/account/license').catch(() => null),
@@ -1184,10 +1224,60 @@ async function viewDashboard(){
   window.__redraw = draw;
 }
 
+async function viewHomeDashboard(){
+  const P = period();
+  const [info, time, devstats] = await Promise.all([api('home/info'), api('v1/stats/time', P), api('v1/stats/devices', {...P, limit: 1000})]);
+  await loadMeta();
+  const sum = (st, k) => (st.stats || []).reduce((a, s) => a + (s.value[k] || 0), 0);
+  const q = sum(time, 'queries'), b = sum(time, 'blocked');
+  const dstat = Object.fromEntries((devstats.stats || []).map(s => [s.device_id, s.value]));
+  const tile = (icon, label, value) => `<div class="lim">${icon}<div><div class="t">${label}</div><div class="v">${value}</div></div></div>`;
+  const srv = meta.servers[0] || {settings: {}}, st = srv.settings || {};
+  const fl = ((st.filter_lists_settings || {}).filter_list || []).filter(f => f.enabled).length;
+  const ur = ((st.user_rules_settings || {}).rules || []).length;
+  const devs = meta.devices.slice().sort((x, y) => ((dstat[y.id] || {}).queries || 0) - ((dstat[x.id] || {}).queries || 0));
+  const rows = devs.map(d => { const v = dstat[d.id] || {};
+    return `<tr data-name="${esc(d.name.toLowerCase())}">
+      <td class="dn">${devIcon(d.device_type)}<span>${esc(d.name)}${d.name !== d.id ? `<span class="muted"> ${esc(d.id)}</span>` : ''}</span></td>
+      <td data-l="Verzoeken"><button class="linkbtn req" ${goAttr('querylog', {device: d.id, server: '', country: ''})}>${K(v.queries)}</button></td>
+      <td class="act"><button class="linkbtn" ${goAttr('querylog', {device: d.id, server: '', country: ''})}>Querylog</button></td></tr>`; }).join('');
+  $('#view').innerHTML = `
+    <section class="limits">${tile(SVG.cloud, info.time_units === 'days' ? `Verzoeken, ${info.points} dagen` : 'Verzoeken, 24 uur', K(info.queries))}${tile(SVG.device, 'Clients', K(info.clients))}${tile(SVG.server, 'Gemiddelde verwerkingstijd', esc(String(info.avg_ms).replace('.', LOCALE.startsWith('nl') ? ',' : '.')) + ' ms')}
+      <div class="plan">AdGuard Home ${esc(info.version || '')}${CFG.home_url ? `<br><a href="${esc(CFG.home_url)}" target="_blank" rel="noopener">AdGuard Home openen</a>` : ''}</div></section>
+    <section class="card">
+      <a class="viewall" href="#statistieken">Alle statistieken bekijken</a>
+      <div class="kpitabs" role="tablist">
+        <button class="kpitab" role="tab" aria-selected="true"><span class="t">Geblokkeerde verzoeken</span>
+          <span class="n"><span class="blk">${K(b)}</span> (${pct(b, q)}%) van <span class="req">${K(q)}</span></span></button>
+      </div>
+      <div class="chart" id="chart"></div>
+    </section>
+    <section class="card srv">
+      <div class="cardhead"><h2>AdGuard Home <span class="help" tabindex="0" data-tip="Je eigen AdGuard Home en de clients die het gebruiken">?</span></h2>
+        <div class="right">Geblokkeerd <button class="linkbtn blk" style="font-size:15px" ${goAttr('querylog', {logStatus: 'b'})}>${K(info.blocked)}</button> (${pct(info.blocked, info.queries)}%) van <button class="linkbtn req" style="font-size:15px" ${goAttr('querylog', {})}>${K(info.queries)}</button> verzoeken</div></div>
+      <div class="srvrow"><span class="toggle"><span data-ptext>Bescherming is ${st.protection_enabled ? 'ingeschakeld' : 'uitgeschakeld'}</span> <button class="sw ${st.protection_enabled ? 'on' : ''}" role="switch" aria-checked="${!!st.protection_enabled}" aria-label="Bescherming" data-srvprot="${esc(srv.id)}" ${CFG.blocking ? '' : 'disabled'}></button></span>
+        <a href="#server/${esc(srv.id)}">Instellingen</a><a href="#lijsten/${esc(srv.id)}">Blokkeerlijsten (${fl})</a>
+        <button class="linkbtn" data-rules="${esc(srv.id)}">Gebruikersregels (${ur})</button></div>
+      <input class="search" type="search" placeholder="Zoek client" aria-label="Zoek client" data-filter>
+      <table class="dtable"><thead><tr><th>Clients ${devs.length}</th><th>Verzoeken</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="3" class="empty">AdGuard Home heeft nog geen clients gezien.</td></tr>'}</tbody></table>
+      ${CFG.home_url ? `<a class="srvfoot" href="${esc(CFG.home_url)}/#clients" target="_blank" rel="noopener">${SVG.plus}Clients beheren in AdGuard Home</a>` : ''}</section>`;
+  const draw = () => barChart($('#chart'), time.stats || [], 'blocked');
+  draw();
+  document.querySelectorAll('[data-filter]').forEach(inp => inp.addEventListener('input', () => {
+    const v = inp.value.trim().toLowerCase();
+    inp.parentElement.querySelectorAll('tbody tr[data-name]').forEach(tr => tr.hidden = v && !tr.dataset.name.includes(v)); }));
+  document.querySelectorAll('[data-rules]').forEach(x => x.addEventListener('click', () => rulesModal(x.dataset.rules)));
+  document.querySelectorAll('[data-srvprot]').forEach(b => b.addEventListener('click', () => toggleSwitch(b, on => post('api/settings', {server_id: b.dataset.srvprot, patch: {protection_enabled: on}}),
+    'Bescherming uitzetten?', 'Zonder bescherming worden advertenties, trackers en gevaarlijke domeinen niet meer geblokkeerd op je hele netwerk.',
+    on => { const t = b.parentElement.querySelector('[data-ptext]'); if (t) t.textContent = 'Bescherming is ' + (on ? 'ingeschakeld' : 'uitgeschakeld'); })));
+  window.__redraw = draw;
+}
+
 /* ---------------- filters ---------------- */
 function filtersHTML(){
   const opt = (v, l, cur) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(l)}</option>`;
   const devs = meta.devices.filter(d => !state.server || d.dns_server_id === state.server);
+  if (HOME) return `<div class="filters"><select data-f="range" aria-label="Periode">${Object.entries(RANGES).map(([k, v]) => opt(k, v[0], state.range)).join('')}</select></div>`;
   return `<div class="filters">
     <select data-f="range" aria-label="Periode">${Object.entries(RANGES).map(([k, v]) => opt(k, v[0], state.range)).join('')}</select>
     <select data-f="server" aria-label="Server">${opt('', 'Alle servers', state.server)}${meta.servers.map(s => opt(s.id, s.name, state.server)).join('')}</select>
@@ -1200,12 +1290,14 @@ function bindFilters(){
 }
 async function ensureMeta(){
   if (!meta.servers.length) await loadMeta();
+  if (HOME) return;
   if (!meta.countries.length) { const c = await api('v1/stats/countries', {...period(), limit: 100}); meta.countries = (c.stats || []).map(x => x.country); }
   if (!meta.companies.length) { const c = await api('v1/stats/companies', {...period(), limit: 100}).catch(() => ({stats: []})); meta.companies = (c.stats || []).map(x => x.company_name).filter(Boolean); }
 }
 
 /* ---------------- statistieken ---------------- */
 async function viewStats(){
+  if (HOME) return viewHomeStats();
   await ensureMeta();
   const P = {...period(), ...filt()};
   const [time, cats, comps, ctry, doms] = await Promise.all([
@@ -1245,6 +1337,32 @@ async function viewStats(){
   const draw = () => barChart($('#chart'), time.stats || [], 'blocked');
   draw(); window.__redraw = draw;
   drawMap(ctryList);
+}
+async function viewHomeStats(){
+  await ensureMeta();
+  const P = period();
+  const [time, doms, bdoms, devs] = await Promise.all([api('v1/stats/time', P), api('v1/stats/domains', {...P, limit: 10}),
+    api('v1/stats/domains', {...P, limit: 10, sort: 'blocked'}), api('v1/stats/devices', {...P, limit: 10})]);
+  const tq = (time.stats || []).reduce((a, s) => a + s.value.queries, 0), tb = (time.stats || []).reduce((a, s) => a + s.value.blocked, 0);
+  const devName = Object.fromEntries(meta.devices.map(d => [d.id, d.name]));
+  const none = '<tr><td class="empty">Nog geen gegevens in deze periode.</td></tr>';
+  const domRow = (s, blk) => `<tr><td class="nm"><button class="nmlink" ${goAttr('querylog', {logSearch: s.domain})} style="display:flex;align-items:center;gap:14px">${favicon(s.domain)}${esc(s.domain)}</button></td>
+    <td class="n"><button class="linkbtn ${blk ? 'blk' : 'req'}" style="font-size:15px" ${goAttr('querylog', blk ? {logSearch: s.domain, logStatus: 'b'} : {logSearch: s.domain})}>${K(blk ? s.value.blocked : s.value.queries)}</button></td></tr>`;
+  const top = (doms.stats || []).map(s => domRow(s, false)).join(''), topb = (bdoms.stats || []).filter(s => s.value.blocked).map(s => domRow(s, true)).join('');
+  const devRows = (devs.stats || []).map(s => `<tr><td class="nm"><button class="nmlink" ${goAttr('querylog', {device: s.device_id})} style="display:flex;align-items:center;gap:14px">${devIcon((meta.devices.find(d => d.id === s.device_id) || {}).device_type)}${esc(devName[s.device_id] || s.device_id)}</button></td>
+    <td class="n"><button class="linkbtn req" style="font-size:15px" ${goAttr('querylog', {device: s.device_id})}>${K(s.value.queries)}</button></td></tr>`).join('');
+  $('#view').innerHTML = `${filtersHTML()}
+    <section class="card"><div class="cardhead"><h2>Verzoeken <span class="help" tabindex="0" data-tip="AdGuard Home bewaart statistieken zo lang als ingesteld bij Instellingen, Algemene instellingen">?</span></h2>
+      <div class="right">Geblokkeerd <button class="linkbtn blk" style="font-size:15px" ${goAttr('querylog', {logStatus: 'b'})}>${K(tb)}</button> (${pct(tb, tq)}%) van <button class="linkbtn req" style="font-size:15px" ${goAttr('querylog', {})}>${K(tq)}</button> verzoeken</div></div>
+      <div class="chart" id="chart"></div></section>
+    <div class="grid2">
+      <section class="card"><div class="cardhead"><h2>Meest opgevraagde domeinen</h2><a href="#querylog" class="right" style="font-size:14px;color:var(--link)">Querylog</a></div><table class="list">${top || none}</table></section>
+      <section class="card"><h2>Meest geblokkeerde domeinen</h2><table class="list">${topb || none}</table></section>
+    </div>
+    <section class="card"><h2>Actiefste clients</h2><table class="list">${devRows || none}</table></section>`;
+  bindFilters();
+  const draw = () => barChart($('#chart'), time.stats || [], 'blocked');
+  draw(); window.__redraw = draw;
 }
 const KNOWN = {'Microsoft Corporation':'microsoft.com','Google':'google.com','Sentry':'sentry.io','Meta Platforms, Inc.':'meta.com','Apple Inc.':'apple.com',
   'AppLovin':'applovin.com','Amazon':'amazon.com','Cloudflare':'cloudflare.com','Spotify':'spotify.com','Samsung':'samsung.com','TikTok':'tiktok.com',
@@ -1338,14 +1456,14 @@ async function viewLog(){
       <div class="r1"><label class="sbox">${SEARCH}<input id="ls" type="search" placeholder="Zoeken" value="${esc(state.logSearch)}" aria-label="Zoek domein"></label>
         <select data-f="range" aria-label="Periode">${Object.entries(RANGES).map(([k, v]) => opt(k, v[0], state.range)).join('')}</select>
         <select data-f="device" aria-label="Apparaat">${opt('', 'Alle apparaten', state.device)}${devs.map(d => opt(d.id, d.name, state.device)).join('')}</select>
-        <select data-f="country" aria-label="Land">${opt('', 'Alle landen', state.country)}${meta.countries.filter(c => c).map(c => opt(c, countryName(c), state.country)).join('')}</select></div>
+        ${C(`<select data-f="country" aria-label="Land">${opt('', 'Alle landen', state.country)}${meta.countries.filter(c => c).map(c => opt(c, countryName(c), state.country)).join('')}</select>`)}</div>
       <div class="r2"><select data-l="logStatus" aria-label="Status">${opt('', 'Alle statussen', state.logStatus)}${opt('b', 'Geblokkeerd', state.logStatus)}${opt('p', 'Verwerkt', state.logStatus)}${opt('a', 'Toegestaan', state.logStatus)}${opt('m', 'Gewijzigd', state.logStatus)}</select>
         <select data-l="logType" aria-label="Type" id="types">${opt('', 'Alle types', state.logType)}</select>
-        <select data-l="logCompany" aria-label="Bedrijf">${opt('', 'Alle bedrijven', state.logCompany)}${companyOpts.map(([id, n]) => opt(id, n, state.logCompany)).join('')}</select>
+        ${C(`<select data-l="logCompany" aria-label="Bedrijf">${opt('', 'Alle bedrijven', state.logCompany)}${companyOpts.map(([id, n]) => opt(id, n, state.logCompany)).join('')}</select>
         <select data-f="server" aria-label="Server">${opt('', 'Alle servers', state.server)}${meta.servers.map(s => opt(s.id, s.name, state.server)).join('')}</select>
-        <select data-l="logCategory" aria-label="Categorie">${opt('', 'Alle categorieën', state.logCategory)}${Object.entries(CAT).map(([k, v]) => opt(k, v[0], state.logCategory)).join('')}</select></div>
+        <select data-l="logCategory" aria-label="Categorie">${opt('', 'Alle categorieën', state.logCategory)}${Object.entries(CAT).map(([k, v]) => opt(k, v[0], state.logCategory)).join('')}</select>`)}</div>
     </div>
-    <div class="tablewrap"><table class="qtable"><thead><tr><th>Status</th><th>Verzoek</th><th>Bedrijf</th><th>Apparaat</th><th>Datum</th><th>Client</th><th></th></tr></thead><tbody id="qrows"><tr><td colspan="7" class="empty">Querylog laden…</td></tr></tbody></table></div>
+    <div class="tablewrap"><table class="qtable"><thead><tr><th>Status</th><th>Verzoek</th><th class="c-co">Bedrijf</th><th>${HOME ? 'Client' : 'Apparaat'}</th><th>Datum</th><th>${HOME ? 'IP-adres' : 'Client'}</th><th></th></tr></thead><tbody id="qrows"><tr><td colspan="7" class="empty">Querylog laden…</td></tr></tbody></table></div>
     <div id="qmore"></div>`;
   bindFilters();
   document.querySelectorAll('select[data-l]').forEach(sel => sel.addEventListener('change', () => { state[sel.dataset.l] = sel.value; sel.dataset.l === 'logType' ? drawRows() : loadRows(); }));
@@ -1390,10 +1508,10 @@ function drawRows(){
       <div class="menu" hidden><button data-act="${blocked ? 'unblock' : 'block'}" data-i="${i}">${blocked ? 'Domein deblokkeren' : 'Domein blokkeren'}</button>
       <button ${goAttr('querylog', {logSearch: x.domain})}>Alleen dit domein tonen</button></div></div>` : '';
     return `<tr><td class="c-st"><span class="pill ${pc}">${pl}</span></td>
-      <td class="c-rq"><span class="rq">${CATICON[c[1]].replace('class="ico"', 'class="ico" role="img" aria-label="' + c[0] + '"')}${SECURE.includes(protoOf(x)) ? LOCK : ''}<span class="dom" title="${esc(x.domain)}">${esc(x.domain)}</span></span></td>
+      <td class="c-rq"><span class="rq">${HOME ? '' : CATICON[c[1]].replace('class="ico"', 'class="ico" role="img" aria-label="' + c[0] + '"')}${SECURE.includes(protoOf(x)) ? LOCK : ''}<span class="dom" title="${esc(x.rule ? x.domain + ' (' + x.rule + ')' : x.domain)}">${esc(x.domain)}</span></span>${HOME && x.rule ? `<div class="muted rule">${esc(x.rule)}</div>` : ''}</td>
       <td class="c-co"><div class="co-name">${esc(companyName(x.company_id))}</div></td><td class="c-dv">${esc(devName[x.device_id] || '–')}</td>
       <td class="c-dt"><div class="dt">${d.toLocaleTimeString(LOCALE)}<br>${d.toLocaleDateString(LOCALE, {day: 'numeric', month: 'short', year: 'numeric'})}</div></td>
-      <td class="c-cl"><span class="cl">${x.client_country ? flag(x.client_country) : '<span class="q">?</span>'}${esc(client)}</span></td><td class="c-mn">${menu}</td></tr>`;
+      <td class="c-cl"><span class="cl">${HOME ? '' : x.client_country ? flag(x.client_country) : '<span class="q">?</span>'}${esc(client)}</span></td><td class="c-mn">${menu}</td></tr>`;
   }).join('') || '<tr><td colspan="7" class="empty">Geen verzoeken gevonden met deze filters. Kies een langere periode of minder filters.</td></tr>';
   body.querySelectorAll('[data-k]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); const m = b.nextElementSibling, open = m.hidden;
     document.querySelectorAll('.menu').forEach(x => x.hidden = true); m.hidden = !open; }));
@@ -1431,32 +1549,32 @@ async function viewServer(id){
     <button class="sw ${getPath(st, path) ? 'on' : ''}" role="switch" aria-checked="${!!getPath(st, path)}" aria-label="${esc(label)}" data-path="${path}" ${offWarn ? `data-warn="${esc(offWarn)}"` : ''} ${CFG.blocking ? '' : 'disabled'}></button></div>`;
   const mode = (st.blocking_mode_settings || {}).blocking_mode || 'NONE';
   const MODES = {NONE: 'Standaard', REFUSED: 'Weigeren (REFUSED)', NXDOMAIN: 'Bestaat niet (NXDOMAIN)', NULL_IP: 'Leeg adres (0.0.0.0)', CUSTOM_IP: 'Eigen IP-adres'};
-  $('#view').innerHTML = `<a class="back" href="#dashboard">← Dashboard</a><h1 class="ptitle">${esc(srv.name)}</h1><p class="psub">Serverinstellingen</p>${roNote()}
+  $('#view').innerHTML = `<a class="back" href="#dashboard">← Dashboard</a><h1 class="ptitle">${esc(srv.name)}</h1><p class="psub">${HOME ? 'Instellingen' : 'Serverinstellingen'}</p>${roNote()}
     <section class="card setcard"><h2>Algemeen</h2>
-      ${row('Bescherming', 'Blokkeert advertenties, trackers en gevaarlijke domeinen voor alle apparaten op deze server.', 'protection_enabled', 'Zonder bescherming wordt er op deze server niets meer geblokkeerd.')}
+      ${row('Bescherming', HOME ? 'Blokkeert advertenties, trackers en gevaarlijke domeinen voor alle clients van AdGuard Home.' : 'Blokkeert advertenties, trackers en gevaarlijke domeinen voor alle apparaten op deze server.', 'protection_enabled', 'Zonder bescherming wordt er op deze server niets meer geblokkeerd.')}
       <div class="setrow"><div><div class="sl">Blokkeermodus</div><div class="sh">Wat een apparaat terugkrijgt als een domein geblokkeerd is.</div></div>
         <select data-mode ${CFG.blocking ? '' : 'disabled'} aria-label="Blokkeermodus">${Object.entries(MODES).filter(([k]) => k !== 'CUSTOM_IP' || mode === 'CUSTOM_IP').map(([k, v]) => `<option value="${k}" ${k === mode ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
       <div class="setrow"><div><div class="sl">Bewaartijd geblokkeerde antwoorden</div><div class="sh">Hoeveel seconden een apparaat een blokkade onthoudt (TTL).</div></div>
         <input type="number" min="0" max="3600" value="${st.block_ttl_seconds ?? 10}" data-ttl ${CFG.blocking ? '' : 'disabled'} aria-label="TTL in seconden"></div>
-      ${row('IP-adressen bewaren in de querylog', 'Laat zien vanaf welk adres een verzoek kwam.', 'ip_log_enabled')}
-      ${row('Nieuwe apparaten automatisch koppelen', 'Apparaten die deze server gebruiken worden vanzelf toegevoegd.', 'auto_connect_devices_enabled')}
+      ${C(row('IP-adressen bewaren in de querylog', 'Laat zien vanaf welk adres een verzoek kwam.', 'ip_log_enabled'))}
+      ${C(row('Nieuwe apparaten automatisch koppelen', 'Apparaten die deze server gebruiken worden vanzelf toegevoegd.', 'auto_connect_devices_enabled'))}
       <div class="setrow"><div><div class="sl">Blokkeerlijsten</div><div class="sh">${fl} lijsten ingeschakeld.</div></div><a href="#lijsten/${esc(srv.id)}" class="linkbtn">Beheren</a></div>
       <div class="setrow"><div><div class="sl">Gebruikersregels</div><div class="sh">${ur} eigen regels.</div></div><button class="linkbtn" data-rules="${esc(srv.id)}">Beheren</button></div></section>
     <section class="card setcard"><h2>Beveiliging</h2>
       ${row('Veilig surfen', 'Blokkeert bekende phishing- en malwaredomeinen.', 'safebrowsing_settings.enabled', 'Phishing- en malwaredomeinen worden dan niet meer geblokkeerd.')}
-      ${row('Gevaarlijke domeinen blokkeren', 'Domeinen die bekendstaan om misleiding of schadelijke software.', 'safebrowsing_settings.block_dangerous_domains')}
-      ${row('Nieuw geregistreerde domeinen blokkeren', 'Domeinen van minder dan 30 dagen oud worden vaak gebruikt voor oplichting.', 'safebrowsing_settings.block_nrd')}
-      ${row('Typosquatting tegengaan', 'Blokkeert domeinen die bijna hetzelfde heten als bekende sites, zoals gooogle.com.', 'safebrowsing_settings.typosquatting_protection_enabled')}
-      ${row('Lookalike-tekens tegengaan', 'Blokkeert domeinen met tekens die op gewone letters lijken (homoglyphs).', 'safebrowsing_settings.homoglyph_protection_enabled')}</section>
+      ${C(row('Gevaarlijke domeinen blokkeren', 'Domeinen die bekendstaan om misleiding of schadelijke software.', 'safebrowsing_settings.block_dangerous_domains'))}
+      ${C(row('Nieuw geregistreerde domeinen blokkeren', 'Domeinen van minder dan 30 dagen oud worden vaak gebruikt voor oplichting.', 'safebrowsing_settings.block_nrd'))}
+      ${C(row('Typosquatting tegengaan', 'Blokkeert domeinen die bijna hetzelfde heten als bekende sites, zoals gooogle.com.', 'safebrowsing_settings.typosquatting_protection_enabled'))}
+      ${C(row('Lookalike-tekens tegengaan', 'Blokkeert domeinen met tekens die op gewone letters lijken (homoglyphs).', 'safebrowsing_settings.homoglyph_protection_enabled'))}</section>
     <section class="card setcard"><h2>Ouderlijk toezicht</h2>
-      ${row('Ouderlijk toezicht', 'Schakelt de opties hieronder in.', 'parental_control_settings.enabled')}
-      ${row('Websites voor volwassenen blokkeren', '', 'parental_control_settings.block_adult_websites_enabled')}
-      ${row('Veilig zoeken afdwingen', 'Voor Google, Bing en andere zoekmachines.', 'parental_control_settings.engines_safe_search_enabled')}
-      ${row('Beperkte modus op YouTube', '', 'parental_control_settings.youtube_safe_search_enabled')}</section>
-    <section class="card setcard"><h2>Browsers en privacy</h2>
+      ${row('Ouderlijk toezicht', HOME ? 'Blokkeert websites voor volwassenen.' : 'Schakelt de opties hieronder in.', 'parental_control_settings.enabled')}
+      ${C(row('Websites voor volwassenen blokkeren', '', 'parental_control_settings.block_adult_websites_enabled'))}
+      ${row('Veilig zoeken afdwingen', HOME ? 'Voor Google, Bing, YouTube en andere zoekmachines.' : 'Voor Google, Bing en andere zoekmachines.', 'parental_control_settings.engines_safe_search_enabled')}
+      ${C(row('Beperkte modus op YouTube', '', 'parental_control_settings.youtube_safe_search_enabled'))}</section>
+    ${C(`<section class="card setcard"><h2>Browsers en privacy</h2>
       ${row('Chrome-prefetch blokkeren', 'Voorkomt dat Chrome pagina’s vooraf laadt via eigen servers.', 'block_chrome_prefetch')}
       ${row('Firefox-DNS-over-HTTPS uitschakelen', 'Zorgt dat Firefox deze DNS-server blijft gebruiken.', 'block_firefox_canary')}
-      ${row('iCloud Privé-relay blokkeren', 'Zorgt dat Apple-apparaten deze DNS-server blijven gebruiken.', 'block_private_relay')}</section>`;
+      ${row('iCloud Privé-relay blokkeren', 'Zorgt dat Apple-apparaten deze DNS-server blijven gebruiken.', 'block_private_relay')}</section>`)}`;
   document.querySelectorAll('[data-path]').forEach(b => b.addEventListener('click', () => toggleSwitch(b,
     on => post('api/settings', {server_id: srv.id, patch: patchFor(b.dataset.path, on)}), b.dataset.warn ? 'Weet je het zeker?' : null, b.dataset.warn)));
   const ms = $('[data-mode]'); if (ms) ms.addEventListener('change', async () => {
@@ -1474,7 +1592,7 @@ async function viewLists(id){
   $('#view').innerHTML = `<a class="back" href="#server/${esc(srv.id)}">← ${esc(srv.name)}</a><h1 class="ptitle">Blokkeerlijsten</h1><p class="psub">${on.size} van ${items.length} lijsten ingeschakeld op ${esc(srv.name)}</p>${roNote()}
     <section class="card setcard"><div class="fltools"><input class="search" type="search" id="fq" placeholder="Zoek blokkeerlijst" aria-label="Zoek blokkeerlijst"></div>
       ${items.map(f => `<div class="setrow flrow" data-n="${esc(String(f.name || '').toLowerCase())}"><div><div class="sl">${esc(f.name || f.filter_id)}</div>
-        ${f.description ? `<div class="sh">${esc(f.description)}</div>` : ''}<div class="meta">${f.rules_count != null ? K(f.rules_count) + ' regels' : ''}${f.time_updated ? ', ' + upd(f.time_updated) : ''}${f.type === 'CUSTOM' ? ', eigen lijst' : ''}</div></div>
+        ${f.description ? `<div class="sh">${esc(f.description)}</div>` : ''}<div class="meta">${f.rules_count != null ? K(f.rules_count) + ' regels' : ''}${f.time_updated ? ', ' + upd(f.time_updated) : ''}${f.type === 'CUSTOM' && !HOME ? ', eigen lijst' : ''}</div></div>
         <button class="sw ${f.on ? 'on' : ''}" role="switch" aria-checked="${f.on}" aria-label="${esc(f.name)}" data-fid="${esc(f.filter_id)}" ${CFG.blocking ? '' : 'disabled'}></button></div>`).join('') || '<p class="empty">Er zijn geen blokkeerlijsten beschikbaar.</p>'}
     </section>`;
   $('#fq').addEventListener('input', e => { const v = e.target.value.trim().toLowerCase(); document.querySelectorAll('.flrow').forEach(r => r.hidden = v && !r.dataset.n.includes(v)); });
@@ -1508,7 +1626,9 @@ const VIEWS = {dashboard: viewDashboard, statistieken: viewStats, bedrijven: vie
 const PARENT = {server: 'dashboard', lijsten: 'dashboard', apparaat: 'dashboard'};
 async function route(){
   clearTimeout(timer); clearInterval(logTimer);
-  const [name, arg] = decodeURIComponent((location.hash || '#dashboard').slice(1)).split('/'), fn = VIEWS[name] || viewDashboard;
+  let [name, arg] = decodeURIComponent((location.hash || '#dashboard').slice(1)).split('/');
+  if (HOME && (name === 'bedrijven' || name === 'apparaat')) name = 'dashboard';
+  const fn = VIEWS[name] || viewDashboard;
   const navName = PARENT[name] || (VIEWS[name] ? name : 'dashboard');
   document.querySelectorAll('.nav a').forEach(a => { if (a.getAttribute('href') === '#' + navName) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   window.__redraw = null;
@@ -1544,8 +1664,17 @@ def main():
         print("Toegestane gebruikers: iedereen (de lijst is leeg).", flush=True)
     server = ThreadingHTTPServer((LISTEN, PORT), Handler)
     shown = "localhost" if LISTEN in ("127.0.0.1", "0.0.0.0") else LISTEN
-    print(f"AdGuard DNS-dashboard draait op http://{shown}:{PORT}")
-    print("Voorbeeldgegevens (demo)." if DEMO else "Verbonden met AdGuard DNS via je API-key.")
+    print(f"AdGuard-dashboard draait op http://{shown}:{PORT}")
+    if DEMO:
+        print("Voorbeeldgegevens (demo).")
+    elif HOME:
+        print(f"Bron: AdGuard Home op {agh_home.CFG['url']}.")
+        try:
+            print(f"Verbonden met AdGuard Home {agh_home.get('status').get('version', '')}.", flush=True)
+        except agh_home.HomeError as e:
+            print(f"Let op: {e}", flush=True)
+    else:
+        print("Bron: AdGuard DNS (cloud), via je API-key.")
     print("Stoppen met Ctrl+C.")
     try:
         server.serve_forever()

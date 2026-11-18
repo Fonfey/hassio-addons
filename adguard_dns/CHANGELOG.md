@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.0
+
+### New / Nieuw
+- Also works with your own **AdGuard Home**. Choose the source on the Configuration tab: `cloud` for AdGuard DNS with an API key, or `home` for AdGuard Home with its address, username and password. With AdGuard Home you see requests, clients, blocked requests per hour, top domains, the query log with the matching rule, and you can turn protection on or off, change settings, turn blocklists on or off and block or unblock domains.
+- Werkt nu ook met je eigen **AdGuard Home**. Kies de bron op het tabblad Configuratie: `cloud` voor AdGuard DNS met een API-key, of `home` voor AdGuard Home met het adres, de gebruikersnaam en het wachtwoord. Met AdGuard Home zie je verzoeken, clients, geblokkeerde verzoeken per uur, topdomeinen en de querylog met de regel die gold, en kun je de bescherming aan- of uitzetten, instellingen wijzigen, blokkeerlijsten aan- of uitzetten en domeinen blokkeren of deblokkeren.
+- The app is now called AdGuard Dashboard and shows as AdGuard in the sidebar.
+- De app heet nu AdGuard Dashboard en staat als AdGuard in de zijbalk.
+
 ## 1.5.2
 
 - The sidebar icon now matches the app icon: the ads-off symbol.

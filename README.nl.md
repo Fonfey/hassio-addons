@@ -1,6 +1,6 @@
 # Fonfey's Home Assistant addons
 
-![Home Assistant-apps: AdGuard DNS Dashboard, Maintenance, Media manager, Notifications, Time Machine en UniFi Dashboard](docs/social-preview.png)
+![Home Assistant-apps: AdGuard Dashboard, Maintenance, Media manager, Notifications, Time Machine en UniFi Dashboard](docs/social-preview.png)
 
 🇬🇧 [Read in English](README.md)
 
@@ -8,11 +8,9 @@ Store-repository voor Home Assistant. Elke app heeft een eigen map met de code, 
 
 ## De apps
 
-### <img src="adguard_dns/icon.png" width="32" height="32" align="absmiddle" alt=""> AdGuard DNS Dashboard
+### <img src="adguard_dns/icon.png" width="32" height="32" align="absmiddle" alt=""> AdGuard Dashboard
 
-Statistieken van je AdGuard DNS-account, querylog, blokkeren en deblokkeren, blokkeerlijsten en serverinstellingen. [Documentatie](adguard_dns/DOCS.md) · code in [`adguard_dns/`](adguard_dns)
-
-**Let op:** deze app is voor **AdGuard DNS**, de DNS-dienst in de cloud van AdGuard (adguard-dns.io). Hij werkt niet met **AdGuard Home**, de gratis software die je zelf installeert en draait; gebruik voor AdGuard Home de officiële AdGuard Home-integratie van Home Assistant.
+Statistieken, querylog, blokkeren en deblokkeren, blokkeerlijsten en instellingen voor **AdGuard DNS** (de clouddienst op adguard-dns.io) of je eigen **AdGuard Home**. Welke je gebruikt kies je op het tabblad Configuratie: een API-key voor AdGuard DNS, of het adres, de gebruikersnaam en het wachtwoord voor AdGuard Home. [Documentatie](adguard_dns/DOCS.md) · code in [`adguard_dns/`](adguard_dns)
 
 <img src="https://github.com/user-attachments/assets/58497767-21b4-4cfc-80bc-e3d82154c687" width="1046" height="571" alt="AdGuard DNS Dashboard: geblokkeerde verzoeken per uur en de DNS-server met apparaten">
 <img src="https://github.com/user-attachments/assets/d1961a7f-eace-49da-932c-1fa25f783c41" width="1055" height="523" alt="AdGuard DNS Dashboard: verzoeken van de afgelopen 24 uur, soorten verzoeken en topbedrijven">
@@ -77,11 +75,11 @@ Of voeg hem met de hand toe:
 1. Ga naar **Instellingen → Apps → App Store**.
 2. Klik rechtsboven op **⋮ → Repositories** en voeg deze URL toe:
    `https://github.com/Fonfey/hassio-addons.git`
-3. De apps staan nu onder **Fonfey's Home Assistant addons**. Installeer wat je wilt en start de app. UniFi en AdGuard vragen op het tabblad **Configuratie** om een API-key.
+3. De apps staan nu onder **Fonfey's Home Assistant addons**. Installeer wat je wilt en start de app. UniFi vraagt op het tabblad **Configuratie** om een API-key; AdGuard om een API-key (AdGuard DNS) of een adres en login (AdGuard Home).
 
 De apps worden geleverd als kant-en-klare images op `ghcr.io/fonfey`. Je hebt geen token of extra login nodig.
 
-Onderhoud, Media manager, Tijdmachine en Meldingen draaien helemaal lokaal: ze praten alleen met je eigen Home Assistant en laden niets van internet, ook geen lettertypen. Het UniFi Dashboard praat daarnaast met je eigen UniFi-console, en het AdGuard DNS Dashboard met de AdGuard DNS-dienst.
+Onderhoud, Media manager, Tijdmachine en Meldingen draaien helemaal lokaal: ze praten alleen met je eigen Home Assistant en laden niets van internet, ook geen lettertypen. Het UniFi Dashboard praat daarnaast met je eigen UniFi-console, en het AdGuard Dashboard met de AdGuard DNS-dienst of je eigen AdGuard Home.
 
 ## Voor ontwikkelaars
 
@@ -91,7 +89,7 @@ Wil je een app uitproberen of aan de code werken zonder Home Assistant, dan draa
 
 | App | Commando | Adres |
 | --- | --- | --- |
-| AdGuard DNS Dashboard | `python3 adguard_dns/adguard_dashboard.py --demo` | http://localhost:8081 |
+| AdGuard Dashboard | `python3 adguard_dns/adguard_dashboard.py --demo` | http://localhost:8081 |
 | Maintenance | `python3 maintenance/maintenance.py --demo` | http://localhost:8082 |
 | Media manager | `python3 media_manager/media_manager.py --demo` | http://localhost:8095 |
 | Notifications | `python3 notifications/notifications.py --demo` | http://localhost:8093 |

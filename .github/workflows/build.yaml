@@ -49,7 +49,7 @@ jobs:
           BEFORE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
           INPUT_APPS: ${{ github.event.inputs.apps }}
         run: |
-          all=$(ls -d */ | tr -d / | while read d; do [ -f "$d/config.yaml" ] && [ -f "$d/Dockerfile" ] && echo "$d"; done)
+          all=$(ls -d */ | tr -d / | while read d; do if [ -f "$d/config.yaml" ] && [ -f "$d/Dockerfile" ]; then echo "$d"; fi; done)
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             apps="${INPUT_APPS:-$all}"
           elif [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$BEFORE" 2>/dev/null; then
@@ -57,7 +57,7 @@ jobs:
           elif git diff --name-only "$BEFORE" "$GITHUB_SHA" | grep -q '^.github/workflows/build.yaml$'; then
             apps="$all"
           else
-            apps=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" | cut -d/ -f1 | sort -u | while read d; do echo "$all" | grep -qx "$d" && echo "$d"; done)
+            apps=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" | cut -d/ -f1 | sort -u | while read d; do if echo "$all" | grep -qx "$d"; then echo "$d"; fi; done)
           fi
           json=$(printf '%s\n' $apps | grep -v '^$' | jq -R . | jq -cs .)
           echo "Apps: $json"

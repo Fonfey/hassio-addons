@@ -286,6 +286,13 @@ def change_device(payload):
     return {"ok": True, "message": "Bescherming ingeschakeld." if on else "Bescherming uitgeschakeld."}
 
 
+def home_action(payload):
+    if not HOME or DEMO:
+        raise ValueError("Dit werkt alleen met AdGuard Home.")
+    res = agh_home.act(payload if isinstance(payload, dict) else {})
+    return dict({"ok": True}, **res) if isinstance(res, dict) else {"ok": True, "message": res}
+
+
 def read_rules(srv):
     if HOME and not DEMO:
         return agh_home.read_rules()
@@ -603,6 +610,8 @@ class Handler(BaseHTTPRequestHandler):
                     self.send(200, json.dumps(agh_home.respond(path, params)), "application/json")
                 except agh_home.HomeError as e:
                     self.send(502, json.dumps({"error": str(e)}), "application/json")
+                except ValueError as e:
+                    self.send(400, json.dumps({"error": str(e)}), "application/json")
                 return
             code, body = fetch_api(path, urllib.parse.urlencode(rest))
             self.send(code, body, "application/json")
@@ -614,7 +623,8 @@ class Handler(BaseHTTPRequestHandler):
         if not user_allowed(self.headers):
             self.send(403, json.dumps({"error": "Geen toegang tot dit dashboard."}), "application/json")
             return
-        handler = {"/api/rules": change_rules, "/api/settings": change_settings, "/api/device": change_device}.get(url.path)
+        handler = {"/api/rules": change_rules, "/api/settings": change_settings, "/api/device": change_device,
+                   "/api/home": home_action}.get(url.path)
         if not handler:
             self.send(404, json.dumps({"error": "Niet gevonden."}), "application/json")
             return
@@ -662,7 +672,7 @@ PAGE = r"""<!doctype html>
 :root{
   --bg:#262c36;--card:#343c48;--card2:#2c333e;--line:#424b58;--line2:#3b4350;
   --text:#ffffff;--soft:#d5dae2;--muted:#9ca6b4;--faint:#6f7a89;
-  --blue:#6d9df5;--red:#f26b4f;--green:#38c793;--purple:#c47cf2;--link:#82a8f8;
+  --blue:#6d9df5;--red:#f26b4f;--green:#38c793;--purple:#c47cf2;--orange:#f2a43a;--link:#82a8f8;
   --cat-ads:#f0574a;--cat-trk:#35b98a;--cat-soc:#4d8df0;--cat-cdn:#9a62e8;--cat-oth:#8d97a5;
   --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
@@ -883,7 +893,76 @@ button[data-go]{background:none;border:0;padding:0;font:inherit;color:inherit;te
 .copyrow .lbl{color:var(--soft);font-size:14px}
 .ro{font-size:13px;color:var(--muted);margin:0 0 14px}
 
+/* AdGuard Home */
+.hhead{display:flex;justify-content:space-between;align-items:center;gap:14px 24px;flex-wrap:wrap;margin-bottom:18px}
+.hhead .ptitle{margin:0}
+.ptitle .ver{font-size:15px;font-weight:500;color:var(--muted);margin-left:10px}
+.hctl{display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-size:14px}
+.pause,.rowctl select{background:#262c36;border:1px solid var(--line);border-radius:10px;padding:6px 10px;color:var(--text);font-size:14px}
+.pause[hidden]{display:none}
+.tiles4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-bottom:22px}
+button.htile[data-go]{position:relative;display:flex;flex-direction:column;background:var(--card);border:0;border-radius:20px;padding:18px 20px 14px;text-align:left;cursor:pointer;color:var(--text);min-height:150px}
+button.htile[data-go]:hover{background:#3a4350}
+.htile .tn{font-size:28px;font-weight:700;line-height:1.1}
+.htile .tp{position:absolute;right:18px;top:20px;font-size:14px;font-weight:600;color:var(--c)}
+.htile .spark{width:100%;height:46px;margin:12px 0 8px;display:block}
+.htile .tl{font-size:14px;color:var(--c);margin-top:auto}
+.csub{color:var(--muted);font-size:14px;margin:-10px 0 14px}
+.setcard .csub{margin:0 0 12px}
+.list td.pc{width:150px;padding-left:20px}
+.pc{white-space:nowrap}
+.pbar{display:inline-block;vertical-align:middle;width:84px;height:5px;background:#262c36;border-radius:3px;overflow:hidden;margin-right:8px}
+.pbar i{display:block;height:100%;border-radius:3px}
+.pv{font-size:13px;color:var(--soft);display:inline-block;min-width:44px;text-align:right}
+.dname{overflow-wrap:anywhere}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.subnav{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 20px}
+.subnav a{padding:7px 14px;border-radius:999px;background:var(--card);color:var(--soft);text-decoration:none;font-size:14px;font-weight:500}
+.subnav a[aria-current="page"]{background:var(--blue);color:#fff}
+.btnrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btnrow.end{justify-content:flex-end;margin-top:14px}
+.btnrow.end .muted{margin-right:auto;font-size:14px}
+.rowctl{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+.grow{min-width:0}
+.flrow .sh.mono{overflow-wrap:anywhere}
+.xbtn{background:none;border:0;color:var(--muted);cursor:pointer;font-size:20px;line-height:1;padding:2px 6px;border-radius:6px}
+.xbtn:hover{color:var(--red);background:#3b4350}
+.xbtn[disabled]{opacity:.4;cursor:not-allowed}
+textarea.code{width:100%;background:#262c36;border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--text);font:13px/1.55 ui-monospace,Consolas,monospace;resize:vertical}
+.inform{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.inform input{flex:1;min-width:160px;background:#262c36;border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--text)}
+.rtable td.mono{white-space:normal;overflow-wrap:anywhere}
+.dtable td.wrap{white-space:normal}
+.act .linkbtn[data-go]{color:var(--link);text-decoration:underline}
+.setrow input[data-k=cache_size]{width:140px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{background:#262c36;border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:13px;color:var(--soft)}
+.chip[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.svcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.svc{display:flex;align-items:center;gap:12px;background:#2c333e;border-radius:12px;padding:10px 12px}
+.svc .si{width:24px;height:24px;flex:none;display:grid;place-items:center}
+.svc .si img{width:22px;height:22px;filter:invert(1);opacity:.85}
+.svc .sn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.checkres{margin-top:4px;padding:14px 16px;background:#2c333e;border-radius:12px}
+.checkres p{margin:8px 0;color:var(--soft)}
+.checkres code{font:12px ui-monospace,Consolas,monospace;background:#262c36;border-radius:6px;padding:3px 7px}
+.engines{display:flex;gap:10px 22px;flex-wrap:wrap;padding:0 0 14px}
+.engines[hidden],.own[hidden]{display:none}
+.chk{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
+.chk input{width:16px;height:16px;accent-color:var(--blue)}
+h3.sub{font-size:16px;margin:18px 0 4px}
+.tres{list-style:none;padding:0;margin:14px 0 0;border:1px solid var(--line2);border-radius:12px}
+.tres li{display:flex;justify-content:space-between;gap:12px;padding:8px 12px;border-top:1px solid var(--line2);font-size:14px}
+.tres li:first-child{border-top:0}
+.tres .ok{color:var(--green)} .tres .bad{color:var(--red);overflow-wrap:anywhere;text-align:right}
+.mform{display:grid;gap:14px}
+.mform label:not(.chk){display:grid;gap:6px;font-size:14px;color:var(--soft)}
+.mform input:not([type=checkbox]),.mform select{background:#262c36;border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--text)}
+.mform .hint{font-size:12px;color:var(--muted)}
+.mform .own{display:grid;gap:10px;padding-left:24px}
+.mform .btns{margin-top:4px}
 @media (max-width:900px){
+  .tiles4{grid-template-columns:repeat(2,minmax(0,1fr))}
   .lfilters .r1{grid-template-columns:repeat(2,minmax(0,1fr))}
   .lfilters .r2{grid-template-columns:repeat(2,minmax(0,1fr))}
   .limits{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -892,6 +971,9 @@ button[data-go]{background:none;border:0;padding:0;font:inherit;color:inherit;te
   .filters{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:640px){
+  .tiles4{gap:10px} .htile{padding:14px 14px 10px;min-height:120px} .htile .tn{font-size:22px} .htile .tp{right:12px;top:16px}
+  .list td.pc{width:auto;padding-left:12px} .pbar{width:44px} .pv{min-width:38px}
+  .svcgrid{grid-template-columns:minmax(0,1fr)} .rowctl{gap:8px}
   .wrap{padding:12px 10px 36px}
   .card{padding:18px 16px;border-radius:20px}
   .limits{grid-template-columns:minmax(0,1fr);gap:14px}
@@ -961,7 +1043,8 @@ const countryName = c => !c || c.length !== 2 ? 'Niet van toepassing' : (regionN
 const HOME = CFG.mode === 'home';
 const ADG = HOME ? (CFG.home_url || '#') : 'https://adguard-dns.io/en/dashboard/';
 const C = html => HOME ? '' : html;
-if (HOME) { document.body.classList.add('home'); const bc = document.querySelector('.nav a[href="#bedrijven"]'); if (bc) bc.remove(); }
+if (HOME) { document.body.classList.add('home'); const bc = document.querySelector('.nav a[href="#bedrijven"]'); if (bc) bc.remove();
+  document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#filters">Filters</a><a href="#instellingen">Instellingen</a>'); }
 
 const state = {range: '24h', server: '', device: '', country: '', kpi: 'blocked', sort: 'blocked', search: '', logStatus: '', logSearch: ''};
 let meta = {servers: [], devices: [], countries: [], companies: []}, timer = null, logTimer = null, mapData = null, mapZoom = 1;
@@ -1221,55 +1304,6 @@ async function viewDashboard(){
     on => { const t = b.parentElement.querySelector('[data-ptext]'); if (t) t.textContent = 'Bescherming is ' + (on ? 'ingeschakeld' : 'uitgeschakeld'); })));
   document.querySelectorAll('[data-devprot]').forEach(b => b.addEventListener('click', () => toggleSwitch(b, on => post('api/device', {device_id: b.dataset.devprot, protection_enabled: on}),
     'Bescherming voor dit apparaat uitzetten?', 'Dit apparaat krijgt dan geen blokkades meer, ook niet van je blokkeerlijsten en gebruikersregels.')));
-  window.__redraw = draw;
-}
-
-async function viewHomeDashboard(){
-  const P = period();
-  const [info, time, devstats] = await Promise.all([api('home/info'), api('v1/stats/time', P), api('v1/stats/devices', {...P, limit: 1000})]);
-  await loadMeta();
-  const sum = (st, k) => (st.stats || []).reduce((a, s) => a + (s.value[k] || 0), 0);
-  const q = sum(time, 'queries'), b = sum(time, 'blocked');
-  const dstat = Object.fromEntries((devstats.stats || []).map(s => [s.device_id, s.value]));
-  const tile = (icon, label, value) => `<div class="lim">${icon}<div><div class="t">${label}</div><div class="v">${value}</div></div></div>`;
-  const srv = meta.servers[0] || {settings: {}}, st = srv.settings || {};
-  const fl = ((st.filter_lists_settings || {}).filter_list || []).filter(f => f.enabled).length;
-  const ur = ((st.user_rules_settings || {}).rules || []).length;
-  const devs = meta.devices.slice().sort((x, y) => ((dstat[y.id] || {}).queries || 0) - ((dstat[x.id] || {}).queries || 0));
-  const rows = devs.map(d => { const v = dstat[d.id] || {};
-    return `<tr data-name="${esc(d.name.toLowerCase())}">
-      <td class="dn">${devIcon(d.device_type)}<span>${esc(d.name)}${d.name !== d.id ? `<span class="muted"> ${esc(d.id)}</span>` : ''}</span></td>
-      <td data-l="Verzoeken"><button class="linkbtn req" ${goAttr('querylog', {device: d.id, server: '', country: ''})}>${K(v.queries)}</button></td>
-      <td class="act"><button class="linkbtn" ${goAttr('querylog', {device: d.id, server: '', country: ''})}>Querylog</button></td></tr>`; }).join('');
-  $('#view').innerHTML = `
-    <section class="limits">${tile(SVG.cloud, info.time_units === 'days' ? `Verzoeken, ${info.points} dagen` : 'Verzoeken, 24 uur', K(info.queries))}${tile(SVG.device, 'Clients', K(info.clients))}${tile(SVG.server, 'Gemiddelde verwerkingstijd', esc(String(info.avg_ms).replace('.', LOCALE.startsWith('nl') ? ',' : '.')) + ' ms')}
-      <div class="plan">AdGuard Home ${esc(info.version || '')}${CFG.home_url ? `<br><a href="${esc(CFG.home_url)}" target="_blank" rel="noopener">AdGuard Home openen</a>` : ''}</div></section>
-    <section class="card">
-      <a class="viewall" href="#statistieken">Alle statistieken bekijken</a>
-      <div class="kpitabs" role="tablist">
-        <button class="kpitab" role="tab" aria-selected="true"><span class="t">Geblokkeerde verzoeken</span>
-          <span class="n"><span class="blk">${K(b)}</span> (${pct(b, q)}%) van <span class="req">${K(q)}</span></span></button>
-      </div>
-      <div class="chart" id="chart"></div>
-    </section>
-    <section class="card srv">
-      <div class="cardhead"><h2>AdGuard Home <span class="help" tabindex="0" data-tip="Je eigen AdGuard Home en de clients die het gebruiken">?</span></h2>
-        <div class="right">Geblokkeerd <button class="linkbtn blk" style="font-size:15px" ${goAttr('querylog', {logStatus: 'b'})}>${K(info.blocked)}</button> (${pct(info.blocked, info.queries)}%) van <button class="linkbtn req" style="font-size:15px" ${goAttr('querylog', {})}>${K(info.queries)}</button> verzoeken</div></div>
-      <div class="srvrow"><span class="toggle"><span data-ptext>Bescherming is ${st.protection_enabled ? 'ingeschakeld' : 'uitgeschakeld'}</span> <button class="sw ${st.protection_enabled ? 'on' : ''}" role="switch" aria-checked="${!!st.protection_enabled}" aria-label="Bescherming" data-srvprot="${esc(srv.id)}" ${CFG.blocking ? '' : 'disabled'}></button></span>
-        <a href="#server/${esc(srv.id)}">Instellingen</a><a href="#lijsten/${esc(srv.id)}">Blokkeerlijsten (${fl})</a>
-        <button class="linkbtn" data-rules="${esc(srv.id)}">Gebruikersregels (${ur})</button></div>
-      <input class="search" type="search" placeholder="Zoek client" aria-label="Zoek client" data-filter>
-      <table class="dtable"><thead><tr><th>Clients ${devs.length}</th><th>Verzoeken</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="3" class="empty">AdGuard Home heeft nog geen clients gezien.</td></tr>'}</tbody></table>
-      ${CFG.home_url ? `<a class="srvfoot" href="${esc(CFG.home_url)}/#clients" target="_blank" rel="noopener">${SVG.plus}Clients beheren in AdGuard Home</a>` : ''}</section>`;
-  const draw = () => barChart($('#chart'), time.stats || [], 'blocked');
-  draw();
-  document.querySelectorAll('[data-filter]').forEach(inp => inp.addEventListener('input', () => {
-    const v = inp.value.trim().toLowerCase();
-    inp.parentElement.querySelectorAll('tbody tr[data-name]').forEach(tr => tr.hidden = v && !tr.dataset.name.includes(v)); }));
-  document.querySelectorAll('[data-rules]').forEach(x => x.addEventListener('click', () => rulesModal(x.dataset.rules)));
-  document.querySelectorAll('[data-srvprot]').forEach(b => b.addEventListener('click', () => toggleSwitch(b, on => post('api/settings', {server_id: b.dataset.srvprot, patch: {protection_enabled: on}}),
-    'Bescherming uitzetten?', 'Zonder bescherming worden advertenties, trackers en gevaarlijke domeinen niet meer geblokkeerd op je hele netwerk.',
-    on => { const t = b.parentElement.querySelector('[data-ptext]'); if (t) t.textContent = 'Bescherming is ' + (on ? 'ingeschakeld' : 'uitgeschakeld'); })));
   window.__redraw = draw;
 }
 
@@ -1621,13 +1655,367 @@ async function viewDevice(id){
     catch (e) { const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Selecteer en kopieer het adres handmatig.'); } }));
 }
 
+/* ---------------- AdGuard Home: eigen pagina's ---------------- */
+const N = n => Number(n || 0).toLocaleString(LOCALE);
+const dis = () => CFG.blocking ? '' : 'disabled';
+const hpost = body => post('api/home', body);
+const swb = (attrs, on, label) => `<button class="sw ${on ? 'on' : ''}" role="switch" aria-checked="${!!on}" aria-label="${esc(label)}" ${attrs} ${dis()}></button>`;
+const setrow = (label, help, ctrl) => `<div class="setrow"><div><div class="sl">${label}</div>${help ? `<div class="sh">${help}</div>` : ''}</div>${ctrl}</div>`;
+const b64ok = s => /^[A-Za-z0-9+/=]+$/.test(String(s || ''));
+const DAYMS = 864e5;
+const RETAIN = {[DAYMS / 4]: '6 uur', [DAYMS]: '24 uur', [7 * DAYMS]: '7 dagen', [30 * DAYMS]: '30 dagen', [90 * DAYMS]: '90 dagen'};
+const SVCGROUP = {ai: 'AI', cdn: 'CDN', dating: 'Dating', gambling: 'Gokken', gaming: 'Games', hosting: 'Hosting', messenger: 'Berichtenapps',
+  privacy: 'Privacy', shopping: 'Winkelen', social_network: 'Sociale netwerken', software: 'Software', streaming: 'Streaming'};
+const TAGS = {device_phone: 'Telefoon', device_tablet: 'Tablet', device_pc: 'Computer', device_laptop: 'Laptop', device_tv: 'Tv', device_nas: 'NAS',
+  device_gameconsole: 'Spelcomputer', device_camera: 'Camera', device_printer: 'Printer', device_audio: 'Audio', device_securityalarm: 'Alarm', device_other: 'Overig'};
+const HMODES = {default: 'Standaard', refused: 'Weigeren (REFUSED)', nxdomain: 'Bestaat niet (NXDOMAIN)', null_ip: 'Leeg adres (0.0.0.0)', custom_ip: 'Eigen IP-adres'};
+const UPMODES = {'': 'Taakverdeling', load_balance: 'Taakverdeling', parallel: 'Parallelle verzoeken', fastest_addr: 'Snelste IP-adres'};
+
+function subnav(base, subs, cur){
+  return `<nav class="subnav" aria-label="Onderdelen">${Object.entries(subs).map(([k, v]) => `<a href="#${base}/${k}" ${k === cur ? 'aria-current="page"' : ''}>${v}</a>`).join('')}</nav>`;
+}
+function spark(arr, color){
+  const a = (arr || []).map(Number), n = a.length, max = Math.max(1, ...a);
+  if (n < 2) return '<svg class="spark" viewBox="0 0 100 40" preserveAspectRatio="none"></svg>';
+  const pts = a.map((v, i) => [i / (n - 1) * 100, 38 - v / max * 34]);
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(2) + ' ' + p[1].toFixed(2)).join(' ');
+  return `<svg class="spark" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="${line} L100 40 L0 40Z" fill="${color}" fill-opacity=".18"/><path d="${line}" fill="none" stroke="${color}" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`;
+}
+function pctRow(name, n, total, color, go){
+  const p = total ? n / total * 100 : 0;
+  return `<tr><td class="nm">${go ? `<button class="nmlink" ${go} style="display:flex;align-items:center;gap:12px">${name}</button>` : `<span>${name}</span>`}</td>
+    <td class="n">${N(n)}</td><td class="pc"><span class="pbar"><i style="width:${Math.max(1, Math.min(100, p))}%;background:${color}"></i></span><span class="pv">${dec1(p)}%</span></td></tr>`;
+}
+function homeBits(o){
+  return `<span class="toggle"><span data-ptext>${o.protection_enabled ? 'Bescherming is ingeschakeld' : o.protection_disabled_duration ? 'Bescherming gepauzeerd, nog ' + Math.ceil(o.protection_disabled_duration / 60000) + ' min' : 'Bescherming is uitgeschakeld'}</span>
+    ${swb('data-hprot', o.protection_enabled, 'Bescherming')}</span>
+    <select class="pause" data-pause aria-label="Bescherming pauzeren" ${dis()} ${o.protection_enabled ? '' : 'hidden'}><option value="">Pauzeren…</option>
+      <option value="30000">30 seconden</option><option value="60000">1 minuut</option><option value="600000">10 minuten</option><option value="3600000">1 uur</option><option value="28800000">8 uur</option></select>`;
+}
+function bindProtection(after){
+  const b = $('[data-hprot]'); if (b) b.addEventListener('click', () => toggleSwitch(b, on => hpost({action: 'protection', enabled: on}),
+    'Bescherming uitzetten?', 'Zonder bescherming worden advertenties, trackers en gevaarlijke domeinen niet meer geblokkeerd op je hele netwerk.', after));
+  const p = $('[data-pause]'); if (p) p.addEventListener('change', async () => { if (!p.value) return;
+    try { await hpost({action: 'protection', enabled: false, duration: +p.value}); toast('Bescherming gepauzeerd.'); route(); } catch (e) { toast(e.message, true); p.value = ''; } });
+}
+
+async function viewHomeDashboard(){
+  const P = period();
+  const [o, time] = await Promise.all([api('home/overview'), api('v1/stats/time', P)]);
+  const s = o.series || {}, q = o.queries, period24 = o.time_units === 'days' ? `voor de afgelopen ${(s.dns_queries || []).length} dagen` : 'voor de afgelopen 24 uur';
+  const tile = (n, label, arr, color, go, share) => `<button class="htile" ${go} style="--c:${color}"><span class="tn">${N(n)}</span>${share != null ? `<span class="tp">${dec1(share)}%</span>` : ''}
+    ${spark(arr, color)}<span class="tl">${label}</span></button>`;
+  const none = '<tr><td class="empty">Nog geen gegevens.</td></tr>';
+  const sum = a => (a || []).reduce((x, y) => x + y.n, 0);
+  const cl = o.top_clients || [], tq = o.top_queried || [], tb = o.top_blocked || [], up = o.upstreams || [], upms = o.upstream_ms || [];
+  const st = [['DNS-verzoeken', q, '', {}], ['Geblokkeerd door filters', o.blocked, 'blk', {logStatus: 'b'}], ['Geblokkeerde malware en phishing', o.safebrowsing, '', null],
+    ['Geblokkeerde websites voor volwassenen', o.parental, '', null], ['Veilig zoeken afgedwongen', o.safesearch, '', null]];
+  $('#view').innerHTML = `
+    <div class="hhead"><h1 class="ptitle">AdGuard Home <span class="ver">${esc(o.version || '')}</span></h1>
+      <div class="hctl">${homeBits(o)}${CFG.home_url ? `<a href="${esc(CFG.home_url)}" target="_blank" rel="noopener">AdGuard Home openen</a>` : ''}</div></div>
+    <section class="tiles4">
+      ${tile(q, 'DNS-verzoeken', s.dns_queries, 'var(--blue)', goAttr('querylog', {}), null)}
+      ${tile(o.blocked, 'Geblokkeerd door filters', s.blocked_filtering, 'var(--red)', goAttr('querylog', {logStatus: 'b'}), q ? o.blocked / q * 100 : 0)}
+      ${tile(o.safebrowsing, 'Geblokkeerde malware en phishing', s.replaced_safebrowsing, 'var(--orange)', goAttr('querylog', {logStatus: 'b'}), q ? o.safebrowsing / q * 100 : 0)}
+      ${tile(o.parental, 'Geblokkeerde websites voor volwassenen', s.replaced_parental, 'var(--purple)', goAttr('querylog', {logStatus: 'b'}), q ? o.parental / q * 100 : 0)}
+    </section>
+    <section class="card"><div class="cardhead"><h2>Verzoeken</h2><div class="right">Geblokkeerd <span class="blk">${N(o.blocked + o.safebrowsing + o.parental)}</span> (${pct(o.blocked + o.safebrowsing + o.parental, q)}%) van <span class="req">${N(q)}</span>, ${esc(period24)}</div></div>
+      <div class="chart" id="chart"></div></section>
+    <div class="grid2">
+      <section class="card"><h2>Algemene statistieken</h2><p class="csub">${esc(period24)}</p><table class="list">
+        ${st.map(([l, n, c, go]) => `<tr><td class="nm">${go ? `<button class="nmlink" ${goAttr('querylog', go)}>${l}</button>` : l}</td><td class="n ${c}">${N(n)}</td></tr>`).join('')}
+        <tr><td class="nm">Gemiddelde verwerkingstijd</td><td class="n">${esc(dec1(o.avg_ms))} ms</td></tr></table></section>
+      <section class="card"><div class="cardhead"><h2>Actiefste clients</h2><a class="right" href="#instellingen/clients" style="font-size:14px">Clients beheren</a></div><table class="list">
+        ${cl.map(c => pctRow(`${devIcon('')}<span>${esc(c.name || c.id)}${c.name ? `<span class="muted"> ${esc(c.id)}</span>` : ''}</span>`, c.n, q, 'var(--blue)', goAttr('querylog', {device: c.id}))).join('') || none}</table></section>
+    </div>
+    <div class="grid2">
+      <section class="card"><h2>Meest opgevraagde domeinen</h2><table class="list">
+        ${tq.map(d => pctRow(`${favicon(d.domain)}<span class="dname">${esc(d.domain)}</span>`, d.n, q, 'var(--blue)', goAttr('querylog', {logSearch: d.domain}))).join('') || none}</table></section>
+      <section class="card"><h2>Meest geblokkeerde domeinen</h2><table class="list">
+        ${tb.map(d => pctRow(`${favicon(d.domain)}<span class="dname">${esc(d.domain)}</span>`, d.n, o.blocked || 1, 'var(--red)', goAttr('querylog', {logSearch: d.domain, logStatus: 'b'}))).join('') || none}</table></section>
+    </div>
+    <div class="grid2">
+      <section class="card"><div class="cardhead"><h2>Upstreams</h2><a class="right" href="#instellingen/dns" style="font-size:14px">DNS-instellingen</a></div><p class="csub">Antwoorden per upstream DNS-server</p><table class="list">
+        ${up.map(u => pctRow(`<span class="dname mono">${esc(u.addr)}</span>`, u.n, sum(up), 'var(--green)')).join('') || none}</table></section>
+      <section class="card"><h2>Reactietijd upstreams</h2><p class="csub">Gemiddelde tijd tot een antwoord</p><table class="list">
+        ${upms.map(u => `<tr><td class="nm"><span class="dname mono">${esc(u.addr)}</span></td><td class="n">${esc(dec1(u.ms))} ms</td></tr>`).join('') || none}</table></section>
+    </div>`;
+  const draw = () => barChart($('#chart'), time.stats || [], 'blocked');
+  draw(); window.__redraw = draw;
+  bindProtection(() => route());
+}
+
+/* ---------------- filters ---------------- */
+const FSUBS = {blokkeerlijsten: 'Blokkeerlijsten', toelatingslijsten: 'Toelatingslijsten', herschrijvingen: 'DNS-herschrijvingen', diensten: 'Geblokkeerde diensten', regels: 'Eigen filterregels'};
+async function viewHomeFilters(sub){
+  if (!FSUBS[sub]) sub = 'blokkeerlijsten';
+  const head = `<h1 class="ptitle">Filters</h1>${subnav('filters', FSUBS, sub)}${roNote()}`;
+  if (sub === 'blokkeerlijsten' || sub === 'toelatingslijsten') return homeLists(head, sub === 'toelatingslijsten');
+  if (sub === 'herschrijvingen') return homeRewrites(head);
+  if (sub === 'diensten') return homeServices(head);
+  return homeRules(head);
+}
+async function homeLists(head, wl){
+  const f = await api('home/filters'), items = wl ? f.allowlists : f.blocklists;
+  const upd = t => t ? 'bijgewerkt ' + new Date(t).toLocaleString(LOCALE, {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}) : 'nog niet bijgewerkt';
+  const on = items.filter(x => x.enabled);
+  $('#view').innerHTML = `${head}
+    <section class="card setcard"><div class="cardhead"><div><h2>${wl ? 'Toelatingslijsten' : 'Blokkeerlijsten'}</h2>
+      <p class="csub"><span>${wl ? 'Domeinen op deze lijsten worden nooit geblokkeerd.' : 'Domeinen op deze lijsten worden geblokkeerd.'}</span> <span>${on.length} van ${items.length} ingeschakeld, ${N(on.reduce((a, x) => a + x.rules_count, 0))} regels.</span></p></div>
+      <div class="btnrow"><button class="btn" data-refresh ${dis()}>Nu bijwerken</button><button class="btn pri" data-addlist ${dis()}>Lijst toevoegen</button></div></div>
+      ${items.map(x => `<div class="setrow flrow"><div class="grow"><div class="sl">${esc(x.name)}</div><div class="sh mono">${esc(x.url)}</div>
+        <div class="meta">${N(x.rules_count)} regels, ${upd(x.last_updated)}</div></div>
+        <div class="rowctl">${swb(`data-lurl="${esc(x.url)}"`, x.enabled, x.name)}<button class="xbtn" data-ldel="${esc(x.url)}" data-lname="${esc(x.name)}" aria-label="Lijst verwijderen" ${dis()}>×</button></div></div>`).join('')
+        || `<p class="empty">Er zijn nog geen ${wl ? 'toelatingslijsten' : 'blokkeerlijsten'}.</p>`}
+    </section>`;
+  document.querySelectorAll('[data-lurl]').forEach(b => b.addEventListener('click', () => toggleSwitch(b, v => hpost({action: 'filter_toggle', url: b.dataset.lurl, whitelist: wl, enabled: v}))));
+  document.querySelectorAll('[data-ldel]').forEach(b => b.addEventListener('click', async () => {
+    if (!(await confirmBox('Lijst verwijderen?', `${b.dataset.lname} wordt uit AdGuard Home verwijderd.`, 'Verwijderen'))) return;
+    try { toast((await hpost({action: 'filter_remove', url: b.dataset.ldel, whitelist: wl})).message); route(); } catch (e) { toast(e.message, true); } }));
+  $('[data-refresh]').addEventListener('click', async e => { e.target.disabled = true;
+    try { toast((await hpost({action: 'filters_refresh', whitelist: wl})).message); route(); } catch (er) { toast(er.message, true); e.target.disabled = false; } });
+  $('[data-addlist]').addEventListener('click', () => {
+    const m = modal(`<h3>${wl ? 'Toelatingslijst toevoegen' : 'Blokkeerlijst toevoegen'}</h3><p>Vul de naam en het adres van de lijst in. Lijsten vind je onder meer op adguard.com en filterlists.com.</p>
+      <form class="mform" id="lf"><label>Naam<input name="name" data-focus required maxlength="200"></label><label>Adres<input name="url" type="url" required placeholder="https://"></label>
+      <div class="btns"><button type="button" class="btn" data-close>Annuleren</button><button class="btn pri">Toevoegen</button></div></form>`);
+    m.el.querySelector('#lf').addEventListener('submit', async ev => { ev.preventDefault(); const fd = new FormData(ev.target); ev.submitter && (ev.submitter.disabled = true);
+      try { toast((await hpost({action: 'filter_add', whitelist: wl, name: fd.get('name'), url: fd.get('url')})).message); m.close(); route(); }
+      catch (er) { toast(er.message, true); ev.submitter && (ev.submitter.disabled = false); } });
+  });
+}
+async function homeRewrites(head){
+  const rw = await api('home/rewrites');
+  $('#view').innerHTML = `${head}
+    <section class="card setcard"><h2>DNS-herschrijvingen</h2><p class="csub">Geef een domein een eigen antwoord, bijvoorbeeld een naam voor een apparaat in je netwerk. Een * aan het begin geldt voor alle subdomeinen.</p>
+      ${CFG.blocking ? `<form class="inform" id="rf"><input name="domain" placeholder="${T('nas.thuis', 'nas.home')}" aria-label="Domein" required><input name="answer" placeholder="192.168.1.10" aria-label="Antwoord: IP-adres of domein" required><button class="btn pri">Toevoegen</button></form>` : ''}
+      <table class="dtable rtable"><thead><tr><th>Domein</th><th>Antwoord</th><th></th></tr></thead><tbody>
+      ${rw.map(r => `<tr><td class="mono">${esc(r.domain)}</td><td class="mono">${esc(r.answer)}</td><td class="act"><button class="xbtn" data-rdel='${esc(JSON.stringify([r.domain, r.answer]))}' aria-label="Verwijderen" ${dis()}>×</button></td></tr>`).join('')
+        || '<tr><td colspan="3" class="empty">Er zijn nog geen herschrijvingen.</td></tr>'}</tbody></table></section>`;
+  const f = $('#rf'); if (f) f.addEventListener('submit', async e => { e.preventDefault(); const fd = new FormData(f);
+    try { toast((await hpost({action: 'rewrite_add', domain: fd.get('domain'), answer: fd.get('answer')})).message); route(); } catch (er) { toast(er.message, true); } });
+  document.querySelectorAll('[data-rdel]').forEach(b => b.addEventListener('click', async () => { const [domain, answer] = JSON.parse(b.dataset.rdel);
+    if (!(await confirmBox('Herschrijving verwijderen?', `${domain} → ${answer}`, 'Verwijderen'))) return;
+    try { toast((await hpost({action: 'rewrite_delete', domain, answer})).message); route(); } catch (e) { toast(e.message, true); } }));
+}
+async function homeServices(head){
+  const d = await api('home/services'), blocked = new Set(d.blocked);
+  state.svcGroup = state.svcGroup || '';
+  const draw = () => {
+    const q = ($('#sq') || {value: ''}).value.trim().toLowerCase();
+    const list = d.services.filter(s => (!state.svcGroup || s.group === state.svcGroup) && (!q || s.name.toLowerCase().includes(q)));
+    $('#svc').innerHTML = list.map(s => `<div class="svc"><span class="si">${b64ok(s.icon) ? `<img src="data:image/svg+xml;base64,${s.icon}" alt="">` : ''}</span><span class="sn">${esc(s.name)}</span>
+      ${swb(`data-svc="${esc(s.id)}"`, blocked.has(s.id), 'Blokkeer ' + s.name)}</div>`).join('') || '<p class="empty">Geen diensten gevonden.</p>';
+    const cnt = () => $('#scount').textContent = T(`${blocked.size} geblokkeerd.`, `${blocked.size} blocked.`);
+    cnt();
+    document.querySelectorAll('[data-svc]').forEach(b => b.addEventListener('click', () => toggleSwitch(b, async on => {
+      on ? blocked.add(b.dataset.svc) : blocked.delete(b.dataset.svc);
+      try { const r = await hpost({action: 'services', ids: [...blocked]}); cnt(); return r; }
+      catch (e) { on ? blocked.delete(b.dataset.svc) : blocked.add(b.dataset.svc); throw e; } })));
+  };
+  $('#view').innerHTML = `${head}
+    <section class="card setcard"><div class="cardhead"><div><h2>Geblokkeerde diensten</h2><p class="csub"><span>Blokkeer complete diensten en apps met één schakelaar.</span> <span id="scount"></span></p></div>
+      <div class="btnrow"><button class="btn" data-unall ${dis()}>Alles deblokkeren</button></div></div>
+      <div class="chips">${['', ...d.groups].map(g => `<button class="chip" data-grp="${esc(g)}" aria-pressed="${g === state.svcGroup}">${esc(g ? SVCGROUP[g] || g : 'Alle')}</button>`).join('')}</div>
+      <input class="search" type="search" id="sq" placeholder="Zoek dienst" aria-label="Zoek dienst">
+      <div class="svcgrid" id="svc"></div></section>`;
+  draw();
+  $('#sq').addEventListener('input', draw);
+  document.querySelectorAll('[data-grp]').forEach(c => c.addEventListener('click', () => { state.svcGroup = c.dataset.grp;
+    document.querySelectorAll('[data-grp]').forEach(x => x.setAttribute('aria-pressed', x === c)); draw(); }));
+  $('[data-unall]').addEventListener('click', async () => { if (!blocked.size) return;
+    if (!(await confirmBox('Alles deblokkeren?', `${blocked.size} diensten worden weer toegestaan.`, 'Deblokkeren'))) return;
+    try { toast((await hpost({action: 'services', ids: []})).message); route(); } catch (e) { toast(e.message, true); } });
+}
+async function homeRules(head){
+  const f = await api('home/filters');
+  $('#view').innerHTML = `${head}
+    <section class="card setcard"><h2>Eigen filterregels</h2><p class="csub">Eén regel per regel. <code>||domein^</code> blokkeert een domein, <code>@@||domein^</code> staat het toe, en een regel die met <code>!</code> begint is een opmerking.</p>
+      <textarea class="code" id="rt" rows="14" spellcheck="false" aria-label="Eigen filterregels" ${dis()}>${esc(f.user_rules.join('\n'))}</textarea>
+      <div class="btnrow end"><span class="muted" id="rc">${f.user_rules.length} regels</span><button class="btn pri" id="rs" ${dis()}>Opslaan</button></div></section>
+    <section class="card setcard"><h2>Filtering testen</h2><p class="csub">Kijk wat AdGuard Home met een domein doet en welke regel daarvoor zorgt.</p>
+      <form class="inform" id="ct"><input name="name" placeholder="${T('voorbeeld.nl', 'example.com')}" aria-label="Domein" required><button class="btn pri">Testen</button></form><div id="cr"></div></section>`;
+  const t = $('#rt'); t.addEventListener('input', () => $('#rc').textContent = t.value.split('\n').filter(x => x.trim()).length + ' regels');
+  $('#rs').addEventListener('click', async e => { e.target.disabled = true;
+    try { toast((await hpost({action: 'rules_set', rules: t.value.split('\n')})).message); meta.servers = []; } catch (er) { toast(er.message, true); } e.target.disabled = false; });
+  $('#ct').addEventListener('submit', async e => { e.preventDefault(); const name = new FormData(e.target).get('name');
+    try { const r = await api('home/check', {name});
+      const R = {NotFilteredNotFound: ['p', 'Niet gefilterd', 'Er is geen regel voor dit domein.'], NotFilteredWhiteList: ['a', 'Toegestaan', 'Een toelatingsregel staat dit domein toe.'],
+        FilteredBlackList: ['b', 'Geblokkeerd', 'Een blokkeerregel blokkeert dit domein.'], FilteredSafeBrowsing: ['b', 'Geblokkeerd', 'Geblokkeerd door Veilig surfen.'],
+        FilteredParental: ['b', 'Geblokkeerd', 'Geblokkeerd door Ouderlijk toezicht.'], FilteredBlockedService: ['b', 'Geblokkeerd', 'Geblokkeerd als dienst ' + r.service_name + '.'],
+        FilteredSafeSearch: ['m', 'Gewijzigd', 'Veilig zoeken stuurt dit domein om.'], Rewrite: ['m', 'Gewijzigd', 'Een DNS-herschrijving geeft een eigen antwoord.'],
+        RewriteEtcHosts: ['m', 'Gewijzigd', 'Het hosts-bestand geeft een eigen antwoord.'], RewriteRule: ['m', 'Gewijzigd', 'Een herschrijfregel geeft een eigen antwoord.']}[r.reason] || ['p', r.reason, ''];
+      $('#cr').innerHTML = `<div class="checkres"><span class="pill ${R[0]}">${esc(R[1])}</span> <b>${esc(name)}</b><p>${esc(R[2])}</p>${r.rules.map(x => `<code>${esc(x)}</code>`).join(' ')}</div>`; }
+    catch (er) { $('#cr').innerHTML = `<p class="empty">${esc(er.message)}</p>`; } });
+}
+
+/* ---------------- instellingen ---------------- */
+const SSUBS = {algemeen: 'Algemeen', dns: 'DNS', clients: 'Clients', dhcp: 'DHCP', encryptie: 'Versleuteling'};
+async function viewHomeSettings(sub){
+  if (!SSUBS[sub]) sub = 'algemeen';
+  const head = `<h1 class="ptitle">Instellingen</h1>${subnav('instellingen', SSUBS, sub)}${roNote()}`;
+  return {algemeen: homeGeneral, dns: homeDns, clients: homeClients, dhcp: homeDhcp, encryptie: homeTls}[sub](head);
+}
+const retainSel = (attr, cur, list) => `<select ${attr} ${dis()} aria-label="Bewaartijd">${list.map(v => `<option value="${v}" ${+cur === v ? 'selected' : ''}>${RETAIN[v]}</option>`).join('')}</select>`;
+async function homeGeneral(head){
+  const g = await api('home/general'), ss = g.safesearch || {};
+  const ENG = {google: 'Google', bing: 'Bing', duckduckgo: 'DuckDuckGo', ecosia: 'Ecosia', yandex: 'Yandex', pixabay: 'Pixabay', youtube: 'YouTube'};
+  $('#view').innerHTML = `${head}
+    <section class="card setcard"><h2>Bescherming</h2>
+      ${setrow('Bescherming', 'Blokkeert advertenties, trackers en gevaarlijke domeinen voor je hele netwerk.', `<div class="rowctl">${homeBits(g)}</div>`)}
+      ${setrow('Veilig surfen', 'Blokkeert bekende phishing- en malwaredomeinen.', swb('data-g="safebrowsing"', g.safebrowsing, 'Veilig surfen'))}
+      ${setrow('Ouderlijk toezicht', 'Blokkeert websites voor volwassenen.', swb('data-g="parental"', g.parental, 'Ouderlijk toezicht'))}
+      ${setrow('Veilig zoeken afdwingen', 'Zoekmachines tonen dan alleen veilige resultaten.', swb('data-ss="enabled"', ss.enabled, 'Veilig zoeken'))}
+      <div class="engines" ${ss.enabled ? '' : 'hidden'}>${Object.entries(ENG).filter(([k]) => k in ss).map(([k, v]) => `<label class="chk"><input type="checkbox" data-ss="${k}" ${ss[k] ? 'checked' : ''} ${dis()}> ${v}</label>`).join('')}</div></section>
+    <section class="card setcard"><h2>Querylog</h2>
+      ${setrow('Querylog bijhouden', 'Bewaart elk DNS-verzoek met tijd, client en resultaat.', swb('data-ql="enabled"', g.querylog.enabled, 'Querylog bijhouden'))}
+      ${setrow('Bewaartijd', 'Hoe lang verzoeken in de querylog blijven.', retainSel('data-ql="interval"', g.querylog.interval, [DAYMS / 4, DAYMS, 7 * DAYMS, 30 * DAYMS, 90 * DAYMS]))}
+      ${setrow('IP-adressen anonimiseren', 'Het laatste deel van elk IP-adres wordt niet bewaard.', swb('data-ql="anonymize_client_ip"', g.querylog.anonymize_client_ip, 'IP-adressen anonimiseren'))}
+      ${setrow('Querylog wissen', 'Verwijdert alle verzoeken uit de querylog.', `<button class="btn dng" data-clear="querylog_clear" ${dis()}>Wissen</button>`)}</section>
+    <section class="card setcard"><h2>Statistieken</h2>
+      ${setrow('Statistieken bijhouden', 'Tellingen voor het dashboard en de statistieken.', swb('data-sc="enabled"', g.stats.enabled, 'Statistieken bijhouden'))}
+      ${setrow('Bewaartijd', 'Over welke periode de statistieken gaan.', retainSel('data-sc="interval"', g.stats.interval, [DAYMS, 7 * DAYMS, 30 * DAYMS, 90 * DAYMS]))}
+      ${setrow('Statistieken wissen', 'Zet alle tellingen terug naar nul.', `<button class="btn dng" data-clear="stats_reset" ${dis()}>Wissen</button>`)}</section>`;
+  bindProtection(() => route());
+  document.querySelectorAll('[data-g]').forEach(b => b.addEventListener('click', () => toggleSwitch(b, on => hpost({action: b.dataset.g, enabled: on}),
+    b.dataset.g === 'safebrowsing' ? 'Weet je het zeker?' : null, 'Phishing- en malwaredomeinen worden dan niet meer geblokkeerd.')));
+  const ssb = $('[data-ss="enabled"]'); ssb.addEventListener('click', () => toggleSwitch(ssb, on => hpost({action: 'safesearch', values: {enabled: on}}), null, null,
+    on => $('.engines').hidden = !on));
+  document.querySelectorAll('input[data-ss]').forEach(c => c.addEventListener('change', async () => {
+    try { toast((await hpost({action: 'safesearch', values: {[c.dataset.ss]: c.checked}})).message); } catch (e) { c.checked = !c.checked; toast(e.message, true); } }));
+  const cfg = (sel, action) => {
+    document.querySelectorAll(`button[${sel}]`).forEach(b => b.addEventListener('click', () => toggleSwitch(b, on => hpost({action, [b.getAttribute(sel)]: on}))));
+    document.querySelectorAll(`select[${sel}]`).forEach(s => s.addEventListener('change', async () => {
+      try { toast((await hpost({action, interval: +s.value})).message); } catch (e) { toast(e.message, true); } }));
+  };
+  cfg('data-ql', 'querylog_config'); cfg('data-sc', 'stats_config');
+  document.querySelectorAll('[data-clear]').forEach(b => b.addEventListener('click', async () => {
+    const ql = b.dataset.clear === 'querylog_clear';
+    if (!(await confirmBox(ql ? 'Querylog wissen?' : 'Statistieken wissen?', ql ? 'Alle verzoeken in de querylog worden verwijderd. Dit kun je niet ongedaan maken.' : 'Alle tellingen gaan terug naar nul. Dit kun je niet ongedaan maken.', 'Wissen'))) return;
+    try { toast((await hpost({action: b.dataset.clear})).message); } catch (e) { toast(e.message, true); } }));
+}
+async function homeDns(head){
+  const d = await api('home/dns');
+  const ta = (k, rows, ph) => `<textarea class="code" data-k="${k}" rows="${rows}" spellcheck="false" placeholder="${esc(ph)}" ${dis()}>${esc((d[k] || []).join('\n'))}</textarea>`;
+  const num = (k, max) => `<input type="number" min="0" max="${max}" data-k="${k}" value="${esc(d[k] ?? 0)}" ${dis()}>`;
+  const chk = (k, label) => setrow(label[0], label[1], swb(`data-kb="${k}"`, d[k], label[0]));
+  $('#view').innerHTML = `${head}
+    <section class="card setcard" data-card><h2>Upstream DNS-servers</h2><p class="csub">Waar AdGuard Home verzoeken naartoe stuurt die niet geblokkeerd worden. Eén adres per regel, bijvoorbeeld <code>https://dns.quad9.net/dns-query</code> of <code>9.9.9.9</code>.</p>
+      ${ta('upstream_dns', 6, 'https://dns.quad9.net/dns-query')}
+      ${setrow('Modus', 'Hoe AdGuard Home de upstreams gebruikt.', `<select data-k="upstream_mode" ${dis()} aria-label="Modus">${['load_balance', 'parallel', 'fastest_addr'].map(m => `<option value="${m}" ${(d.upstream_mode || 'load_balance') === m ? 'selected' : ''}>${UPMODES[m]}</option>`).join('')}</select>`)}
+      <h3 class="sub">Fallback-DNS-servers</h3><p class="csub">Worden gebruikt als geen enkele upstream antwoordt.</p>${ta('fallback_dns', 3, '')}
+      <h3 class="sub">Bootstrap-DNS-servers</h3><p class="csub">Gewone IP-adressen om de namen van versleutelde upstreams op te zoeken.</p>${ta('bootstrap_dns', 3, '9.9.9.10')}
+      <div id="tr"></div><div class="btnrow end"><button class="btn" id="tu" ${dis()}>Upstreams testen</button><button class="btn pri" data-save ${dis()}>Opslaan</button></div></section>
+    <section class="card setcard" data-card><h2>DNS-server</h2>
+      ${setrow('Limiet per client', 'Maximaal aantal verzoeken per seconde per client. 0 is geen limiet.', num('ratelimit', 100000))}
+      ${setrow('Blokkeermodus', 'Wat een client terugkrijgt als een domein geblokkeerd is.', `<select data-k="blocking_mode" ${dis()} aria-label="Blokkeermodus">${Object.entries(HMODES).filter(([k]) => k !== 'custom_ip' || d.blocking_mode === 'custom_ip').map(([k, v]) => `<option value="${k}" ${k === d.blocking_mode ? 'selected' : ''}>${v}</option>`).join('')}</select>`)}
+      ${setrow('Bewaartijd geblokkeerde antwoorden', 'Hoeveel seconden een client een blokkade onthoudt (TTL).', num('blocked_response_ttl', 86400))}
+      ${chk('dnssec_enabled', ['DNSSEC', 'Vraagt upstreams om ondertekende antwoorden.'])}
+      ${chk('disable_ipv6', ['IPv6-adressen niet opzoeken', 'Beantwoordt verzoeken om IPv6-adressen (AAAA) leeg.'])}
+      ${chk('edns_cs_enabled', ['EDNS Client Subnet', 'Stuurt een deel van je IP-adres mee, voor dichterbij gelegen servers.'])}
+      <div class="btnrow end"><button class="btn pri" data-save ${dis()}>Opslaan</button></div></section>
+    <section class="card setcard" data-card><h2>Cache</h2>
+      ${chk('cache_enabled', ['Cache gebruiken', 'Onthoudt antwoorden zodat ze sneller terugkomen.'])}
+      ${setrow('Grootte van de cache', 'In bytes. 4194304 is 4 MB.', num('cache_size', 1073741824))}
+      ${chk('cache_optimistic', ['Optimistische cache', 'Geeft een verlopen antwoord direct terug en vernieuwt het daarna.'])}
+      <div class="btnrow end"><button class="btn pri" data-save ${dis()}>Opslaan</button></div></section>`;
+  document.querySelectorAll('[data-kb]').forEach(b => b.addEventListener('click', () => { if (b.disabled) return; const on = !b.classList.contains('on');
+    b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }));
+  document.querySelectorAll('[data-save]').forEach(btn => btn.addEventListener('click', async () => {
+    const card = btn.closest('[data-card]'), values = {};
+    card.querySelectorAll('[data-k]').forEach(el => { values[el.dataset.k] = el.tagName === 'TEXTAREA' ? el.value.split('\n').map(x => x.trim()).filter(Boolean) : el.type === 'number' ? +el.value : el.value; });
+    card.querySelectorAll('[data-kb]').forEach(el => values[el.dataset.kb] = el.classList.contains('on'));
+    btn.disabled = true;
+    try { toast((await hpost({action: 'dns', values})).message); } catch (e) { toast(e.message, true); } btn.disabled = false; }));
+  $('#tu').addEventListener('click', async e => { e.target.disabled = true; const v = k => $(`[data-k="${k}"]`).value.split('\n').map(x => x.trim()).filter(Boolean);
+    try { const r = await hpost({action: 'test_upstream', upstream_dns: v('upstream_dns'), bootstrap_dns: v('bootstrap_dns')});
+      $('#tr').innerHTML = `<ul class="tres">${Object.entries(r.result || {}).map(([a, s]) => `<li><span class="mono">${esc(a)}</span><span class="${s === 'OK' ? 'ok' : 'bad'}">${s === 'OK' ? 'Werkt' : esc(s)}</span></li>`).join('')}</ul>`; }
+    catch (er) { toast(er.message, true); } e.target.disabled = false; });
+}
+async function homeClients(head){
+  const c = await api('home/clients');
+  const summary = x => x.use_global_settings ? 'Algemene instellingen' : [x.filtering_enabled && 'filtering', x.safebrowsing_enabled && 'veilig surfen', x.parental_enabled && 'ouderlijk toezicht', x.safe_search && 'veilig zoeken'].filter(Boolean).join(', ').replace(/^./, c => c.toUpperCase()) || 'Geen bescherming';
+  const tag = x => (x.tags || []).map(t => TAGS[t]).filter(Boolean)[0] || '';
+  const known = new Set(c.clients.flatMap(x => x.ids || []));
+  $('#view').innerHTML = `${head}
+    <section class="card setcard"><div class="cardhead"><div><h2>Vaste clients</h2><p class="csub">Apparaten met een eigen naam en eventueel eigen instellingen.</p></div>
+      <div class="btnrow"><button class="btn pri" data-cadd ${dis()}>Client toevoegen</button></div></div>
+      <table class="dtable"><thead><tr><th>Naam</th><th>Herkend aan</th><th>Instellingen</th><th></th></tr></thead><tbody>
+      ${c.clients.map((x, i) => `<tr><td><b>${esc(x.name)}</b>${tag(x) ? `<div class="muted">${esc(tag(x))}</div>` : ''}</td><td class="mono wrap">${(x.ids || []).map(esc).join('<br>')}</td>
+        <td class="wrap">${esc(summary(x))}</td><td class="act"><button class="linkbtn" ${goAttr('querylog', {device: (x.ids || [])[0]})}>Querylog</button>
+        <button class="linkbtn" data-cedit="${i}" ${dis()}>Wijzigen</button><button class="xbtn" data-cdel="${esc(x.name)}" aria-label="Verwijderen" ${dis()}>×</button></td></tr>`).join('')
+        || '<tr><td colspan="4" class="empty">Er zijn nog geen vaste clients.</td></tr>'}</tbody></table></section>
+    <section class="card setcard"><h2>Gevonden clients</h2><p class="csub">Adressen die AdGuard Home zelf heeft gevonden, bijvoorbeeld via DHCP, rDNS of het hosts-bestand.</p>
+      <table class="dtable"><thead><tr><th>IP-adres</th><th>Naam</th><th>Bron</th><th></th></tr></thead><tbody>
+      ${c.auto.filter(x => !known.has(x.ip)).map(x => `<tr><td class="mono">${esc(x.ip)}</td><td>${esc(x.name)}</td><td>${esc(x.source)}</td>
+        <td class="act"><button class="linkbtn" data-cfrom='${esc(JSON.stringify(x))}' ${dis()}>Toevoegen als client</button></td></tr>`).join('')
+        || '<tr><td colspan="4" class="empty">Er zijn geen andere clients gevonden.</td></tr>'}</tbody></table></section>`;
+  const form = (x, isNew) => {
+    const own = !x.use_global_settings;
+    const m = modal(`<h3>${isNew ? 'Client toevoegen' : 'Client wijzigen'}</h3>
+      <form class="mform" id="cf"><label>Naam<input name="name" value="${esc(x.name || '')}" required maxlength="100" data-focus></label>
+      <label>Herkend aan<textarea name="ids" rows="3" class="code" placeholder="192.168.1.20" required>${esc((x.ids || []).join('\n'))}</textarea><span class="hint">IP-adres, reeks (192.168.1.0/24), MAC-adres of ClientID. Eén per regel.</span></label>
+      <label>Soort apparaat<select name="tag"><option value="">Geen</option>${Object.entries(TAGS).map(([k, v]) => `<option value="${k}" ${(x.tags || []).includes(k) ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+      <label class="chk"><input type="checkbox" name="global" ${own ? '' : 'checked'}> Algemene instellingen gebruiken</label>
+      <div class="own" ${own ? '' : 'hidden'}>${[['filtering_enabled', 'Filtering'], ['safebrowsing_enabled', 'Veilig surfen'], ['parental_enabled', 'Ouderlijk toezicht'], ['safe_search', 'Veilig zoeken']]
+        .map(([k, l]) => `<label class="chk"><input type="checkbox" name="${k}" ${x[k] ? 'checked' : ''}> ${l}</label>`).join('')}</div>
+      <label class="chk"><input type="checkbox" name="ignore_querylog" ${x.ignore_querylog ? 'checked' : ''}> Niet in de querylog</label>
+      <label class="chk"><input type="checkbox" name="ignore_statistics" ${x.ignore_statistics ? 'checked' : ''}> Niet in de statistieken</label>
+      <div class="btns"><button type="button" class="btn" data-close>Annuleren</button><button class="btn pri">${isNew ? 'Toevoegen' : 'Opslaan'}</button></div></form>`);
+    const f = m.el.querySelector('#cf');
+    f.global.addEventListener('change', () => f.querySelector('.own').hidden = f.global.checked);
+    f.addEventListener('submit', async e => { e.preventDefault();
+      const data = {name: f.name.value.trim(), ids: f.ids.value.split('\n').map(s => s.trim()).filter(Boolean),
+        tags: [...(x.tags || []).filter(t => !TAGS[t]), ...(f.tag.value ? [f.tag.value] : [])], use_global_settings: f.global.checked,
+        ignore_querylog: f.ignore_querylog.checked, ignore_statistics: f.ignore_statistics.checked};
+      ['filtering_enabled', 'safebrowsing_enabled', 'parental_enabled', 'safe_search'].forEach(k => data[k] = f[k].checked);
+      try { toast((await hpost(isNew ? {action: 'client_add', data} : {action: 'client_update', name: x.name, data})).message); m.close(); meta.servers = []; meta.devices = []; route(); }
+      catch (er) { toast(er.message, true); } });
+  };
+  $('[data-cadd]').addEventListener('click', () => form({use_global_settings: true}, true));
+  document.querySelectorAll('[data-cedit]').forEach(b => b.addEventListener('click', () => form(c.clients[+b.dataset.cedit], false)));
+  document.querySelectorAll('[data-cfrom]').forEach(b => b.addEventListener('click', () => { const a = JSON.parse(b.dataset.cfrom); form({name: a.name || a.ip, ids: [a.ip], use_global_settings: true}, true); }));
+  document.querySelectorAll('[data-cdel]').forEach(b => b.addEventListener('click', async () => {
+    if (!(await confirmBox('Client verwijderen?', `${b.dataset.cdel} wordt verwijderd. Het apparaat blijft gewoon werken met de algemene instellingen.`, 'Verwijderen'))) return;
+    try { toast((await hpost({action: 'client_delete', name: b.dataset.cdel})).message); meta.servers = []; meta.devices = []; route(); } catch (e) { toast(e.message, true); } }));
+}
+async function homeDhcp(head){
+  const d = await api('home/dhcp'), v4 = d.v4 || {};
+  const exp = t => t ? new Date(t).toLocaleString(LOCALE, {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}) : '';
+  const tbl = (rows, withExp) => `<table class="dtable"><thead><tr><th>IP-adres</th><th>Naam</th><th>MAC-adres</th>${withExp ? '<th>Verloopt</th>' : ''}</tr></thead><tbody>
+    ${rows.map(l => `<tr><td class="mono">${esc(l.ip)}</td><td>${esc(l.hostname)}</td><td class="mono">${esc(l.mac)}</td>${withExp ? `<td>${esc(exp(l.expires))}</td>` : ''}</tr>`).join('')
+      || `<tr><td colspan="${withExp ? 4 : 3}" class="empty">Geen.</td></tr>`}</tbody></table>`;
+  $('#view').innerHTML = `${head}
+    <section class="card setcard"><h2>DHCP-server</h2>
+      ${setrow('Status', d.enabled ? 'AdGuard Home deelt IP-adressen uit in je netwerk.' : 'Uit. Je router deelt de IP-adressen uit.', `<span class="pill ${d.enabled ? 'a' : 'p'}">${d.enabled ? 'Aan' : 'Uit'}</span>`)}
+      ${d.enabled ? setrow('Netwerkinterface', '', `<span class="mono">${esc(d.interface)}</span>`) + setrow('Gateway', '', `<span class="mono">${esc(v4.gateway_ip || '')}</span>`)
+        + setrow('Reeks', '', `<span class="mono">${esc((v4.range_start || '') + ' – ' + (v4.range_end || ''))}</span>`) : ''}
+      <p class="ro">De DHCP-server stel je in AdGuard Home zelf in, omdat een fout hier je hele netwerk kan raken.${CFG.home_url ? ` <a href="${esc(CFG.home_url)}/#dhcp" target="_blank" rel="noopener">DHCP-instellingen openen</a>` : ''}</p></section>
+    ${d.enabled ? `<section class="card setcard"><h2>Uitgedeelde adressen</h2>${tbl(d.leases, true)}</section><section class="card setcard"><h2>Vaste adressen</h2>${tbl(d.static_leases, false)}</section>` : ''}`;
+}
+async function homeTls(head){
+  const t = await api('home/tls'), ok = t.valid_cert && t.valid_key && t.valid_pair;
+  const until = t.not_after && !/^0001/.test(t.not_after) ? new Date(t.not_after).toLocaleDateString(LOCALE, {day: 'numeric', month: 'long', year: 'numeric'}) : '';
+  $('#view').innerHTML = `${head}
+    <section class="card setcard"><h2>Versleuteling</h2>
+      ${setrow('Status', t.enabled ? 'AdGuard Home is bereikbaar via HTTPS, DNS-over-HTTPS, DNS-over-TLS en DNS-over-QUIC.' : 'Uit. Clients gebruiken gewone, onversleutelde DNS.', `<span class="pill ${t.enabled ? 'a' : 'p'}">${t.enabled ? 'Aan' : 'Uit'}</span>`)}
+      ${t.enabled ? setrow('Servernaam', '', `<span class="mono">${esc(t.server_name || '')}</span>`)
+        + setrow('Certificaat', t.warning_validation ? esc(t.warning_validation) : until ? 'Geldig tot ' + esc(until) + '.' : '', `<span class="pill ${ok ? 'a' : 'b'}">${ok ? 'Geldig' : 'Probleem'}</span>`)
+        + setrow('Poorten', '', `<span class="mono">HTTPS ${esc(t.port_https)}, DoT ${esc(t.port_dns_over_tls)}, DoQ ${esc(t.port_dns_over_quic)}</span>`)
+        + setrow('Gewone DNS', '', `<span class="pill ${t.serve_plain_dns ? 'a' : 'p'}">${t.serve_plain_dns ? 'Aan' : 'Uit'}</span>`) : ''}
+      <p class="ro">Certificaten en poorten stel je in AdGuard Home zelf in.${CFG.home_url ? ` <a href="${esc(CFG.home_url)}/#encryption" target="_blank" rel="noopener">Versleuteling openen</a>` : ''}</p></section>`;
+}
+
 /* ---------------- routering ---------------- */
-const VIEWS = {dashboard: viewDashboard, statistieken: viewStats, bedrijven: viewCompanies, querylog: viewLog, server: viewServer, lijsten: viewLists, apparaat: viewDevice};
+const VIEWS = {dashboard: viewDashboard, statistieken: viewStats, bedrijven: viewCompanies, querylog: viewLog, server: viewServer, lijsten: viewLists, apparaat: viewDevice,
+  filters: viewHomeFilters, instellingen: viewHomeSettings};
 const PARENT = {server: 'dashboard', lijsten: 'dashboard', apparaat: 'dashboard'};
 async function route(){
   clearTimeout(timer); clearInterval(logTimer);
   let [name, arg] = decodeURIComponent((location.hash || '#dashboard').slice(1)).split('/');
   if (HOME && (name === 'bedrijven' || name === 'apparaat')) name = 'dashboard';
+  if (HOME && name === 'server') [name, arg] = ['instellingen', 'algemeen'];
+  if (HOME && name === 'lijsten') [name, arg] = ['filters', 'blokkeerlijsten'];
+  if (!HOME && (name === 'filters' || name === 'instellingen')) name = 'dashboard';
   const fn = VIEWS[name] || viewDashboard;
   const navName = PARENT[name] || (VIEWS[name] ? name : 'dashboard');
   document.querySelectorAll('.nav a').forEach(a => { if (a.getAttribute('href') === '#' + navName) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });

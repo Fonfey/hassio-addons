@@ -10,7 +10,7 @@ Store repository for Home Assistant. Each app has its own folder with the code, 
 
 ### <img src="adguard_dns/icon.png" width="32" height="32" align="absmiddle" alt=""> AdGuard Dashboard
 
-Statistics, query log, blocking and unblocking, blocklists and settings for **AdGuard DNS** (the cloud service at adguard-dns.io) or your own **AdGuard Home**. You choose which one on the Configuration tab: an API key for AdGuard DNS, or the address, username and password for AdGuard Home. [Documentation](adguard_dns/DOCS.md) · code in [`adguard_dns/`](adguard_dns)
+Statistics, query log, blocking and unblocking, blocklists and settings for **AdGuard DNS** (the cloud service at adguard-dns.io) or your own **AdGuard Home**, where it also manages filters, blocked services, DNS rewrites, clients and DNS settings. You choose which one on the Configuration tab: an API key for AdGuard DNS, or the address, username and password for AdGuard Home. [Documentation](adguard_dns/DOCS.md) · code in [`adguard_dns/`](adguard_dns)
 
 <img src="https://github.com/user-attachments/assets/58497767-21b4-4cfc-80bc-e3d82154c687" width="1046" height="571" alt="AdGuard DNS Dashboard: blocked requests per hour and the DNS server with its devices">
 <img src="https://github.com/user-attachments/assets/d1961a7f-eace-49da-932c-1fa25f783c41" width="1055" height="523" alt="AdGuard DNS Dashboard: requests of the last 24 hours, types of requests and top companies">

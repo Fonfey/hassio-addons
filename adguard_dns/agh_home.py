@@ -281,6 +281,10 @@ def respond(path, params):
     now = int(time.time() * 1000)
     frm = int((params.get("time_from_millis") or [now - 86400000])[0])
     to = int((params.get("time_to_millis") or [now])[0])
+    if path in PAGES:
+        return PAGES[path]()
+    if path == "home/check":
+        return check_host((params.get("name") or [""])[0])
     if path == "home/info":
         st, s = get("status"), stats()
         flt = get("filtering/status")
@@ -383,3 +387,305 @@ def change_settings(patch):
         done = True
     if not done:
         raise ValueError("Deze instelling bestaat niet in AdGuard Home.")
+
+
+# ---------------------------------------------------------------- eigen pagina's voor AdGuard Home
+def _names():
+    """IP-adres of ID naar naam, uit vaste en automatisch gevonden clients."""
+    m = {}
+    try:
+        cl = get("clients")
+    except HomeError:
+        return m
+    for c in (cl.get("auto_clients") or []):
+        if c.get("ip") and c.get("name"):
+            m[c["ip"]] = c["name"]
+    for c in (cl.get("clients") or []):
+        for i in (c.get("ids") or []):
+            m[str(i)] = c.get("name") or str(i)
+    return m
+
+
+def overview():
+    s, st = stats(), get("status")
+    names = _names()
+    n = lambda k: int(s.get(k) or 0)
+    return {
+        "version": st.get("version", ""), "protection_enabled": bool(st.get("protection_enabled")),
+        "protection_disabled_duration": int(st.get("protection_disabled_duration") or 0),
+        "time_units": s.get("time_units") or "hours",
+        "queries": n("num_dns_queries"), "blocked": n("num_blocked_filtering"), "safebrowsing": n("num_replaced_safebrowsing"),
+        "parental": n("num_replaced_parental"), "safesearch": n("num_replaced_safesearch"),
+        "avg_ms": round(float(s.get("avg_processing_time") or 0) * 1000, 1),
+        "series": {k: list(s.get(k) or []) for k in ("dns_queries", "blocked_filtering", "replaced_safebrowsing", "replaced_parental")},
+        "top_clients": [{"id": k, "name": names.get(k, ""), "n": int(v or 0)} for k, v in _pairs(s.get("top_clients"))],
+        "top_queried": [{"domain": k, "n": int(v or 0)} for k, v in _pairs(s.get("top_queried_domains"))],
+        "top_blocked": [{"domain": k, "n": int(v or 0)} for k, v in _pairs(s.get("top_blocked_domains"))],
+        "upstreams": [{"addr": k, "n": int(v or 0)} for k, v in _pairs(s.get("top_upstreams_responses"))],
+        "upstream_ms": [{"addr": k, "ms": round(float(v or 0) * 1000, 1)} for k, v in _pairs(s.get("top_upstreams_avg_time"))],
+    }
+
+
+def _flist(items):
+    return [{"id": f.get("id"), "name": f.get("name") or f.get("url"), "url": f.get("url"), "enabled": bool(f.get("enabled")),
+             "rules_count": int(f.get("rules_count") or 0), "last_updated": f.get("last_updated") or ""} for f in (items or [])]
+
+
+def filters():
+    f = get("filtering/status", ttl=3)
+    return {"enabled": bool(f.get("enabled", True)), "interval": f.get("interval"),
+            "blocklists": _flist(f.get("filters")), "allowlists": _flist(f.get("whitelist_filters")),
+            "user_rules": [r for r in (f.get("user_rules") or []) if str(r).strip()]}
+
+
+def services():
+    allsvc = get("blocked_services/all", ttl=3600)
+    cur = get("blocked_services/get", ttl=3)
+    return {"groups": [g.get("id") for g in (allsvc.get("groups") or [])],
+            "services": [{"id": x.get("id"), "name": x.get("name"), "group": x.get("group_id") or "", "icon": x.get("icon_svg") or ""}
+                         for x in (allsvc.get("blocked_services") or [])],
+            "blocked": list(cur.get("ids") or [])}
+
+
+def general():
+    st, ss = get("status", ttl=3), get("safesearch/status", ttl=3)
+    return {"protection_enabled": bool(st.get("protection_enabled")),
+            "protection_disabled_duration": int(st.get("protection_disabled_duration") or 0),
+            "safebrowsing": bool(get("safebrowsing/status", ttl=3).get("enabled")),
+            "parental": bool(get("parental/status", ttl=3).get("enabled")),
+            "safesearch": {k: bool(v) for k, v in ss.items() if isinstance(v, bool)},
+            "querylog": {k: v for k, v in get("querylog/config", ttl=3).items() if k in ("enabled", "interval", "anonymize_client_ip")},
+            "stats": {k: v for k, v in get("stats/config", ttl=3).items() if k in ("enabled", "interval")}}
+
+
+DNS_KEYS = {"upstream_dns": list, "bootstrap_dns": list, "fallback_dns": list, "upstream_mode": str, "ratelimit": int,
+            "blocking_mode": str, "blocked_response_ttl": int, "blocking_ipv4": str, "blocking_ipv6": str,
+            "cache_enabled": bool, "cache_size": int, "cache_optimistic": bool, "dnssec_enabled": bool, "disable_ipv6": bool,
+            "edns_cs_enabled": bool, "upstream_timeout": int}
+
+
+def dns():
+    d = get("dns_info", ttl=3)
+    return {k: d.get(k) for k in DNS_KEYS}
+
+
+CLIENT_KEYS = ("name", "ids", "tags", "use_global_settings", "filtering_enabled", "parental_enabled", "safebrowsing_enabled",
+               "use_global_blocked_services", "blocked_services", "upstreams", "ignore_querylog", "ignore_statistics")
+
+
+def clients():
+    c = get("clients", ttl=3)
+    return {"clients": [dict({k: x.get(k) for k in CLIENT_KEYS}, safe_search=(x.get("safe_search") or {}).get("enabled", bool(x.get("safesearch_enabled"))))
+                        for x in (c.get("clients") or [])],
+            "auto": [{"ip": x.get("ip"), "name": x.get("name") or "", "source": x.get("source") or ""} for x in (c.get("auto_clients") or [])],
+            "tags": list(c.get("supported_tags") or [])}
+
+
+def dhcp():
+    d = get("dhcp/status", ttl=5)
+    lease = lambda x: {"mac": x.get("mac", ""), "ip": x.get("ip", ""), "hostname": x.get("hostname", ""), "expires": x.get("expires", "")}
+    return {"enabled": bool(d.get("enabled")), "interface": d.get("interface_name") or "", "v4": d.get("v4") or {},
+            "leases": [lease(x) for x in (d.get("leases") or [])], "static_leases": [lease(x) for x in (d.get("static_leases") or [])]}
+
+
+def tls():
+    t = get("tls/status", ttl=10)
+    keep = ("enabled", "server_name", "force_https", "port_https", "port_dns_over_tls", "port_dns_over_quic", "valid_cert",
+            "valid_chain", "valid_key", "valid_pair", "not_after", "issuer", "subject", "dns_names", "warning_validation", "serve_plain_dns")
+    return {k: t.get(k) for k in keep}
+
+
+def check_host(name):
+    name = str(name or "").strip()[:253]
+    if not re.match(r"^[A-Za-z0-9._*-]+$", name):
+        raise ValueError("Vul een geldige domeinnaam in.")
+    r = get("filtering/check_host?" + urllib.parse.urlencode({"name": name}), ttl=0)
+    return {"reason": r.get("reason") or "", "rules": [x.get("text") for x in (r.get("rules") or []) if x.get("text")],
+            "service_name": r.get("service_name") or "", "cname": r.get("cname") or "", "ip_addrs": r.get("ip_addrs") or []}
+
+
+PAGES = {"home/overview": overview, "home/filters": filters, "home/services": services, "home/general": general,
+         "home/dns": dns, "home/clients": clients, "home/dhcp": dhcp, "home/tls": tls,
+         "home/rewrites": lambda: [{"domain": r.get("domain"), "answer": r.get("answer"), "enabled": r.get("enabled", True)}
+                                   for r in (get("rewrite/list", ttl=3) or [])]}
+
+
+# ---------------------------------------------------------------- acties vanuit de eigen pagina's
+def _s(v, n=500):
+    v = str(v if v is not None else "").strip()
+    if len(v) > n or any(c in v for c in "\r\n\x00"):
+        raise ValueError("Ongeldige invoer.")
+    return v
+
+
+def _strs(v, n=200, each=500):
+    if isinstance(v, str):
+        v = v.splitlines()
+    if not isinstance(v, list) or len(v) > n:
+        raise ValueError("Ongeldige lijst.")
+    return [_s(x, each) for x in v if str(x).strip()]
+
+
+def _int(v, lo, hi):
+    try:
+        v = int(v)
+    except (TypeError, ValueError):
+        raise ValueError("Vul een getal in.")
+    if not lo <= v <= hi:
+        raise ValueError(f"Kies een getal van {lo} tot {hi}.")
+    return v
+
+
+def _url(v):
+    v = _s(v, 1000)
+    if not re.match(r"^(https?://\S+|/\S+)$", v):
+        raise ValueError("Vul een geldig adres in dat begint met http:// of https://.")
+    return v
+
+
+DAY = 86400000
+INTERVALS = {"querylog": (DAY // 4, DAY, 7 * DAY, 30 * DAY, 90 * DAY), "stats": (DAY, 7 * DAY, 30 * DAY, 90 * DAY)}
+
+
+def _client_data(d, base=None):
+    out = dict(base or {})
+    out["name"] = _s(d.get("name", out.get("name")), 100)
+    if not out["name"]:
+        raise ValueError("Geef de client een naam.")
+    ids = _strs(d.get("ids", out.get("ids") or []), 50, 100)
+    if not ids:
+        raise ValueError("Vul minstens één IP-adres, MAC-adres of ClientID in.")
+    out["ids"] = ids
+    for k in ("use_global_settings", "filtering_enabled", "parental_enabled", "safebrowsing_enabled", "use_global_blocked_services",
+              "ignore_querylog", "ignore_statistics"):
+        if k in d:
+            out[k] = bool(d[k])
+    if "tags" in d:
+        out["tags"] = _strs(d["tags"], 20, 50)
+    if "safe_search" in d:
+        ss = dict(out.get("safe_search") or {})
+        ss["enabled"] = bool(d["safe_search"])
+        out["safe_search"] = ss
+        out["safesearch_enabled"] = bool(d["safe_search"])
+    out.setdefault("use_global_settings", True)
+    out.setdefault("use_global_blocked_services", True)
+    return out
+
+
+def act(p):
+    """Voert één wijziging uit. Alleen de acties hieronder; alle invoer wordt gecontroleerd."""
+    a = str(p.get("action") or "")
+    if a == "protection":
+        body = {"enabled": bool(p.get("enabled"))}
+        if not body["enabled"] and p.get("duration"):
+            body["duration"] = _int(p["duration"], 1000, 7 * DAY)
+        post("protection", body)
+        return "Bescherming ingeschakeld." if body["enabled"] else "Bescherming uitgeschakeld."
+    if a in ("safebrowsing", "parental"):
+        post(a + "/" + ("enable" if p.get("enabled") else "disable"))
+        return "Instelling opgeslagen."
+    if a == "safesearch":
+        cur = {k: v for k, v in get("safesearch/status", ttl=0).items() if isinstance(v, bool)}
+        for k, v in (p.get("values") or {}).items():
+            if k in cur:
+                cur[k] = bool(v)
+        post("safesearch/settings", cur, method="PUT")
+        return "Instelling opgeslagen."
+    if a in ("querylog_config", "stats_config"):
+        kind = a.split("_")[0]
+        cur = get(kind + "/config", ttl=0)
+        if "enabled" in p:
+            cur["enabled"] = bool(p["enabled"])
+        if "interval" in p:
+            iv = _int(p["interval"], 0, 366 * DAY)
+            if iv not in INTERVALS[kind]:
+                raise ValueError("Ongeldige bewaartijd.")
+            cur["interval"] = iv
+        if kind == "querylog" and "anonymize_client_ip" in p:
+            cur["anonymize_client_ip"] = bool(p["anonymize_client_ip"])
+        post(kind + "/config/update", cur, method="PUT")
+        return "Instelling opgeslagen."
+    if a == "querylog_clear":
+        post("querylog_clear")
+        return "De querylog is gewist."
+    if a == "stats_reset":
+        post("stats_reset")
+        return "De statistieken zijn gewist."
+    if a == "dns":
+        body = {}
+        for k, t in DNS_KEYS.items():
+            if k not in (p.get("values") or {}):
+                continue
+            v = p["values"][k]
+            if t is list:
+                v = _strs(v, 100, 300)
+                if k == "upstream_dns" and not v:
+                    raise ValueError("Vul minstens één upstream DNS-server in.")
+            elif t is bool:
+                v = bool(v)
+            elif t is int:
+                v = _int(v, 0, {"ratelimit": 100000, "blocked_response_ttl": 86400, "cache_size": 1 << 30, "upstream_timeout": 60}[k])
+            else:
+                v = _s(v, 100)
+                if k == "upstream_mode" and v not in ("", "load_balance", "parallel", "fastest_addr"):
+                    raise ValueError("Ongeldige upstream-modus.")
+                if k == "blocking_mode" and v not in MODE_TO_CLOUD:
+                    raise ValueError("Ongeldige blokkeermodus.")
+            body[k] = v
+        if not body:
+            raise ValueError("Er is niets om te wijzigen.")
+        post("dns_config", body)
+        return "DNS-instellingen opgeslagen."
+    if a == "test_upstream":
+        res = post("test_upstream_dns", {"upstream_dns": _strs(p.get("upstream_dns"), 100, 300),
+                                         "bootstrap_dns": _strs(p.get("bootstrap_dns"), 100, 300), "fallback_dns": []})
+        return {"message": "Test klaar.", "result": res}
+    if a in ("filter_add", "filter_remove", "filter_toggle"):
+        wl = bool(p.get("whitelist"))
+        url = _url(p.get("url"))
+        if a == "filter_add":
+            name = _s(p.get("name"), 200) or url
+            post("filtering/add_url", {"name": name, "url": url, "whitelist": wl})
+            return "Lijst toegevoegd."
+        if a == "filter_remove":
+            post("filtering/remove_url", {"url": url, "whitelist": wl})
+            return "Lijst verwijderd."
+        f = filters()
+        hit = next((x for x in f["allowlists" if wl else "blocklists"] if x["url"] == url), None)
+        if not hit:
+            raise ValueError("Lijst niet gevonden.")
+        on = bool(p.get("enabled"))
+        post("filtering/set_url", {"url": url, "whitelist": wl, "data": {"name": hit["name"], "url": url, "enabled": on}})
+        return "Lijst ingeschakeld." if on else "Lijst uitgeschakeld."
+    if a == "filters_refresh":
+        res = post("filtering/refresh", {"whitelist": bool(p.get("whitelist"))})
+        return f"Lijsten bijgewerkt: {int((res or {}).get('updated') or 0)} gewijzigd."
+    if a == "rules_set":
+        set_rules(_strs(p.get("rules"), 20000, 2000))
+        return "Filterregels opgeslagen."
+    if a in ("rewrite_add", "rewrite_delete"):
+        dom, ans = _s(p.get("domain"), 253), _s(p.get("answer"), 300)
+        if not dom or not ans:
+            raise ValueError("Vul een domein en een antwoord in.")
+        post("rewrite/" + ("add" if a == "rewrite_add" else "delete"), {"domain": dom, "answer": ans})
+        return "Herschrijving toegevoegd." if a == "rewrite_add" else "Herschrijving verwijderd."
+    if a == "services":
+        known = {s["id"] for s in services()["services"]}
+        ids = [i for i in _strs(p.get("ids"), 500, 100) if i in known]
+        cur = get("blocked_services/get", ttl=0)
+        post("blocked_services/update", {"ids": ids, "schedule": cur.get("schedule") or {}}, method="PUT")
+        return "Geblokkeerde diensten opgeslagen."
+    if a == "client_add":
+        post("clients/add", _client_data(p.get("data") or {}))
+        return "Client toegevoegd."
+    if a == "client_update":
+        name = _s(p.get("name"), 100)
+        cur = next((c for c in (get("clients", ttl=0).get("clients") or []) if c.get("name") == name), None)
+        if not cur:
+            raise ValueError("Client niet gevonden.")
+        post("clients/update", {"name": name, "data": _client_data(p.get("data") or {}, cur)})
+        return "Client opgeslagen."
+    if a == "client_delete":
+        post("clients/delete", {"name": _s(p.get("name"), 100)})
+        return "Client verwijderd."
+    raise ValueError("Onbekende actie.")

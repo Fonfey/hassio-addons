@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.0
+
+### New / Nieuw
+- AdGuard Home gets much more: a dashboard like AdGuard Home's own (four tiles with graphs, general statistics, top clients and domains with percentages, upstreams with response time, pause protection), a **Filters** section (blocklists and allowlists, DNS rewrites, blocked services, custom filtering rules with a tester) and a **Settings** section (general, DNS with an upstream test, clients, and the status of DHCP and encryption).
+- AdGuard Home krijgt veel meer: een dashboard zoals dat van AdGuard Home zelf (vier tegels met grafiek, algemene statistieken, topclients en topdomeinen met percentages, upstreams met reactietijd, bescherming pauzeren), een onderdeel **Filters** (blokkeer- en toelatingslijsten, DNS-herschrijvingen, geblokkeerde diensten, eigen filterregels met een test) en een onderdeel **Instellingen** (algemeen, DNS met een upstreamtest, clients, en de status van DHCP en versleuteling).
+
 ## 1.6.0
 
 ### New / Nieuw

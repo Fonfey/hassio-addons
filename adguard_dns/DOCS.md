@@ -49,13 +49,15 @@ With **AdGuard DNS**:
 - **Companies**: the most requested and most blocked company and a table with the top companies.
 - **Query log**: the latest DNS requests, searchable and filterable by blocked or allowed.
 
-With **AdGuard Home**:
+With **AdGuard Home** the dashboard follows the structure of AdGuard Home itself:
 
-- **Dashboard**: requests, number of clients and average processing time, blocked requests per hour, the protection switch and your clients with their number of requests.
-- **Statistics**: requests per period, the most requested and most blocked domains, and the most active clients. AdGuard Home keeps statistics as long as set in AdGuard Home under Settings, General settings.
+- **Dashboard**: DNS queries, blocked by filters, blocked malware and phishing and blocked adult websites, each with a small graph; requests per hour; general statistics; the most active clients; the most requested and most blocked domains; and your upstream DNS servers with their response time. The protection switch can also pause protection for 30 seconds up to 8 hours.
+- **Statistics**: requests per period, the most requested and most blocked domains, and the most active clients.
 - **Query log**: the latest DNS requests with the rule that blocked or allowed them, searchable and filterable by client and status.
+- **Filters**: blocklists and allowlists (turn on or off, add, remove, update now), DNS rewrites, blocked services such as TikTok or YouTube with one switch per service, and your custom filtering rules with a tester that shows what AdGuard Home does with a domain.
+- **Settings**: general (protection, safe browsing, parental control, safe search per search engine, query log and statistics with retention and clearing), DNS (upstream, fallback and bootstrap servers with a test, upstream mode, rate limit, blocking mode, DNSSEC, cache), clients (add, edit and remove persistent clients, or add a client that AdGuard Home found itself), and the status of DHCP and encryption.
 
-AdGuard Home does not know companies, countries or categories of requests, so those parts are not shown.
+AdGuard Home does not know companies, countries or categories of requests, so those parts are not shown. DHCP and encryption are shown but not changed from the dashboard, because a mistake there can affect your whole network; you change those in AdGuard Home itself.
 
 ### Blocking and unblocking
 
@@ -64,7 +66,7 @@ In the query log, each request has a menu with three dots. Choose **Block domain
 ### Changing settings
 
 - **AdGuard DNS**: through **Server settings** and **Blocklists** at your DNS server, and **Settings** at a device, you change everything in the dashboard itself. Only connecting a new device is done on the AdGuard DNS website.
-- **AdGuard Home**: through **Settings** you change protection, blocking mode, safe browsing, parental control and safe search, and through **Blocklists** you turn lists on or off. Adding lists and managing clients is done in AdGuard Home itself.
+- **AdGuard Home**: almost everything is changed in the dashboard itself, through **Filters** and **Settings**. Only DHCP, encryption and the AdGuard Home login itself are changed in AdGuard Home.
 
 ### Who may see the dashboard
 
@@ -117,13 +119,15 @@ Met **AdGuard DNS**:
 - **Bedrijven**: het meest opgevraagde en meest geblokkeerde bedrijf en een tabel met de topbedrijven.
 - **Querylog**: de laatste DNS-verzoeken, te doorzoeken en te filteren op geblokkeerd of toegestaan.
 
-Met **AdGuard Home**:
+Met **AdGuard Home** volgt het dashboard de opbouw van AdGuard Home zelf:
 
-- **Dashboard**: verzoeken, aantal clients en gemiddelde verwerkingstijd, geblokkeerde verzoeken per uur, de schakelaar voor de bescherming en je clients met hun aantal verzoeken.
-- **Statistieken**: verzoeken per periode, de meest opgevraagde en meest geblokkeerde domeinen en de actiefste clients. AdGuard Home bewaart statistieken zo lang als ingesteld in AdGuard Home bij Instellingen, Algemene instellingen.
+- **Dashboard**: DNS-verzoeken, geblokkeerd door filters, geblokkeerde malware en phishing en geblokkeerde websites voor volwassenen, elk met een kleine grafiek; verzoeken per uur; algemene statistieken; de actiefste clients; de meest opgevraagde en meest geblokkeerde domeinen; en je upstream-DNS-servers met hun reactietijd. Met de schakelaar voor de bescherming kun je die ook 30 seconden tot 8 uur pauzeren.
+- **Statistieken**: verzoeken per periode, de meest opgevraagde en meest geblokkeerde domeinen en de actiefste clients.
 - **Querylog**: de laatste DNS-verzoeken met de regel die ze blokkeerde of toeliet, te doorzoeken en te filteren op client en status.
+- **Filters**: blokkeerlijsten en toelatingslijsten (aan of uit, toevoegen, verwijderen, nu bijwerken), DNS-herschrijvingen, geblokkeerde diensten zoals TikTok of YouTube met één schakelaar per dienst, en je eigen filterregels met een test die laat zien wat AdGuard Home met een domein doet.
+- **Instellingen**: algemeen (bescherming, veilig surfen, ouderlijk toezicht, veilig zoeken per zoekmachine, querylog en statistieken met bewaartijd en wissen), DNS (upstream-, fallback- en bootstrap-servers met een test, upstream-modus, limiet per client, blokkeermodus, DNSSEC, cache), clients (vaste clients toevoegen, wijzigen en verwijderen, of een client toevoegen die AdGuard Home zelf vond), en de status van DHCP en versleuteling.
 
-AdGuard Home kent geen bedrijven, landen of soorten verzoeken; die onderdelen staan er dan niet.
+AdGuard Home kent geen bedrijven, landen of soorten verzoeken; die onderdelen staan er dan niet. DHCP en versleuteling zie je wel, maar wijzig je niet vanuit het dashboard, omdat een fout daar je hele netwerk kan raken; die pas je in AdGuard Home zelf aan.
 
 ### Blokkeren en deblokkeren
 
@@ -132,7 +136,7 @@ In de querylog staat achter elk verzoek een menu met drie puntjes. Kies **Domein
 ### Instellingen wijzigen
 
 - **AdGuard DNS**: via **Serverinstellingen** en **Blokkeerlijsten** bij je DNS-server, en **Instellingen** bij een apparaat, wijzig je alles in het dashboard zelf. Alleen een nieuw apparaat koppelen doe je op de site van AdGuard DNS.
-- **AdGuard Home**: via **Instellingen** wijzig je de bescherming, de blokkeermodus, veilig surfen, ouderlijk toezicht en veilig zoeken, en via **Blokkeerlijsten** zet je lijsten aan of uit. Lijsten toevoegen en clients beheren doe je in AdGuard Home zelf.
+- **AdGuard Home**: bijna alles wijzig je in het dashboard zelf, via **Filters** en **Instellingen**. Alleen DHCP, versleuteling en de login van AdGuard Home zelf pas je in AdGuard Home aan.
 
 ### Wie mag het dashboard zien
 

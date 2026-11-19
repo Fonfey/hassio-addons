@@ -1,7 +1,7 @@
 name: AdGuard Dashboard
-version: "1.7.1"
+version: "1.8.0"
 slug: adguard_dns_dashboard
-description: "Statistics, query log and blocking for AdGuard DNS (cloud service) or your own AdGuard Home. Choose which one on the Configuration tab."
+description: "Statistics, query log and blocking for AdGuard DNS (cloud service), or the original screen of your own AdGuard Home. Choose which one on the Configuration tab."
 url: https://github.com/Fonfey/hassio-addons/tree/main/adguard_dns
 image: ghcr.io/fonfey/{arch}-hassio-adguard-dns-dashboard
 arch:

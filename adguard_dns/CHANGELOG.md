@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8.0
+
+- AdGuard Home: the app now shows the original AdGuard Home screen instead of its own pages, logged in automatically with the username and password from the Configuration tab. Everything AdGuard Home offers works as usual, and new AdGuard Home features show up right away. Particularly handy when AdGuard Home runs elsewhere, for example on a Raspberry Pi.
+- AdGuard Home: de app toont nu het originele scherm van AdGuard Home in plaats van eigen pagina's, automatisch ingelogd met de gebruikersnaam en het wachtwoord van het tabblad Configuratie. Alles wat AdGuard Home biedt werkt zoals je gewend bent, en nieuwe functies van AdGuard Home zie je meteen. Vooral handig als AdGuard Home ergens anders draait, bijvoorbeeld op een Raspberry Pi.
+
 ## 1.7.1
 
 - AdGuard Home: the lists on the dashboard (clients, domains, upstreams) now scroll inside their card, so the page stays short.

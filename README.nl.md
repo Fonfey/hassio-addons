@@ -10,7 +10,7 @@ Store-repository voor Home Assistant. Elke app heeft een eigen map met de code, 
 
 ### <img src="adguard_dns/icon.png" width="32" height="32" align="absmiddle" alt=""> AdGuard Dashboard
 
-Statistieken, querylog, blokkeren en deblokkeren, blokkeerlijsten en instellingen voor **AdGuard DNS** (de clouddienst op adguard-dns.io) of je eigen **AdGuard Home**, waar het ook filters, geblokkeerde diensten, DNS-herschrijvingen, clients en DNS-instellingen beheert. Welke je gebruikt kies je op het tabblad Configuratie: een API-key voor AdGuard DNS, of het adres, de gebruikersnaam en het wachtwoord voor AdGuard Home. [Documentatie](adguard_dns/DOCS.md) · code in [`adguard_dns/`](adguard_dns)
+Statistieken, querylog, blokkeren en deblokkeren, blokkeerlijsten en instellingen voor **AdGuard DNS** (de clouddienst op adguard-dns.io) of het originele scherm van je eigen **AdGuard Home**, automatisch ingelogd; handig als AdGuard Home ergens anders draait, zoals op een Raspberry Pi. Welke je gebruikt kies je op het tabblad Configuratie: een API-key voor AdGuard DNS, of het adres, de gebruikersnaam en het wachtwoord voor AdGuard Home. [Documentatie](adguard_dns/DOCS.md) · code in [`adguard_dns/`](adguard_dns)
 
 <img src="https://github.com/user-attachments/assets/58497767-21b4-4cfc-80bc-e3d82154c687" width="1046" height="571" alt="AdGuard DNS Dashboard: geblokkeerde verzoeken per uur en de DNS-server met apparaten">
 <img src="https://github.com/user-attachments/assets/d1961a7f-eace-49da-932c-1fa25f783c41" width="1055" height="523" alt="AdGuard DNS Dashboard: verzoeken van de afgelopen 24 uur, soorten verzoeken en topbedrijven">

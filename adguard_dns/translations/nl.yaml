@@ -1,7 +1,7 @@
 configuration:
   source:
     name: Bron
-    description: "cloud: AdGuard DNS, de clouddienst op adguard-dns.io (vraagt een API-key). home: je eigen AdGuard Home (vraagt het adres, de gebruikersnaam en het wachtwoord)."
+    description: "cloud: AdGuard DNS, de clouddienst op adguard-dns.io (vraagt een API-key). home: het originele scherm van je eigen AdGuard Home, automatisch ingelogd (vraagt het adres, de gebruikersnaam en het wachtwoord)."
   api_key:
     name: API-key
     description: 'Alleen voor cloud. Aanmaken op https://adguard-dns.io/en/dashboard/ : klik rechtsboven op je account, kies User preferences
@@ -11,10 +11,10 @@ configuration:
     description: "Alleen voor home. Het adres van de webinterface van AdGuard Home, bijvoorbeeld http://192.168.1.2:3000. Gebruik je de AdGuard Home-app in Home Assistant? Vul dan bij die app op het tabblad Configuratie, onder Netwerk, een poort in bij Web interface, en vul hier http://<IP-adres van Home Assistant>:<die poort> in."
   home_username:
     name: Gebruikersnaam AdGuard Home
-    description: Alleen voor home. De gebruikersnaam waarmee je inlogt bij AdGuard Home.
+    description: Alleen voor home. De gebruikersnaam waarmee je inlogt bij AdGuard Home. De app logt je daarmee automatisch in.
   home_password:
     name: Wachtwoord AdGuard Home
-    description: Alleen voor home. Het wachtwoord waarmee je inlogt bij AdGuard Home.
+    description: Alleen voor home. Het wachtwoord waarmee je inlogt bij AdGuard Home. Let goed op: na 5 foute pogingen blokkeert AdGuard Home het inloggen 15 minuten.
   refresh_seconds:
     name: Verversen (seconden)
     description: Hoe vaak het dashboard nieuwe gegevens ophaalt.

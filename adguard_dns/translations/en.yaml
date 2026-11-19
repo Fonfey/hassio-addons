@@ -1,7 +1,7 @@
 configuration:
   source:
     name: Source
-    description: "cloud: AdGuard DNS, the cloud service at adguard-dns.io (needs an API key). home: your own AdGuard Home (needs its address, username and password)."
+    description: "cloud: AdGuard DNS, the cloud service at adguard-dns.io (needs an API key). home: the original screen of your own AdGuard Home, logged in automatically (needs its address, username and password)."
   api_key:
     name: API key
     description: 'Only for cloud. Create it at https://adguard-dns.io/en/dashboard/ : open your account at the top right, choose User preferences
@@ -11,10 +11,10 @@ configuration:
     description: "Only for home. The address of the AdGuard Home web interface, for example http://192.168.1.2:3000. Using the AdGuard Home app in Home Assistant? Set a port at Web interface on its Configuration tab, Network, and enter http://<IP address of Home Assistant>:<that port>."
   home_username:
     name: AdGuard Home username
-    description: Only for home. The username you log in to AdGuard Home with.
+    description: Only for home. The username you log in to AdGuard Home with. The app logs you in with it automatically.
   home_password:
     name: AdGuard Home password
-    description: Only for home. The password you log in to AdGuard Home with.
+    description: Only for home. The password you log in to AdGuard Home with. Check it carefully: after 5 wrong attempts AdGuard Home blocks logging in for 15 minutes.
   refresh_seconds:
     name: Refresh (seconds)
     description: How often the dashboard fetches new data.

@@ -33,7 +33,7 @@ Check the password carefully: after 5 wrong attempts AdGuard Home blocks logging
 
 **Using the AdGuard Home app in Home Assistant?** That app is normally only reachable through Home Assistant itself. Open the AdGuard Home app, go to the **Configuration** tab and set a port at **Web interface** under **Network**, for example `3000`. Restart AdGuard Home and fill in `http://<IP address of Home Assistant>:3000` at `home_url`, with the username and password of AdGuard Home.
 
-Tip: the AdGuard Home app already has its own item in the sidebar. For AdGuard Home, this app is mainly useful when AdGuard Home runs elsewhere, for example on a Raspberry Pi.
+Which situation is yours? If AdGuard Home runs on another device, such as a Raspberry Pi, a NAS or a server, this app puts its screen in the Home Assistant sidebar. If AdGuard Home runs as an app inside Home Assistant itself, that app already has its own sidebar item, so you don't need this app for it.
 
 Without an API key or address, the app runs with sample data.
 
@@ -99,7 +99,7 @@ Let goed op het wachtwoord: na 5 foute pogingen blokkeert AdGuard Home het inlog
 
 **Gebruik je de AdGuard Home-app in Home Assistant?** Die app is normaal alleen via Home Assistant zelf bereikbaar. Open de AdGuard Home-app, ga naar het tabblad **Configuratie** en vul onder **Netwerk** een poort in bij **Web interface**, bijvoorbeeld `3000`. Start AdGuard Home opnieuw en vul bij `home_url` `http://<IP-adres van Home Assistant>:3000` in, met de gebruikersnaam en het wachtwoord van AdGuard Home.
 
-Tip: de AdGuard Home-app heeft al een eigen knop in de zijbalk. Voor AdGuard Home is deze app vooral handig als AdGuard Home ergens anders draait, bijvoorbeeld op een Raspberry Pi.
+Welke situatie heb jij? Draait AdGuard Home op een ander apparaat, zoals een Raspberry Pi, een NAS of een server, dan zet deze app het scherm in de zijbalk van Home Assistant. Draait AdGuard Home als app in Home Assistant zelf, dan heeft die app al een eigen knop in de zijbalk en heb je deze app daar niet voor nodig.
 
 Zonder API-key of adres draait de app met voorbeeldgegevens.
 
